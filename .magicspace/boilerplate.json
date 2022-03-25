@@ -1,0 +1,17 @@
+{
+  "extends": "@mufan/code-boilerplates/typescript",
+  "options": {
+    "name": "x-value",
+    "repository": "https://github.com/vilic/x-value.git",
+    "license": "MIT",
+    "author": "vilicvane",
+    "tsProjects": [
+      {
+        "name": "library"
+      },
+      {
+        "name": "test"
+      }
+    ]
+  }
+}
