@@ -1,0 +1,27 @@
+{
+  "name": "x-value",
+  "version": "0.0.0",
+  "repository": "https://github.com/vilic/x-value.git",
+  "license": "MIT",
+  "author": "vilicvane",
+  "main": "bld/library/index.js",
+  "types": "bld/library/index.d.ts",
+  "scripts": {
+    "build": "rimraf ./bld && tsc --build",
+    "lint": "run-in-every eslint-project --parallel --echo -- eslint --config {configFileName} .",
+    "lint-prettier": "prettier --check .",
+    "test": "yarn lint-prettier && yarn build && yarn lint"
+  },
+  "dependencies": {
+    "tslib": "^2.3.1"
+  },
+  "devDependencies": {
+    "@mufan/code": "^0.2.10",
+    "@mufan/eslint-plugin": "^0.1.52",
+    "eslint": "^8.11.0",
+    "prettier": "^2.6.1",
+    "rimraf": "^3.0.2",
+    "run-in-every": "^0.2.0",
+    "typescript": "^4.6.3"
+  }
+}
