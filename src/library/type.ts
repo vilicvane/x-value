@@ -1,7 +1,8 @@
-import {Medium, MediumPackedType} from './medium';
-import {Value} from './value';
+import {Medium, MediumPackedType, MediumTypesPackedType} from './medium';
 
 const hasOwnProperty = Object.prototype.hasOwnProperty;
+
+export type TypeAssertion<T = unknown> = (value: T) => string | boolean | void;
 
 export abstract class Type<TCategory extends string = string> {
   /**
@@ -9,25 +10,36 @@ export abstract class Type<TCategory extends string = string> {
    */
   protected _category!: TCategory;
 
-  decode<TCounterMedium extends Medium<object>>(
-    medium: TCounterMedium,
-    value: TCounterMedium extends Medium<infer TMediumTypes>
-      ? MediumPackedType<TMediumTypes>
-      : never,
-  ): Value<this> {
-    let unpacked = medium.unpack(value);
+  constructor(protected assertions: TypeAssertion[] = []) {}
 
-    return new Value(
-      this,
-      this.decodeUnpacked(medium, unpacked) as TypeToMediumType<
-        this,
-        Medium<XValue.Values>
-      >,
-    );
+  // refine<TSymbol extends symbol>(
+  //   symbol: TSymbol,
+  //   assertion: (value: unknown) => void,
+  // ): this {}
+
+  decode(medium: Medium, packed: unknown): unknown {
+    let unpacked = medium.unpack(packed);
+    return this.decodeUnpacked(medium, unpacked);
   }
 
   /** @internal */
   abstract decodeUnpacked(medium: Medium, unpacked: unknown): unknown;
+
+  protected assert(value: unknown): void {
+    for (let assertion of this.assertions) {
+      let result = assertion(value) ?? true;
+
+      if (result === true) {
+        continue;
+      }
+
+      if (result === false) {
+        result = 'Invalid type';
+      }
+
+      throw new TypeError(result);
+    }
+  }
 }
 
 export type PossibleType =
@@ -39,26 +51,45 @@ export type PossibleType =
   | OptionalType<Type>;
 
 export class AtomicType<TSymbol extends symbol> extends Type<'atomic'> {
-  constructor(readonly symbol: TSymbol) {
-    super();
+  constructor(readonly symbol: TSymbol, assertion: TypeAssertion) {
+    super([assertion]);
+  }
+
+  decode<TCounterMedium extends Medium<object>>(
+    medium: TCounterMedium,
+    value: MediumPackedType<TCounterMedium>,
+  ): TypeOf<this>;
+  decode(medium: Medium, value: unknown): unknown {
+    return super.decode(medium, value);
   }
 
   /** @internal */
   decodeUnpacked(medium: Medium, unpacked: object): unknown {
     let codec = medium.requireCodec(this.symbol);
-    return codec.decode(unpacked);
+    let value = codec.decode(unpacked);
+    this.assert(value);
+    return value;
   }
 }
 
 export function atomic<TSymbol extends symbol>(
   symbol: TSymbol,
+  assertion: TypeAssertion,
 ): AtomicType<TSymbol> {
-  return new AtomicType(symbol);
+  return new AtomicType(symbol, assertion);
 }
 
 export class ObjectType<TTypeDefinition extends object> extends Type<'object'> {
   constructor(readonly definition: TTypeDefinition) {
     super();
+  }
+
+  decode<TCounterMedium extends Medium<object>>(
+    medium: TCounterMedium,
+    value: MediumPackedType<TCounterMedium>,
+  ): __ObjectTypeDefinitionToMediumType<TTypeDefinition, XValue.Values>;
+  decode(medium: Medium, value: unknown): unknown {
+    return super.decode(medium, value);
   }
 
   /** @internal */
@@ -91,6 +122,14 @@ export class ArrayType<TElement extends Type> extends Type<'array'> {
     super();
   }
 
+  decode<TCounterMedium extends Medium<object>>(
+    medium: TCounterMedium,
+    value: MediumPackedType<TCounterMedium>,
+  ): TypeOf<TElement>[];
+  decode(medium: Medium, value: unknown): unknown {
+    return super.decode(medium, value);
+  }
+
   /** @internal */
   decodeUnpacked(medium: Medium, unpacked: unknown): unknown {
     // TODO: implicit conversion to array.
@@ -116,6 +155,14 @@ export class UnionType<TType extends Type> extends Type<'union'> {
     }
 
     super();
+  }
+
+  decode<TCounterMedium extends Medium<object>>(
+    medium: TCounterMedium,
+    value: MediumPackedType<TCounterMedium>,
+  ): TypeOf<TType>;
+  decode(medium: Medium, value: unknown): unknown {
+    return super.decode(medium, value);
   }
 
   /** @internal */
@@ -147,6 +194,14 @@ export class IntersectionType<TType extends Type> extends Type<'intersection'> {
     }
 
     super();
+  }
+
+  decode<TCounterMedium extends Medium<object>>(
+    medium: TCounterMedium,
+    value: MediumPackedType<TCounterMedium>,
+  ): __UnionToIntersection<TypeOf<TType>>;
+  decode(medium: Medium, value: unknown): unknown {
+    return super.decode(medium, value);
   }
 
   /** @internal */
@@ -219,6 +274,14 @@ export class OptionalType<TType extends Type> extends Type<'optional'> {
     super();
   }
 
+  decode<TCounterMedium extends Medium<object>>(
+    medium: TCounterMedium,
+    value: MediumPackedType<TCounterMedium>,
+  ): TypeOf<TType> | undefined;
+  decode(medium: Medium, value: unknown): unknown {
+    return super.decode(medium, value);
+  }
+
   /** @internal */
   decodeUnpacked(medium: Medium, unpacked: unknown): unknown {
     if (unpacked === undefined) {
@@ -233,9 +296,15 @@ export function optional<TType extends Type>(Type: TType): OptionalType<TType> {
   return new OptionalType(Type);
 }
 
-export type TypeToMediumType<TType, TMedium> = TMedium extends Medium<
-  infer TMediumTypes
->
+export type TypeOf<TType extends Type> = __TypeToMediumType<
+  TType,
+  XValue.Values
+>;
+
+export type TypeToMediumType<
+  TType extends Type,
+  TMedium extends Medium<object>,
+> = TMedium extends Medium<infer TMediumTypes>
   ? TMediumTypes extends {packed: infer T}
     ? T
     : __TypeToMediumType<TType, TMediumTypes>
@@ -244,18 +313,7 @@ export type TypeToMediumType<TType, TMedium> = TMedium extends Medium<
 type __TypeToMediumType<TType, TMediumTypes> = TType extends ObjectType<
   infer TDefinition
 >
-  ? {
-      [TKey in __KeyOfOptional<TDefinition>]?: TDefinition[TKey] extends OptionalType<
-        infer TNestedType
-      >
-        ? __TypeToMediumType<TNestedType, TMediumTypes>
-        : never;
-    } & {
-      [TKey in __KeyOfNonOptional<TDefinition>]: __TypeToMediumType<
-        TDefinition[TKey],
-        TMediumTypes
-      >;
-    }
+  ? __ObjectTypeDefinitionToMediumType<TDefinition, TMediumTypes>
   : TType extends ArrayType<infer TElementType>
   ? __TypeToMediumType<TElementType, TMediumTypes>[]
   : TType extends AtomicType<infer TTypeSymbol>
@@ -267,6 +325,19 @@ type __TypeToMediumType<TType, TMediumTypes> = TType extends ObjectType<
   : TType extends IntersectionType<infer TElementType>
   ? __UnionToIntersection<__TypeToMediumType<TElementType, TMediumTypes>>
   : never;
+
+type __ObjectTypeDefinitionToMediumType<TDefinition, TMediumTypes> = {
+  [TKey in __KeyOfOptional<TDefinition>]?: TDefinition[TKey] extends OptionalType<
+    infer TNestedType
+  >
+    ? __TypeToMediumType<TNestedType, TMediumTypes>
+    : never;
+} & {
+  [TKey in __KeyOfNonOptional<TDefinition>]: __TypeToMediumType<
+    TDefinition[TKey],
+    TMediumTypes
+  >;
+};
 
 type __KeyOfOptional<TType> = Extract<
   {

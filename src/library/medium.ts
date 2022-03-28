@@ -26,12 +26,14 @@ export interface MediumPacking<TPacked> {
 export interface MediumOptions<
   TMediumTypes extends object = GeneralMediumTypes,
 > {
-  packing?: MediumPacking<MediumPackedType<TMediumTypes>>;
+  packing?: MediumPacking<MediumTypesPackedType<TMediumTypes>>;
   codecs: MediumAtomicCodecs<TMediumTypes>;
 }
 
 export class Medium<TMediumTypes extends object = GeneralMediumTypes> {
-  private packing: MediumPacking<MediumPackedType<TMediumTypes>> | undefined;
+  private packing:
+    | MediumPacking<MediumTypesPackedType<TMediumTypes>>
+    | undefined;
   private codecs: MediumAtomicCodecs<TMediumTypes>;
 
   constructor(
@@ -76,11 +78,11 @@ export class Medium<TMediumTypes extends object = GeneralMediumTypes> {
     return codec;
   }
 
-  unpack(packed: MediumPackedType<TMediumTypes>): unknown {
+  unpack(packed: MediumTypesPackedType<TMediumTypes>): unknown {
     return this.packing ? this.packing.unpack(packed) : packed;
   }
 
-  pack(unpacked: unknown): MediumPackedType<TMediumTypes>;
+  pack(unpacked: unknown): MediumTypesPackedType<TMediumTypes>;
   pack(unpacked: unknown): unknown {
     return this.packing ? this.packing.pack(unpacked) : unpacked;
   }
@@ -100,8 +102,13 @@ interface __MediumAtomicCodec<TMediumAtomic = unknown, TValue = unknown> {
   decode(value: TMediumAtomic): TValue;
 }
 
-export type MediumPackedType<TMediumTypes extends object> =
+export type MediumTypesPackedType<TMediumTypes extends object> =
   TMediumTypes extends {packed: infer T} ? T : never;
+
+export type MediumPackedType<TMedium extends Medium<object>> =
+  TMedium extends Medium<infer TMediumTypes>
+    ? MediumTypesPackedType<TMediumTypes>
+    : never;
 
 export function medium<TMediumTypes extends object>(
   description: string,

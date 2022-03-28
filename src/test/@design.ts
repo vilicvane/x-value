@@ -22,7 +22,7 @@ interface ECMAScriptMediumTypes {
 }
 
 const xObjectIdSymbol = Symbol();
-const xObjectId = x.atomic(xObjectIdSymbol);
+const xObjectId = x.atomic(xObjectIdSymbol, () => {});
 
 interface NodeJSMediumTypes extends ECMAScriptMediumTypes {
   [xObjectIdSymbol]: ArrayBuffer;
@@ -88,11 +88,11 @@ const ecmascript = x.medium<ECMAScriptMediumTypes>('ECMAScript', {
 // const browser = ecmascript.extend<BrowserMediumTypes>('Browser');
 
 const A = x.object({
-  // x: x.optional(
-  //   x.object({
-  //     yy: x.number,
-  //   }),
-  // ),
+  x: x.optional(
+    x.object({
+      yy: x.number,
+    }),
+  ),
 });
 
 const B = x.object({
@@ -120,7 +120,7 @@ let ppp = Params.decode(
     date: new Date().toISOString(),
     c: {
       x: {
-        yy: 1,
+        yy: 11,
         xx: 2,
       },
       extra: 3,
@@ -128,7 +128,8 @@ let ppp = Params.decode(
   }),
 );
 
-console.log(ppp.value);
+console.log(ppp);
+console.log(ppp.date.toLocaleDateString());
 
 // let {id, foo, bar, date, c} = ppp;
 
