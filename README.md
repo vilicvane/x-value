@@ -1,6 +1,8 @@
 # x-value
 
-Just another awesome magic.
+```ts
+
+```
 
 ## License
 
