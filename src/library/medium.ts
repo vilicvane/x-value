@@ -1,4 +1,4 @@
-export const mediumAtomicSymbol = Symbol();
+export const atomicTypeSymbol = Symbol();
 
 export type GeneralMediumTypes =
   | {
@@ -10,12 +10,12 @@ export type GeneralMediumTypes =
     };
 
 export type MediumAtomicCodecs<TMediumTypes extends object> = {
-  [TSymbol in Extract<keyof TMediumTypes, symbol>]?: __MediumAtomicCodec<
-    TMediumTypes[TSymbol],
-    TSymbol extends keyof XValue.Types ? XValue.Types[TSymbol] : never
+  [TSymbol in keyof XValue.Types]?: __MediumAtomicCodec<
+    TMediumTypes extends {[TKey in TSymbol]: infer T} ? T : unknown,
+    XValue.Types[TSymbol]
   >;
 } & {
-  [mediumAtomicSymbol]: __MediumAtomicCodec;
+  [atomicTypeSymbol]?: __MediumAtomicCodec;
 };
 
 export interface MediumPacking<TPacked> {
@@ -69,7 +69,7 @@ export class Medium<TMediumTypes extends object = GeneralMediumTypes> {
 
     let codec =
       (codecs as Record<symbol, __MediumAtomicCodec>)[symbol] ??
-      codecs[mediumAtomicSymbol];
+      codecs[atomicTypeSymbol];
 
     if (!codec) {
       throw new Error();

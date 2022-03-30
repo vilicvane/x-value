@@ -3,31 +3,42 @@ import {atomic} from './type';
 declare global {
   namespace XValue {
     interface Types {
-      [undefinedSymbol]: undefined;
-      [stringSymbol]: string;
-      [numberSymbol]: number;
-      [DateSymbol]: Date;
+      [undefinedTypeSymbol]: undefined;
+      [nullTypeSymbol]: null;
+      [stringTypeSymbol]: string;
+      [numberTypeSymbol]: number;
+      [booleanTypeSymbol]: boolean;
+      [dateTypeSymbol]: Date;
     }
   }
 }
 
-export const undefinedSymbol = Symbol();
-export const undefined = atomic(undefinedSymbol, value => value === void 0);
+export const undefinedTypeSymbol = Symbol();
+export const undefined = atomic(undefinedTypeSymbol, value => value === void 0);
 
-export const nullSymbol = Symbol();
-export const nullType = atomic(nullSymbol, value => value === null);
+export const nullTypeSymbol = Symbol();
+export const nullType = atomic(nullTypeSymbol, value => value === null);
 
-export const stringSymbol = Symbol();
-export const string = atomic(stringSymbol, value => typeof value === 'string');
+export const stringTypeSymbol = Symbol();
+export const string = atomic(
+  stringTypeSymbol,
+  value => typeof value === 'string',
+);
 
-export const numberSymbol = Symbol();
-export const number = atomic(numberSymbol, value => typeof value === 'number');
+export const numberTypeSymbol = Symbol();
+export const number = atomic(
+  numberTypeSymbol,
+  value => typeof value === 'number',
+);
 
-// export const integerSymbol = Symbol();
-// export const integer = number.refine(integerSymbol, () => {});
+export const booleanTypeSymbol = Symbol();
+export const boolean = atomic(
+  booleanTypeSymbol,
+  value => typeof value === 'boolean',
+);
 
-export const DateSymbol = Symbol();
+export const dateTypeSymbol = Symbol();
 export const Date = atomic(
-  DateSymbol,
+  dateTypeSymbol,
   value => value instanceof globalThis.Date,
 );

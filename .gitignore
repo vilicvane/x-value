@@ -7,3 +7,7 @@ npm-debug.log
 # TypeScript Build Artifacts
 bld/
 .bld-cache/
+# Test Outputs
+/coverage/
+# Drafts
+/src/test/design.ts
