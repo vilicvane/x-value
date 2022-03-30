@@ -87,6 +87,10 @@ const ecmascript = x.medium<ECMAScriptMediumTypes>('ECMAScript', {
 
 // const browser = ecmascript.extend<BrowserMediumTypes>('Browser');
 
+const email = x.string.refine<string & {__nominal: 'email'}>(value =>
+  /@/.test(value) ? true : 'Not an email',
+);
+
 const A = x.object({
   x: x.optional(
     x.object({
@@ -105,7 +109,7 @@ const C = x.intersection(A, B);
 
 const Params = x.object({
   id: x.union(xObjectId, x.undefined),
-  foo: x.optional(x.string),
+  foo: x.optional(email),
   bar: x.array(x.number),
   date: x.union(x.Date),
   c: C,
@@ -115,7 +119,7 @@ let ppp = Params.decode(
   json,
   JSON.stringify({
     id: '507f1f77bcf86cd799439011',
-    foo: '123',
+    foo: '123@',
     bar: [1, 2],
     date: new Date().toISOString(),
     c: {

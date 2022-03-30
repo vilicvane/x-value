@@ -15,19 +15,7 @@ export class TypeConstraintError extends TypeError {
 }
 
 export abstract class Type<TCategory extends string = string> {
-  /**
-   * For static type checking.
-   */
-  protected _category!: TCategory;
-
-  constructor(protected constraints: TypeConstraint[] = []) {}
-
-  refine<TSymbol extends symbol>(
-    symbol: TSymbol,
-    constraint: TypeConstraint,
-  ): this {
-    return this;
-  }
+  protected __static_type_category!: TCategory;
 
   decode(medium: Medium, packed: unknown): unknown {
     let unpacked = medium.unpack(packed);
@@ -46,24 +34,6 @@ export abstract class Type<TCategory extends string = string> {
     unpacked: unknown,
   ): [unknown, TypeIssue[]];
 
-  diagnose(value: unknown): TypeIssue[] {
-    let issues: TypeIssue[] = [];
-
-    for (let constraint of this.constraints) {
-      let result = constraint(value) ?? true;
-
-      if (result === true) {
-        continue;
-      }
-
-      issues.push({
-        message: typeof result === 'string' ? result : 'Unexpected value',
-      });
-    }
-
-    return issues;
-  }
-
   satisfies<T>(value: T): T {
     let issues = this.diagnose(value);
 
@@ -77,19 +47,41 @@ export abstract class Type<TCategory extends string = string> {
   is<T>(value: T): boolean {
     return this.diagnose(value).length === 0;
   }
+
+  abstract diagnose(value: unknown): TypeIssue[];
 }
 
 export type PossibleType =
-  | AtomicType<symbol>
+  | AtomicType<unknown, symbol>
   | ObjectType<Record<string, Type>>
   | ArrayType<Type>
   | UnionType<Type>
   | IntersectionType<Type>
   | OptionalType<Type>;
 
-export class AtomicType<TSymbol extends symbol> extends Type<'atomic'> {
-  constructor(readonly symbol: TSymbol, constraint: TypeConstraint) {
-    super([constraint]);
+export type AtomicTypeType<
+  TType,
+  TSymbol extends symbol,
+> = unknown extends TType
+  ? XValue.Values extends {[TKey in TSymbol]: infer T}
+    ? T
+    : never
+  : TType;
+
+export class AtomicType<
+  TType,
+  TSymbol extends symbol = never,
+> extends Type<'atomic'> {
+  protected __static_type_type!: TType;
+
+  constructor(readonly symbol: symbol, readonly constraints: TypeConstraint[]) {
+    super();
+  }
+
+  refine<TRefinedType extends AtomicTypeType<TType, TSymbol>>(
+    constraint: TypeConstraint<AtomicTypeType<TType, TSymbol>>,
+  ): AtomicType<TRefinedType> {
+    return new AtomicType(this.symbol, [...this.constraints, constraint]);
   }
 
   decode<TCounterMedium extends Medium<object>>(
@@ -109,13 +101,31 @@ export class AtomicType<TSymbol extends symbol> extends Type<'atomic'> {
 
     return [issues.length === 0 ? value : undefined, issues];
   }
+
+  diagnose(value: unknown): TypeIssue[] {
+    let issues: TypeIssue[] = [];
+
+    for (let constraint of this.constraints) {
+      let result = constraint(value) ?? true;
+
+      if (result === true) {
+        continue;
+      }
+
+      issues.push({
+        message: typeof result === 'string' ? result : 'Unexpected value',
+      });
+    }
+
+    return issues;
+  }
 }
 
 export function atomic<TSymbol extends symbol>(
   symbol: TSymbol,
   constraint: TypeConstraint,
-): AtomicType<TSymbol> {
-  return new AtomicType(symbol, constraint);
+): AtomicType<unknown, TSymbol> {
+  return new AtomicType(symbol, [constraint]);
 }
 
 export class ObjectType<
@@ -135,7 +145,7 @@ export class ObjectType<
 
   /** @internal */
   decodeUnpacked(medium: Medium, unpacked: unknown): [unknown, TypeIssue[]] {
-    // TODO: implicit conversion to object.
+    // TODO: implicit conversion to object?
 
     if (typeof unpacked !== 'object' || unpacked === null) {
       return [
@@ -161,11 +171,10 @@ export class ObjectType<
       issues.push(...entryIssues);
     }
 
-    let value = Object.fromEntries(entries);
-
-    issues.push(...super.diagnose(value));
-
-    return [issues.length === 0 ? value : undefined, issues];
+    return [
+      issues.length === 0 ? Object.fromEntries(entries) : undefined,
+      issues,
+    ];
   }
 
   diagnose(value: unknown): TypeIssue[] {
@@ -177,12 +186,9 @@ export class ObjectType<
       ];
     }
 
-    return [
-      ...Object.entries(this.definition).flatMap(([key, Type]) =>
-        Type.diagnose((value as any)[key]),
-      ),
-      ...super.diagnose(value),
-    ];
+    return Object.entries(this.definition).flatMap(([key, Type]) =>
+      Type.diagnose((value as any)[key]),
+    );
   }
 }
 
@@ -235,8 +241,6 @@ export class ArrayType<TElement extends Type> extends Type<'array'> {
       issues.push(...entryIssues);
     }
 
-    issues.push(...super.diagnose(value));
-
     return [issues.length === 0 ? value : undefined, issues];
   }
 
@@ -251,10 +255,7 @@ export class ArrayType<TElement extends Type> extends Type<'array'> {
 
     let Element = this.Element;
 
-    return [
-      ...value.flatMap(element => Element.diagnose(element)),
-      ...super.diagnose(value),
-    ];
+    return value.flatMap(element => Element.diagnose(element));
   }
 }
 
@@ -314,11 +315,11 @@ export class UnionType<TType extends Type> extends Type<'union'> {
       lastIssues = issues;
 
       if (issues.length === 0) {
-        break;
+        return issues;
       }
     }
 
-    return [...lastIssues, ...super.diagnose(value)];
+    return lastIssues;
   }
 }
 
@@ -357,11 +358,7 @@ export class IntersectionType<TType extends Type> extends Type<'intersection'> {
       issues.push(...partialIssues);
     }
 
-    let value = merge(partials);
-
-    issues.push(...super.diagnose(value));
-
-    return [issues.length === 0 ? value : undefined, issues];
+    return [issues.length === 0 ? merge(partials) : undefined, issues];
 
     function merge(partials: unknown[]): unknown {
       let pendingMergeKeyToValues: Map<string | number, unknown[]> | undefined;
@@ -414,10 +411,7 @@ export class IntersectionType<TType extends Type> extends Type<'intersection'> {
   }
 
   diagnose(value: unknown): TypeIssue[] {
-    return [
-      ...this.Types.flatMap(Type => Type.diagnose(value)),
-      ...super.diagnose(value),
-    ];
+    return this.Types.flatMap(Type => Type.diagnose(value));
   }
 }
 
@@ -442,26 +436,16 @@ export class OptionalType<TType extends Type> extends Type<'optional'> {
 
   /** @internal */
   decodeUnpacked(medium: Medium, unpacked: unknown): [unknown, TypeIssue[]] {
-    let optionalValue: unknown;
-    let issues: TypeIssue[] = [];
-
-    if (unpacked !== undefined) {
-      let [value, valueIssues] = this.Type.decodeUnpacked(medium, unpacked);
-
-      optionalValue = value;
-      issues.push(...valueIssues);
+    if (unpacked === undefined) {
+      return [undefined, []];
+    } else {
+      let [value, issues] = this.Type.decodeUnpacked(medium, unpacked);
+      return [issues.length === 0 ? value : undefined, issues];
     }
-
-    issues.push(...super.diagnose(optionalValue));
-
-    return [issues.length === 0 ? optionalValue : undefined, issues];
   }
 
   diagnose(value: unknown): TypeIssue[] {
-    return [
-      ...(value === undefined ? [] : this.Type.diagnose(value)),
-      ...super.diagnose(value),
-    ];
+    return value === undefined ? [] : this.Type.diagnose(value);
   }
 }
 
@@ -489,10 +473,12 @@ type __TypeToMediumType<TType, TMediumTypes> = TType extends ObjectType<
   ? __ObjectTypeDefinitionToMediumType<TDefinition, TMediumTypes>
   : TType extends ArrayType<infer TElementType>
   ? __TypeToMediumType<TElementType, TMediumTypes>[]
-  : TType extends AtomicType<infer TTypeSymbol>
-  ? TMediumTypes extends {[Symbol in TTypeSymbol]: infer TMediumType}
-    ? TMediumType
-    : never
+  : TType extends AtomicType<infer TAtomicType, infer TTypeSymbol>
+  ? unknown extends TAtomicType
+    ? TMediumTypes extends {[TKey in TTypeSymbol]: infer TMediumType}
+      ? TMediumType
+      : never
+    : TAtomicType
   : TType extends UnionType<infer TElementType>
   ? __TypeToMediumType<TElementType, TMediumTypes>
   : TType extends IntersectionType<infer TElementType>
