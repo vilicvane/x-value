@@ -12,7 +12,7 @@ export type GeneralMediumTypes =
 export type MediumAtomicCodecs<TMediumTypes extends object> = {
   [TSymbol in Extract<keyof TMediumTypes, symbol>]?: __MediumAtomicCodec<
     TMediumTypes[TSymbol],
-    TSymbol extends keyof XValue.Values ? XValue.Values[TSymbol] : never
+    TSymbol extends keyof XValue.Types ? XValue.Types[TSymbol] : never
   >;
 } & {
   [mediumAtomicSymbol]: __MediumAtomicCodec;
@@ -93,7 +93,7 @@ export type MediumAtomicCodec<
   TSymbol extends keyof TMediumTypes = keyof TMediumTypes,
 > = __MediumAtomicCodec<
   TMediumTypes[TSymbol],
-  TSymbol extends keyof XValue.Values ? XValue.Values[TSymbol] : never
+  TSymbol extends keyof XValue.Types ? XValue.Types[TSymbol] : never
 >;
 
 // eslint-disable-next-line @typescript-eslint/naming-convention

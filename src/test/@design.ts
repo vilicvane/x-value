@@ -3,7 +3,7 @@ import {mediumAtomicSymbol} from '../library';
 
 declare global {
   namespace XValue {
-    interface Values {
+    interface Types {
       [xObjectIdSymbol]: ArrayBuffer;
     }
   }
@@ -132,7 +132,7 @@ let ppp = Params.decode(
   }),
 );
 
-console.log(ppp);
+console.log(ppp.foo);
 console.log(ppp.date.toLocaleDateString());
 
 // let {id, foo, bar, date, c} = ppp;

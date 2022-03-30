@@ -2,7 +2,7 @@ import {atomic} from './type';
 
 declare global {
   namespace XValue {
-    interface Values {
+    interface Types {
       [undefinedSymbol]: undefined;
       [stringSymbol]: string;
       [numberSymbol]: number;
