@@ -1,12 +1,12 @@
-import {dateTypeSymbol, json} from '../library';
+import * as x from '../library';
 
 export interface ExtendedJSONTypes extends XValue.JSONTypes {
-  [dateTypeSymbol]: string;
+  [x.dateTypeSymbol]: string;
 }
 
-export const extendedJSON = json.extend<ExtendedJSONTypes>('Extended JSON', {
+export const extendedJSON = x.json.extend<ExtendedJSONTypes>('Extended JSON', {
   codecs: {
-    [dateTypeSymbol]: {
+    [x.dateTypeSymbol]: {
       encode(date) {
         return date.toISOString();
       },
@@ -16,3 +16,7 @@ export const extendedJSON = json.extend<ExtendedJSONTypes>('Extended JSON', {
     },
   },
 });
+
+export const Sunday = x.Date.refine<Date & {__nominal: 'Sunday'}>(
+  date => date.getDay() === 0,
+);
