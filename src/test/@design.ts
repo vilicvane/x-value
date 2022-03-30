@@ -22,7 +22,7 @@ interface ECMAScriptMediumTypes {
 }
 
 const xObjectIdSymbol = Symbol();
-const xObjectId = x.atomic(xObjectIdSymbol, () => {});
+const xObjectId = x.atomic(xObjectIdSymbol, () => true);
 
 interface NodeJSMediumTypes extends ECMAScriptMediumTypes {
   [xObjectIdSymbol]: ArrayBuffer;

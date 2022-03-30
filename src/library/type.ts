@@ -1,8 +1,18 @@
-import {Medium, MediumPackedType, MediumTypesPackedType} from './medium';
+import {Medium, MediumPackedType} from './medium';
 
 const hasOwnProperty = Object.prototype.hasOwnProperty;
 
-export type TypeAssertion<T = unknown> = (value: T) => string | boolean | void;
+export type TypeConstraint<T = unknown> = (value: T) => string | boolean;
+
+export interface TypeIssue {
+  message: string;
+}
+
+export class TypeConstraintError extends TypeError {
+  constructor(readonly issues: TypeIssue[]) {
+    super();
+  }
+}
 
 export abstract class Type<TCategory extends string = string> {
   /**
@@ -10,49 +20,76 @@ export abstract class Type<TCategory extends string = string> {
    */
   protected _category!: TCategory;
 
-  constructor(protected assertions: TypeAssertion[] = []) {}
+  constructor(protected constraints: TypeConstraint[] = []) {}
 
-  // refine<TSymbol extends symbol>(
-  //   symbol: TSymbol,
-  //   assertion: (value: unknown) => void,
-  // ): this {}
+  refine<TSymbol extends symbol>(
+    symbol: TSymbol,
+    constraint: TypeConstraint,
+  ): this {
+    return this;
+  }
 
   decode(medium: Medium, packed: unknown): unknown {
     let unpacked = medium.unpack(packed);
-    return this.decodeUnpacked(medium, unpacked);
+    let [value, issues] = this.decodeUnpacked(medium, unpacked);
+
+    if (issues.length > 0) {
+      throw new TypeConstraintError(issues);
+    }
+
+    return value;
   }
 
   /** @internal */
-  abstract decodeUnpacked(medium: Medium, unpacked: unknown): unknown;
+  abstract decodeUnpacked(
+    medium: Medium,
+    unpacked: unknown,
+  ): [unknown, TypeIssue[]];
 
-  protected assert(value: unknown): void {
-    for (let assertion of this.assertions) {
-      let result = assertion(value) ?? true;
+  diagnose(value: unknown): TypeIssue[] {
+    let issues: TypeIssue[] = [];
+
+    for (let constraint of this.constraints) {
+      let result = constraint(value) ?? true;
 
       if (result === true) {
         continue;
       }
 
-      if (result === false) {
-        result = 'Invalid type';
-      }
-
-      throw new TypeError(result);
+      issues.push({
+        message: typeof result === 'string' ? result : 'Unexpected value',
+      });
     }
+
+    return issues;
+  }
+
+  satisfies<T>(value: T): T {
+    let issues = this.diagnose(value);
+
+    if (issues.length === 0) {
+      return value;
+    }
+
+    throw new TypeConstraintError(issues);
+  }
+
+  is<T>(value: T): boolean {
+    return this.diagnose(value).length === 0;
   }
 }
 
 export type PossibleType =
   | AtomicType<symbol>
-  | ObjectType<object>
+  | ObjectType<Record<string, Type>>
   | ArrayType<Type>
   | UnionType<Type>
   | IntersectionType<Type>
   | OptionalType<Type>;
 
 export class AtomicType<TSymbol extends symbol> extends Type<'atomic'> {
-  constructor(readonly symbol: TSymbol, assertion: TypeAssertion) {
-    super([assertion]);
+  constructor(readonly symbol: TSymbol, constraint: TypeConstraint) {
+    super([constraint]);
   }
 
   decode<TCounterMedium extends Medium<object>>(
@@ -64,22 +101,26 @@ export class AtomicType<TSymbol extends symbol> extends Type<'atomic'> {
   }
 
   /** @internal */
-  decodeUnpacked(medium: Medium, unpacked: object): unknown {
+  decodeUnpacked(medium: Medium, unpacked: object): [unknown, TypeIssue[]] {
     let codec = medium.requireCodec(this.symbol);
     let value = codec.decode(unpacked);
-    this.assert(value);
-    return value;
+
+    let issues = this.diagnose(value);
+
+    return [issues.length === 0 ? value : undefined, issues];
   }
 }
 
 export function atomic<TSymbol extends symbol>(
   symbol: TSymbol,
-  assertion: TypeAssertion,
+  constraint: TypeConstraint,
 ): AtomicType<TSymbol> {
-  return new AtomicType(symbol, assertion);
+  return new AtomicType(symbol, constraint);
 }
 
-export class ObjectType<TTypeDefinition extends object> extends Type<'object'> {
+export class ObjectType<
+  TTypeDefinition extends Record<string, Type>,
+> extends Type<'object'> {
   constructor(readonly definition: TTypeDefinition) {
     super();
   }
@@ -93,25 +134,59 @@ export class ObjectType<TTypeDefinition extends object> extends Type<'object'> {
   }
 
   /** @internal */
-  decodeUnpacked(medium: Medium, unpacked: unknown): unknown {
+  decodeUnpacked(medium: Medium, unpacked: unknown): [unknown, TypeIssue[]] {
     // TODO: implicit conversion to object.
 
     if (typeof unpacked !== 'object' || unpacked === null) {
-      throw new TypeError();
+      return [
+        undefined,
+        [
+          {
+            message: `Expecting unpacked value to be a non-null object, getting ${unpacked}.`,
+          },
+        ],
+      ];
     }
 
-    let entries = Object.entries(this.definition).map(
-      ([key, Type]: [string, Type]) => [
-        key,
-        Type.decodeUnpacked(medium, (unpacked as any)[key]),
-      ],
-    );
+    let entries: [string, unknown][] = [];
+    let issues: TypeIssue[] = [];
 
-    return Object.fromEntries(entries);
+    for (let [key, Type] of Object.entries(this.definition)) {
+      let [value, entryIssues] = Type.decodeUnpacked(
+        medium,
+        (unpacked as any)[key],
+      );
+
+      entries.push([key, value]);
+      issues.push(...entryIssues);
+    }
+
+    let value = Object.fromEntries(entries);
+
+    issues.push(...super.diagnose(value));
+
+    return [issues.length === 0 ? value : undefined, issues];
+  }
+
+  diagnose(value: unknown): TypeIssue[] {
+    if (typeof value !== 'object' || value === null) {
+      return [
+        {
+          message: `Expecting a non-null object, getting ${value}.`,
+        },
+      ];
+    }
+
+    return [
+      ...Object.entries(this.definition).flatMap(([key, Type]) =>
+        Type.diagnose((value as any)[key]),
+      ),
+      ...super.diagnose(value),
+    ];
   }
 }
 
-export function object<TTypeDefinition extends object>(
+export function object<TTypeDefinition extends Record<string, Type>>(
   definition: TTypeDefinition,
 ): ObjectType<TTypeDefinition> {
   return new ObjectType(definition);
@@ -131,16 +206,55 @@ export class ArrayType<TElement extends Type> extends Type<'array'> {
   }
 
   /** @internal */
-  decodeUnpacked(medium: Medium, unpacked: unknown): unknown {
+  decodeUnpacked(medium: Medium, unpacked: unknown): [unknown, TypeIssue[]] {
     // TODO: implicit conversion to array.
 
     if (!Array.isArray(unpacked)) {
-      throw new TypeError();
+      return [
+        undefined,
+        [
+          {
+            message: `Expecting unpacked value to be an array, getting ${unpacked}.`,
+          },
+        ],
+      ];
     }
 
     let Element = this.Element;
 
-    return unpacked.map(element => Element.decodeUnpacked(medium, element));
+    let value: unknown[] = [];
+    let issues: TypeIssue[] = [];
+
+    for (let unpackedElement of unpacked) {
+      let [element, entryIssues] = Element.decodeUnpacked(
+        medium,
+        unpackedElement,
+      );
+
+      value.push(element);
+      issues.push(...entryIssues);
+    }
+
+    issues.push(...super.diagnose(value));
+
+    return [issues.length === 0 ? value : undefined, issues];
+  }
+
+  diagnose(value: unknown): TypeIssue[] {
+    if (!Array.isArray(value)) {
+      return [
+        {
+          message: `Expecting an array, getting ${value}.`,
+        },
+      ];
+    }
+
+    let Element = this.Element;
+
+    return [
+      ...value.flatMap(element => Element.diagnose(element)),
+      ...super.diagnose(value),
+    ];
   }
 }
 
@@ -166,18 +280,45 @@ export class UnionType<TType extends Type> extends Type<'union'> {
   }
 
   /** @internal */
-  decodeUnpacked(medium: Medium, unpacked: unknown): unknown {
-    let lastError!: unknown;
+  decodeUnpacked(medium: Medium, unpacked: unknown): [unknown, TypeIssue[]] {
+    let lastIssues!: TypeIssue[];
 
     for (let Type of this.Types) {
-      try {
-        return Type.decodeUnpacked(medium, unpacked);
-      } catch (error) {
-        lastError = error;
+      let [value, issues] = Type.decodeUnpacked(medium, unpacked);
+
+      if (issues.length === 0) {
+        return [value, issues];
+      }
+
+      lastIssues = issues;
+    }
+
+    return [
+      undefined,
+      [
+        {
+          message:
+            'The unpacked value satisfies none of the type in the union type',
+        },
+        ...lastIssues,
+      ],
+    ];
+  }
+
+  diagnose(value: unknown): TypeIssue[] {
+    let lastIssues!: TypeIssue[];
+
+    for (let Type of this.Types) {
+      let issues = Type.diagnose(value);
+
+      lastIssues = issues;
+
+      if (issues.length === 0) {
+        break;
       }
     }
 
-    throw lastError;
+    return [...lastIssues, ...super.diagnose(value)];
   }
 }
 
@@ -205,12 +346,22 @@ export class IntersectionType<TType extends Type> extends Type<'intersection'> {
   }
 
   /** @internal */
-  decodeUnpacked(medium: Medium, unpacked: unknown): unknown {
-    let partials = this.Types.map(Type =>
-      Type.decodeUnpacked(medium, unpacked),
-    );
+  decodeUnpacked(medium: Medium, unpacked: unknown): [unknown, TypeIssue[]] {
+    let partials: unknown[] = [];
+    let issues: TypeIssue[] = [];
 
-    return merge(partials);
+    for (let Type of this.Types) {
+      let [partial, partialIssues] = Type.decodeUnpacked(medium, unpacked);
+
+      partials.push(partial);
+      issues.push(...partialIssues);
+    }
+
+    let value = merge(partials);
+
+    issues.push(...super.diagnose(value));
+
+    return [issues.length === 0 ? value : undefined, issues];
 
     function merge(partials: unknown[]): unknown {
       let pendingMergeKeyToValues: Map<string | number, unknown[]> | undefined;
@@ -261,6 +412,13 @@ export class IntersectionType<TType extends Type> extends Type<'intersection'> {
       return merged;
     }
   }
+
+  diagnose(value: unknown): TypeIssue[] {
+    return [
+      ...this.Types.flatMap(Type => Type.diagnose(value)),
+      ...super.diagnose(value),
+    ];
+  }
 }
 
 export function intersection<TTypes extends Type[]>(
@@ -283,12 +441,27 @@ export class OptionalType<TType extends Type> extends Type<'optional'> {
   }
 
   /** @internal */
-  decodeUnpacked(medium: Medium, unpacked: unknown): unknown {
-    if (unpacked === undefined) {
-      return undefined;
+  decodeUnpacked(medium: Medium, unpacked: unknown): [unknown, TypeIssue[]] {
+    let optionalValue: unknown;
+    let issues: TypeIssue[] = [];
+
+    if (unpacked !== undefined) {
+      let [value, valueIssues] = this.Type.decodeUnpacked(medium, unpacked);
+
+      optionalValue = value;
+      issues.push(...valueIssues);
     }
 
-    return this.Type.decodeUnpacked(medium, unpacked);
+    issues.push(...super.diagnose(optionalValue));
+
+    return [issues.length === 0 ? optionalValue : undefined, issues];
+  }
+
+  diagnose(value: unknown): TypeIssue[] {
+    return [
+      ...(value === undefined ? [] : this.Type.diagnose(value)),
+      ...super.diagnose(value),
+    ];
   }
 }
 
