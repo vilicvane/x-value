@@ -45,7 +45,7 @@ Assuming we have 3 mediums: `browser`, `server`, `rpc`; and 2 types: `ObjectId`,
 | `ObjectId`  | `string` | packed as `string` | `ObjectId` | `string` |
 | `Date`      | `Date`   | packed as `string` | `Date`     | `Date`   |
 
-We can encoding value to a medium:
+We can encode value to a medium:
 
 ```ts
 let id = '6246056b1be8cbf6ca18401f';
@@ -67,7 +67,7 @@ Date.encode(rpc, date);
 Date.encode(server, date);
 ```
 
-Or decoding packed data of a medium to value:
+Or decode packed data of a medium to value:
 
 ```ts
 // All results in '6246056b1be8cbf6ca18401f'
