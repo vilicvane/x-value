@@ -1,22 +1,36 @@
+import {__ObjectTypeDefinitionToMediumType} from '../@utils';
 import {Medium, MediumTypesPackedType} from '../medium';
 
-import {__ObjectTypeDefinitionToMediumType} from './@utils';
 import {Type, TypeIssue} from './type';
 
 export interface ObjectType<TTypeDefinition> {
   decode<TMediumTypes extends object>(
     medium: Medium<TMediumTypes>,
-    value: MediumTypesPackedType<TMediumTypes>,
-  ): __ObjectTypeDefinitionToMediumType<TTypeDefinition, XValue.Types>;
+    value: MediumTypesPackedType<
+      TMediumTypes,
+      __ObjectTypeDefinitionToMediumType<TTypeDefinition, TMediumTypes, true>
+    >,
+  ): __ObjectTypeDefinitionToMediumType<TTypeDefinition, XValue.Types, false>;
 
   encode<TMediumTypes extends object>(
     medium: Medium<TMediumTypes>,
-    value: __ObjectTypeDefinitionToMediumType<TTypeDefinition, XValue.Types>,
-  ): MediumTypesPackedType<TMediumTypes>;
+    value: __ObjectTypeDefinitionToMediumType<
+      TTypeDefinition,
+      XValue.Types,
+      false
+    >,
+  ): MediumTypesPackedType<
+    TMediumTypes,
+    __ObjectTypeDefinitionToMediumType<TTypeDefinition, TMediumTypes, true>
+  >;
 
   is(
     value: unknown,
-  ): value is __ObjectTypeDefinitionToMediumType<TTypeDefinition, XValue.Types>;
+  ): value is __ObjectTypeDefinitionToMediumType<
+    TTypeDefinition,
+    XValue.Types,
+    false
+  >;
 }
 
 export class ObjectType<

@@ -1,18 +1,24 @@
+import {__MediumTypeOf, __UnionToIntersection, merge} from '../@utils';
 import {Medium, MediumTypesPackedType} from '../medium';
 
-import {__UnionToIntersection, merge} from './@utils';
 import {Type, TypeIssue, TypeOf} from './type';
 
 export interface IntersectionType<TType> {
   decode<TMediumTypes extends object>(
     medium: Medium<TMediumTypes>,
-    value: MediumTypesPackedType<TMediumTypes>,
+    value: MediumTypesPackedType<
+      TMediumTypes,
+      __UnionToIntersection<__MediumTypeOf<TType, TMediumTypes, true>>
+    >,
   ): __UnionToIntersection<TypeOf<TType>>;
 
   encode<TMediumTypes extends object>(
     medium: Medium<TMediumTypes>,
     value: __UnionToIntersection<TypeOf<TType>>,
-  ): MediumTypesPackedType<TMediumTypes>;
+  ): MediumTypesPackedType<
+    TMediumTypes,
+    __UnionToIntersection<__MediumTypeOf<TType, TMediumTypes, true>>
+  >;
 
   is(value: unknown): value is __UnionToIntersection<TypeOf<TType>>;
 }

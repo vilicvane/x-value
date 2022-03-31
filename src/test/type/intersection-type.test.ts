@@ -25,6 +25,49 @@ it('intersection type results in never should work with built-in json medium', (
   expect(Type.is(value2)).toBe(false);
 });
 
+it('intersection type should work with built-in json value medium', () => {
+  const Type = x.intersection(
+    x.object({
+      foo: x.string,
+    }),
+    x.object({
+      bar: x.number,
+    }),
+  );
+
+  let value1: TypeOf<typeof Type> = {
+    foo: 'abc',
+    bar: 123,
+  };
+  let value2 = {
+    foo: 'abc',
+  };
+  let value3 = {
+    foo: 'abc',
+    bar: 'def',
+  };
+
+  expect(Type.decode(x.jsonValue, value1)).toEqual(value1);
+  expect(() => Type.decode(x.jsonValue, value2 as any)).toThrow(
+    TypeConstraintError,
+  );
+  expect(() => Type.decode(x.jsonValue, value3 as any)).toThrow(
+    TypeConstraintError,
+  );
+
+  expect(Type.encode(x.jsonValue, value1)).toEqual(value1);
+  expect(() => Type.encode(x.jsonValue, value2 as any)).toThrow(
+    TypeConstraintError,
+  );
+  expect(() => Type.encode(x.jsonValue, value3 as any)).toThrow(
+    TypeConstraintError,
+  );
+
+  expect(Type.is(value1)).toBe(true);
+  expect(Type.is(value2)).toBe(false);
+  expect(Type.is(value3)).toBe(false);
+});
+
 it('intersection type should work with built-in json medium', () => {
   const Type = x.intersection(
     x.object({

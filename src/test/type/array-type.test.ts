@@ -1,6 +1,6 @@
 import * as x from '../../library';
 import {TypeConstraintError, TypeOf} from '../../library';
-import {extendedJSON} from '../@usage';
+import {extendedJSON, extendedJSONValue} from '../@usage';
 
 it('simple array type should work with built-in json medium', () => {
   const Type = x.array(x.string);
@@ -51,6 +51,50 @@ it('simple array type should work with extended json medium', () => {
     TypeConstraintError,
   );
   expect(() => Type.encode(extendedJSON, value4 as any)).toThrow(
+    TypeConstraintError,
+  );
+});
+
+it('simple array type should work with extended json value medium', () => {
+  const Type = x.array(x.Date);
+
+  const value1: TypeOf<typeof Type> = [
+    new Date('2022-3-31'),
+    new Date('2022-4-1'),
+  ];
+  const value2: TypeOf<typeof Type> = [];
+  const value3 = [123];
+  const value4 = 'oops';
+
+  expect(
+    Type.decode(
+      extendedJSONValue,
+      value1.map(date => date.toISOString()),
+    ),
+  ).toEqual(value1);
+  expect(
+    Type.decode(
+      extendedJSONValue,
+      value2.map(date => date.toISOString()),
+    ),
+  ).toEqual(value2);
+  expect(() => Type.decode(extendedJSONValue, value3 as any)).toThrow(
+    TypeError,
+  );
+  expect(() => Type.decode(extendedJSONValue, value4 as any)).toThrow(
+    TypeConstraintError,
+  );
+
+  expect(Type.encode(extendedJSONValue, value1)).toEqual(
+    JSON.parse(JSON.stringify(value1)),
+  );
+  expect(Type.encode(extendedJSONValue, value2)).toEqual(
+    JSON.parse(JSON.stringify(value2)),
+  );
+  expect(() => Type.encode(extendedJSONValue, value3 as any)).toThrow(
+    TypeConstraintError,
+  );
+  expect(() => Type.encode(extendedJSONValue, value4 as any)).toThrow(
     TypeConstraintError,
   );
 });

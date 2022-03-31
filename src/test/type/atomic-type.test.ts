@@ -1,6 +1,6 @@
 import * as x from '../../library';
 import {TypeConstraintError, TypeOf} from '../../library';
-import {extendedJSON} from '../@usage';
+import {extendedJSON, extendedJSONValue} from '../@usage';
 
 export const Sunday = x.Date.refine<Date & {__nominal: 'Sunday'}>(
   date => date.getDay() === 0,
@@ -91,4 +91,23 @@ it('date atomic refinement sunday should work with extended json medium', () => 
 
   expect(Sunday.satisfies(sunday)).toBe(sunday);
   expect(() => Sunday.satisfies(monday)).toThrow(TypeConstraintError);
+});
+
+it('date atomic refinement sunday should work with extended json value medium', () => {
+  let sunday = new Date('2022-3-27') as TypeOf<typeof Sunday>;
+  let monday = new Date('2022-3-28');
+
+  expect(Sunday.decode(extendedJSONValue, sunday.toISOString()).getTime()).toBe(
+    sunday.getTime(),
+  );
+  expect(() => Sunday.decode(extendedJSONValue, monday.toISOString())).toThrow(
+    TypeConstraintError,
+  );
+
+  expect(Sunday.encode(extendedJSONValue, sunday)).toEqual(
+    sunday.toISOString(),
+  );
+  expect(() => Sunday.encode(extendedJSONValue, monday as any)).toThrow(
+    TypeConstraintError,
+  );
 });

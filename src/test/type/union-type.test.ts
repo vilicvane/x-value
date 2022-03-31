@@ -58,3 +58,35 @@ it('union type of mixed types should work with built-in json medium', () => {
   expect(Type.is(value3)).toBe(false);
   expect(Type.is(value4)).toBe(false);
 });
+
+it('union type of mixed types should work with built-in json value medium', () => {
+  const Type = x.union(
+    x.object({
+      type: x.literal('text'),
+      value: x.string,
+    }),
+    x.number,
+  );
+
+  let value1: TypeOf<typeof Type> = {
+    type: 'text',
+    value: '123',
+  };
+  let value2: TypeOf<typeof Type> = 123;
+  let value3: any = true;
+  let value4: any = {
+    type: 'text',
+    value: 123,
+  };
+
+  expect(Type.decode(x.jsonValue, value1)).toEqual(value1);
+  expect(Type.decode(x.jsonValue, value2)).toEqual(value2);
+  expect(() => Type.decode(x.jsonValue, true as any)).toThrow(
+    TypeConstraintError,
+  );
+
+  expect(Type.encode(x.jsonValue, value1)).toEqual(value1);
+  expect(Type.encode(x.jsonValue, value2)).toEqual(value2);
+  expect(() => Type.encode(x.jsonValue, value3)).toThrow(TypeConstraintError);
+  expect(() => Type.encode(x.jsonValue, value4)).toThrow(TypeConstraintError);
+});

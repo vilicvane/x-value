@@ -102,11 +102,14 @@ interface __MediumAtomicCodec<TMediumAtomic = unknown, TValue = unknown> {
   decode(value: unknown): TValue;
 }
 
-export type MediumTypesPackedType<TMediumTypes> = TMediumTypes extends {
-  packed: infer T;
+export type MediumTypesPackedType<
+  TMediumTypes,
+  TFallback = never,
+> = TMediumTypes extends {
+  packed: infer TPacked;
 }
-  ? T
-  : never;
+  ? TPacked
+  : TFallback;
 
 export function medium<TMediumTypes extends object>(
   description: string,

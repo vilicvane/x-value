@@ -1,6 +1,5 @@
+import {__MediumTypeOf} from '../@utils';
 import {Medium} from '../medium';
-
-import {__MediumTypeOf} from './@utils';
 
 export abstract class Type<TCategory extends string = string> {
   protected __static_type_category!: TCategory;
@@ -67,4 +66,8 @@ export class TypeConstraintError extends TypeError {
   }
 }
 
-export type TypeOf<TType extends Type> = __MediumTypeOf<TType, XValue.Types>;
+export type TypeOf<TType extends Type> = __MediumTypeOf<
+  TType,
+  XValue.Types,
+  false
+>;

@@ -1,3 +1,4 @@
+import {__MediumTypeOf} from '../@utils';
 import {Medium, MediumTypesPackedType} from '../medium';
 
 import {Type, TypeIssue, TypeOf} from './type';
@@ -5,13 +6,19 @@ import {Type, TypeIssue, TypeOf} from './type';
 export interface ArrayType<TElement> {
   decode<TMediumTypes extends object>(
     medium: Medium<TMediumTypes>,
-    value: MediumTypesPackedType<TMediumTypes>,
+    value: MediumTypesPackedType<
+      TMediumTypes,
+      __MediumTypeOf<TElement, TMediumTypes, true>[]
+    >,
   ): TypeOf<TElement>[];
 
   encode<TMediumTypes extends object>(
     medium: Medium<TMediumTypes>,
     value: TypeOf<TElement>[],
-  ): MediumTypesPackedType<TMediumTypes>;
+  ): MediumTypesPackedType<
+    TMediumTypes,
+    __MediumTypeOf<TElement, TMediumTypes, true>[]
+  >;
 
   is(value: unknown): value is TypeOf<TElement>[];
 }

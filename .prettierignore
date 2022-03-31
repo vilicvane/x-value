@@ -1,3 +1,5 @@
 # TypeScript Build Artifacts
 bld/
 .bld-cache/
+# Test Coverage Outputs
+/coverage/

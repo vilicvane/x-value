@@ -1,37 +1,56 @@
-import {ArrayType} from './array-type';
-import {AtomicType} from './atomic-type';
-import {IntersectionType} from './intersection-type';
-import {ObjectType} from './object-type';
-import {OptionalType} from './optional-type';
-import {Type} from './type';
-import {UnionType} from './union-type';
+import {
+  ArrayType,
+  AtomicType,
+  IntersectionType,
+  ObjectType,
+  OptionalType,
+  Type,
+  UnionType,
+} from './type';
 
 const hasOwnProperty = Object.prototype.hasOwnProperty;
 
-export type __MediumTypeOf<TType, TMediumTypes> = TType extends ObjectType<
-  infer TDefinition
->
-  ? __ObjectTypeDefinitionToMediumType<TDefinition, TMediumTypes>
+export type __MediumTypeOf<
+  TType,
+  TMediumTypes,
+  TAtomicSymbolOnly extends boolean,
+> = TType extends ObjectType<infer TDefinition>
+  ? __ObjectTypeDefinitionToMediumType<
+      TDefinition,
+      TMediumTypes,
+      TAtomicSymbolOnly
+    >
   : TType extends ArrayType<infer TElementType>
-  ? __MediumTypeOf<TElementType, TMediumTypes>[]
+  ? __MediumTypeOf<TElementType, TMediumTypes, TAtomicSymbolOnly>[]
   : TType extends AtomicType<infer TAtomicType, infer TTypeSymbol>
-  ? __AtomicMediumType<TAtomicType, TTypeSymbol, TMediumTypes>
+  ? __AtomicMediumType<
+      TAtomicSymbolOnly extends true ? unknown : TAtomicType,
+      TTypeSymbol,
+      TMediumTypes
+    >
   : TType extends UnionType<infer TElementType>
-  ? __MediumTypeOf<TElementType, TMediumTypes>
+  ? __MediumTypeOf<TElementType, TMediumTypes, TAtomicSymbolOnly>
   : TType extends IntersectionType<infer TElementType>
-  ? __UnionToIntersection<__MediumTypeOf<TElementType, TMediumTypes>>
+  ? __UnionToIntersection<
+      __MediumTypeOf<TElementType, TMediumTypes, TAtomicSymbolOnly>
+    >
   : never;
 
-export type __ObjectTypeDefinitionToMediumType<TDefinition, TMediumTypes> = {
+export type __ObjectTypeDefinitionToMediumType<
+  TDefinition,
+  TMediumTypes,
+  TAtomicSymbolOnly extends boolean,
+> = {
   [TKey in __KeyOfOptional<TDefinition>]?: TDefinition[TKey] extends OptionalType<
     infer TNestedType
   >
-    ? __MediumTypeOf<TNestedType, TMediumTypes>
+    ? __MediumTypeOf<TNestedType, TMediumTypes, TAtomicSymbolOnly>
     : never;
 } & {
   [TKey in __KeyOfNonOptional<TDefinition>]: __MediumTypeOf<
     TDefinition[TKey],
-    TMediumTypes
+    TMediumTypes,
+    TAtomicSymbolOnly
   >;
 };
 

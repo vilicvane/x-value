@@ -1,3 +1,4 @@
+import {__MediumTypeOf} from '../@utils';
 import {Medium, MediumTypesPackedType} from '../medium';
 
 import {Type, TypeIssue, TypeOf} from './type';
@@ -5,13 +6,16 @@ import {Type, TypeIssue, TypeOf} from './type';
 export interface OptionalType<TType> {
   decode<TMediumTypes extends object>(
     medium: Medium<TMediumTypes>,
-    value: MediumTypesPackedType<TMediumTypes>,
+    value: MediumTypesPackedType<
+      TMediumTypes,
+      __MediumTypeOf<TType, TMediumTypes, true> | undefined
+    >,
   ): TypeOf<TType> | undefined;
 
   encode<TMediumTypes extends object>(
     medium: Medium<TMediumTypes>,
     value: TypeOf<TType> | undefined,
-  ): MediumTypesPackedType<TMediumTypes>;
+  ): __MediumTypeOf<TType, TMediumTypes, true> | undefined;
 
   is(value: unknown): value is TypeOf<TType> | undefined;
 }

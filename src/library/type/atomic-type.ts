@@ -1,6 +1,6 @@
+import {__AtomicMediumType} from '../@utils';
 import {Medium, MediumTypesPackedType} from '../medium';
 
-import {__AtomicMediumType} from './@utils';
 import {Type, TypeConstraint, TypeIssue} from './type';
 
 export type AtomicTypeType<
@@ -15,13 +15,19 @@ export type AtomicTypeType<
 export interface AtomicType<TType, TSymbol> {
   decode<TMediumTypes extends object>(
     medium: Medium<TMediumTypes>,
-    value: MediumTypesPackedType<TMediumTypes>,
+    value: MediumTypesPackedType<
+      TMediumTypes,
+      __AtomicMediumType<unknown, TSymbol, TMediumTypes>
+    >,
   ): __AtomicMediumType<TType, TSymbol, XValue.Types>;
 
   encode<TMediumTypes extends object>(
-    medium: TMediumTypes,
+    medium: Medium<TMediumTypes>,
     value: __AtomicMediumType<TType, TSymbol, XValue.Types>,
-  ): MediumTypesPackedType<TMediumTypes>;
+  ): MediumTypesPackedType<
+    TMediumTypes,
+    __AtomicMediumType<unknown, TSymbol, TMediumTypes>
+  >;
 
   is(value: unknown): value is __AtomicMediumType<TType, TSymbol, XValue.Types>;
 }
@@ -38,7 +44,7 @@ export class AtomicType<
 
   refine<TRefinedType extends AtomicTypeType<TType, TSymbol>>(
     constraint: TypeConstraint<AtomicTypeType<TType, TSymbol>>,
-  ): AtomicType<TRefinedType> {
+  ): AtomicType<TRefinedType, TSymbol> {
     return new AtomicType(this.symbol, [...this.constraints, constraint]);
   }
 
