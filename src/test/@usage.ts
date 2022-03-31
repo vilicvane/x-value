@@ -16,7 +16,3 @@ export const extendedJSON = x.json.extend<ExtendedJSONTypes>('Extended JSON', {
     },
   },
 });
-
-export const Sunday = x.Date.refine<Date & {__nominal: 'Sunday'}>(
-  date => date.getDay() === 0,
-);

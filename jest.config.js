@@ -4,4 +4,7 @@ module.exports = {
   coverageDirectory: 'coverage',
   coverageProvider: 'v8',
   roots: ['<rootDir>/bld/test'],
+  snapshotSerializers: [
+    '<rootDir>/bld/test/serializers/type-constraint-error.js',
+  ],
 };

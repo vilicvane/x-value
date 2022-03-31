@@ -14,10 +14,11 @@ export type PossibleType =
   | IntersectionType<Type>
   | OptionalType<Type>;
 
-export * from './array-type';
-export * from './atomic-type';
-export * from './intersection-type';
-export * from './object-type';
-export * from './optional-type';
 export * from './type';
+export * from './atomic-type';
+export * from './object-type';
+export * from './array-type';
+export * from './intersection-type';
 export * from './union-type';
+export * from './optional-type';
+export * from './literal-type';
