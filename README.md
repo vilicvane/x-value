@@ -65,12 +65,12 @@ Date.encode(server, date);  // new Date('2022-03-31T16:00:00.000Z')
 Or decode packed data of a medium to value:
 
 ```ts
-// All results in '6246056b1be8cbf6ca18401f'
+// All result in '6246056b1be8cbf6ca18401f'
 ObjectId.decode(browser, '6246056b1be8cbf6ca18401f');
 ObjectId.decode(rpc, '"6246056b1be8cbf6ca18401f"');
 ObjectId.decode(server, new ObjectId('6246056b1be8cbf6ca18401f'));
 
-// All results in new Date('2022-03-31T16:00:00.000Z')
+// All result in new Date('2022-03-31T16:00:00.000Z')
 Date.decode(browser, new Date('2022-03-31T16:00:00.000Z'));
 Date.decode(rpc, '"2022-03-31T16:00:00.000Z"');
 Date.decode(server, new Date('2022-03-31T16:00:00.000Z'));
