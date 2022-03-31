@@ -1,7 +1,7 @@
 import * as x from '../../library';
 import {TypeConstraintError, TypeOf} from '../../library';
 
-it('intersection type results in never should work with built-in json medium', () => {
+it('intersection type results in never should work with json medium', () => {
   const Type = x.intersection(x.string, x.number);
 
   let value1 = 'abc';
@@ -25,7 +25,7 @@ it('intersection type results in never should work with built-in json medium', (
   expect(Type.is(value2)).toBe(false);
 });
 
-it('intersection type should work with built-in json value medium', () => {
+it('intersection type should work with json value medium', () => {
   const Type = x.intersection(
     x.object({
       foo: x.string,
@@ -68,7 +68,7 @@ it('intersection type should work with built-in json value medium', () => {
   expect(Type.is(value3)).toBe(false);
 });
 
-it('intersection type should work with built-in json medium', () => {
+it('intersection type should work with json medium', () => {
   const Type = x.intersection(
     x.object({
       foo: x.string,

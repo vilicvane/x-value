@@ -1,8 +1,7 @@
 import * as x from '../../library';
 import {TypeConstraintError, TypeOf} from '../../library';
-import {extendedJSON, extendedJSONValue} from '../@usage';
 
-it('simple array type should work with built-in json medium', () => {
+it('simple array type should work with json medium', () => {
   const Type = x.array(x.string);
 
   const value1: TypeOf<typeof Type> = ['abc', 'def'];
@@ -36,21 +35,21 @@ it('simple array type should work with extended json medium', () => {
   const value3 = [123];
   const value4 = 'oops';
 
-  expect(Type.decode(extendedJSON, JSON.stringify(value1))).toEqual(value1);
-  expect(Type.decode(extendedJSON, JSON.stringify(value2))).toEqual(value2);
-  expect(() => Type.decode(extendedJSON, JSON.stringify(value3))).toThrow(
+  expect(Type.decode(x.extendedJSON, JSON.stringify(value1))).toEqual(value1);
+  expect(Type.decode(x.extendedJSON, JSON.stringify(value2))).toEqual(value2);
+  expect(() => Type.decode(x.extendedJSON, JSON.stringify(value3))).toThrow(
     TypeError,
   );
-  expect(() => Type.decode(extendedJSON, JSON.stringify(value4))).toThrow(
+  expect(() => Type.decode(x.extendedJSON, JSON.stringify(value4))).toThrow(
     TypeConstraintError,
   );
 
-  expect(Type.encode(extendedJSON, value1)).toEqual(JSON.stringify(value1));
-  expect(Type.encode(extendedJSON, value2)).toEqual(JSON.stringify(value2));
-  expect(() => Type.encode(extendedJSON, value3 as any)).toThrow(
+  expect(Type.encode(x.extendedJSON, value1)).toEqual(JSON.stringify(value1));
+  expect(Type.encode(x.extendedJSON, value2)).toEqual(JSON.stringify(value2));
+  expect(() => Type.encode(x.extendedJSON, value3 as any)).toThrow(
     TypeConstraintError,
   );
-  expect(() => Type.encode(extendedJSON, value4 as any)).toThrow(
+  expect(() => Type.encode(x.extendedJSON, value4 as any)).toThrow(
     TypeConstraintError,
   );
 });
@@ -68,33 +67,33 @@ it('simple array type should work with extended json value medium', () => {
 
   expect(
     Type.decode(
-      extendedJSONValue,
+      x.extendedJSONValue,
       value1.map(date => date.toISOString()),
     ),
   ).toEqual(value1);
   expect(
     Type.decode(
-      extendedJSONValue,
+      x.extendedJSONValue,
       value2.map(date => date.toISOString()),
     ),
   ).toEqual(value2);
-  expect(() => Type.decode(extendedJSONValue, value3 as any)).toThrow(
+  expect(() => Type.decode(x.extendedJSONValue, value3 as any)).toThrow(
     TypeError,
   );
-  expect(() => Type.decode(extendedJSONValue, value4 as any)).toThrow(
+  expect(() => Type.decode(x.extendedJSONValue, value4 as any)).toThrow(
     TypeConstraintError,
   );
 
-  expect(Type.encode(extendedJSONValue, value1)).toEqual(
+  expect(Type.encode(x.extendedJSONValue, value1)).toEqual(
     JSON.parse(JSON.stringify(value1)),
   );
-  expect(Type.encode(extendedJSONValue, value2)).toEqual(
+  expect(Type.encode(x.extendedJSONValue, value2)).toEqual(
     JSON.parse(JSON.stringify(value2)),
   );
-  expect(() => Type.encode(extendedJSONValue, value3 as any)).toThrow(
+  expect(() => Type.encode(x.extendedJSONValue, value3 as any)).toThrow(
     TypeConstraintError,
   );
-  expect(() => Type.encode(extendedJSONValue, value4 as any)).toThrow(
+  expect(() => Type.encode(x.extendedJSONValue, value4 as any)).toThrow(
     TypeConstraintError,
   );
 });

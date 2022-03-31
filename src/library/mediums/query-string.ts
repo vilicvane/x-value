@@ -1,5 +1,7 @@
 import {atomicTypeSymbol, medium} from '../medium';
 
+import {EXTENDED_CODECS, ExtendedTypes} from './@extended';
+
 declare global {
   namespace XValue {
     interface QueryStringTypes {
@@ -28,6 +30,17 @@ export const queryString = medium<XValue.QueryStringTypes>('Query String', {
     },
   },
 });
+
+export interface ExtendedQueryStringTypes
+  extends XValue.QueryStringTypes,
+    ExtendedTypes {}
+
+export const extendedQueryString = queryString.extend<ExtendedQueryStringTypes>(
+  'Extended Query String',
+  {
+    codecs: EXTENDED_CODECS,
+  },
+);
 
 export function stringify(dict: unknown): string {
   if (typeof dict !== 'object' || dict === null) {

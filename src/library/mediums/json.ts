@@ -1,5 +1,7 @@
 import {atomicTypeSymbol, medium} from '../medium';
 
+import {EXTENDED_CODECS, ExtendedTypes} from './@extended';
+
 declare global {
   namespace XValue {
     interface JSONTypes {
@@ -27,4 +29,10 @@ export const json = medium<XValue.JSONTypes>('JSON', {
       },
     },
   },
+});
+
+export interface ExtendedJSONTypes extends XValue.JSONTypes, ExtendedTypes {}
+
+export const extendedJSON = json.extend<ExtendedJSONTypes>('Extended JSON', {
+  codecs: EXTENDED_CODECS,
 });

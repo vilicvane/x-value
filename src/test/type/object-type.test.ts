@@ -1,8 +1,7 @@
 import * as x from '../../library';
 import {TypeConstraintError, TypeOf} from '../../library';
-import {extendedJSON} from '../@usage';
 
-it('simple object type should work with built-in json medium', () => {
+it('simple object type should work with json medium', () => {
   const Type = x.object({
     id: x.string,
     name: x.string,
@@ -61,7 +60,7 @@ it('nested object type should decode extended json medium', () => {
 
   expect(
     Type.decode(
-      extendedJSON,
+      x.extendedJSON,
       JSON.stringify({
         ...value,
         wild: 'oops',
@@ -72,7 +71,7 @@ it('nested object type should decode extended json medium', () => {
   expect(Type.is(value)).toBe(true);
 });
 
-it('object type with optional property should work with built-in json medium', () => {
+it('object type with optional property should work with json medium', () => {
   const Type = x.object({
     id: x.string,
     profile: x.object({
@@ -136,7 +135,7 @@ it('object type with optional property should work with built-in json medium', (
   ).toBe(false);
 });
 
-it('object type with union type property should work with built-in json medium', () => {
+it('object type with union type property should work with json medium', () => {
   const Type = x.object({
     id: x.string,
     profile: x.union(
@@ -194,7 +193,7 @@ it('object type with union type property should work with built-in json medium',
   expect(Type.is(value3)).toBe(false);
 });
 
-it('object type with intersection type property should work with built-in json medium', () => {
+it('object type with intersection type property should work with json medium', () => {
   const Type = x.object({
     id: x.string,
     profile: x.intersection(

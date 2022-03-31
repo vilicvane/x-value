@@ -1,12 +1,11 @@
 import * as x from '../../library';
 import {TypeConstraintError, TypeOf} from '../../library';
-import {extendedJSON, extendedJSONValue} from '../@usage';
 
 export const Sunday = x.Date.refine<Date & {__nominal: 'Sunday'}>(
   date => date.getDay() === 0,
 );
 
-it('pre-defined atomic types should decode/encode built-in json medium', () => {
+it('pre-defined atomic types should decode/encode json medium', () => {
   expect(x.nullType.decode(x.json, 'null')).toBe(null);
   expect(x.string.decode(x.json, '"text"')).toBe('text');
   expect(x.number.decode(x.json, '123')).toBe(123);
@@ -18,7 +17,7 @@ it('pre-defined atomic types should decode/encode built-in json medium', () => {
   expect(x.boolean.encode(x.json, true)).toBe('true');
 });
 
-it('pre-defined atomic types should error decode/encode built-in json medium with wrong unpacked value', () => {
+it('pre-defined atomic types should error decode/encode json medium with wrong unpacked value', () => {
   expect(() => x.nullType.decode(x.json, '"text"')).toThrow(
     TypeConstraintError,
   );
@@ -40,7 +39,7 @@ it('pre-defined atomic types should error decode/encode built-in json medium wit
   );
 });
 
-it('date atomic type should error decoding built-in json medium', () => {
+it('date atomic type should error decoding json medium', () => {
   expect(() =>
     x.Date.decode(x.json, JSON.stringify(new Date().toISOString())),
   ).toThrow(TypeConstraintError);
@@ -53,28 +52,28 @@ it('date atomic type should error decoding built-in json medium', () => {
 it('date atomic type should decode/encode extended json medium', () => {
   let date = new Date();
 
-  expect(x.Date.decode(extendedJSON, JSON.stringify(date)).getTime()).toBe(
+  expect(x.Date.decode(x.extendedJSON, JSON.stringify(date)).getTime()).toBe(
     date.getTime(),
   );
 
-  expect(x.Date.encode(extendedJSON, date)).toBe(JSON.stringify(date));
+  expect(x.Date.encode(x.extendedJSON, date)).toBe(JSON.stringify(date));
 });
 
 it('date atomic refinement sunday should work with extended json medium', () => {
   let sunday = new Date('2022-3-27');
   let monday = new Date('2022-3-28');
 
-  expect(Sunday.decode(extendedJSON, JSON.stringify(sunday)).getTime()).toBe(
+  expect(Sunday.decode(x.extendedJSON, JSON.stringify(sunday)).getTime()).toBe(
     sunday.getTime(),
   );
-  expect(() => Sunday.decode(extendedJSON, JSON.stringify(monday))).toThrow(
+  expect(() => Sunday.decode(x.extendedJSON, JSON.stringify(monday))).toThrow(
     TypeConstraintError,
   );
 
-  expect(Sunday.encode(extendedJSON, sunday as TypeOf<typeof Sunday>)).toBe(
+  expect(Sunday.encode(x.extendedJSON, sunday as TypeOf<typeof Sunday>)).toBe(
     JSON.stringify(sunday),
   );
-  expect(() => Sunday.encode(extendedJSON, monday as any)).toThrow(
+  expect(() => Sunday.encode(x.extendedJSON, monday as any)).toThrow(
     TypeConstraintError,
   );
 
@@ -97,17 +96,17 @@ it('date atomic refinement sunday should work with extended json value medium', 
   let sunday = new Date('2022-3-27') as TypeOf<typeof Sunday>;
   let monday = new Date('2022-3-28');
 
-  expect(Sunday.decode(extendedJSONValue, sunday.toISOString()).getTime()).toBe(
-    sunday.getTime(),
-  );
-  expect(() => Sunday.decode(extendedJSONValue, monday.toISOString())).toThrow(
-    TypeConstraintError,
-  );
+  expect(
+    Sunday.decode(x.extendedJSONValue, sunday.toISOString()).getTime(),
+  ).toBe(sunday.getTime());
+  expect(() =>
+    Sunday.decode(x.extendedJSONValue, monday.toISOString()),
+  ).toThrow(TypeConstraintError);
 
-  expect(Sunday.encode(extendedJSONValue, sunday)).toEqual(
+  expect(Sunday.encode(x.extendedJSONValue, sunday)).toEqual(
     sunday.toISOString(),
   );
-  expect(() => Sunday.encode(extendedJSONValue, monday as any)).toThrow(
+  expect(() => Sunday.encode(x.extendedJSONValue, monday as any)).toThrow(
     TypeConstraintError,
   );
 });
