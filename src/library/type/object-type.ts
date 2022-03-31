@@ -18,6 +18,14 @@ export class ObjectType<
     return super.decode(medium, value);
   }
 
+  encode<TCounterMedium extends Medium<object>>(
+    medium: TCounterMedium,
+    value: __ObjectTypeDefinitionToMediumType<TTypeDefinition, XValue.Types>,
+  ): MediumPackedType<TCounterMedium>;
+  encode(medium: Medium, value: unknown): unknown {
+    return super.encode(medium, value);
+  }
+
   /** @internal */
   decodeUnpacked(medium: Medium, unpacked: unknown): [unknown, TypeIssue[]] {
     // TODO: implicit conversion to object?
@@ -43,6 +51,38 @@ export class ObjectType<
       );
 
       entries.push([key, value]);
+      issues.push(...entryIssues);
+    }
+
+    return [
+      issues.length === 0 ? Object.fromEntries(entries) : undefined,
+      issues,
+    ];
+  }
+
+  /** @internal */
+  encodeUnpacked(medium: Medium, value: unknown): [unknown, TypeIssue[]] {
+    if (typeof value !== 'object' || value === null) {
+      return [
+        undefined,
+        [
+          {
+            message: `Expecting value to be a non-null object, getting ${value}.`,
+          },
+        ],
+      ];
+    }
+
+    let entries: [string, unknown][] = [];
+    let issues: TypeIssue[] = [];
+
+    for (let [key, Type] of Object.entries(this.definition)) {
+      let [unpacked, entryIssues] = Type.encodeUnpacked(
+        medium,
+        (value as any)[key],
+      );
+
+      entries.push([key, unpacked]);
       issues.push(...entryIssues);
     }
 

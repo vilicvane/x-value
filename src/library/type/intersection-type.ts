@@ -1,9 +1,7 @@
 import {Medium, MediumPackedType} from '../medium';
 
-import {__UnionToIntersection} from './@utils';
+import {__UnionToIntersection, merge} from './@utils';
 import {Type, TypeIssue, TypeOf} from './type';
-
-const hasOwnProperty = Object.prototype.hasOwnProperty;
 
 export class IntersectionType<TType extends Type> extends Type<'intersection'> {
   constructor(readonly Types: TType[]) {
@@ -22,6 +20,14 @@ export class IntersectionType<TType extends Type> extends Type<'intersection'> {
     return super.decode(medium, value);
   }
 
+  encode<TCounterMedium extends Medium<object>>(
+    medium: TCounterMedium,
+    value: __UnionToIntersection<TypeOf<TType>>,
+  ): MediumPackedType<TCounterMedium>;
+  encode(medium: Medium, value: unknown): unknown {
+    return super.encode(medium, value);
+  }
+
   /** @internal */
   decodeUnpacked(medium: Medium, unpacked: unknown): [unknown, TypeIssue[]] {
     let partials: unknown[] = [];
@@ -35,55 +41,21 @@ export class IntersectionType<TType extends Type> extends Type<'intersection'> {
     }
 
     return [issues.length === 0 ? merge(partials) : undefined, issues];
+  }
 
-    function merge(partials: unknown[]): unknown {
-      let pendingMergeKeyToValues: Map<string | number, unknown[]> | undefined;
+  /** @internal */
+  encodeUnpacked(medium: Medium, value: unknown): [unknown, TypeIssue[]] {
+    let partials: unknown[] = [];
+    let issues: TypeIssue[] = [];
 
-      let merged = partials.reduce((merged, partial) => {
-        if (merged === partial) {
-          return merged;
-        }
+    for (let Type of this.Types) {
+      let [partial, partialIssues] = Type.encodeUnpacked(medium, value);
 
-        if (typeof merged === 'object') {
-          if (merged === null) {
-            // merged !== partial
-            throw new TypeError();
-          }
-
-          if (typeof partial !== 'object' || partial === null) {
-            throw new TypeError();
-          }
-
-          for (let [key, value] of Object.entries(partial)) {
-            let pendingMergeValues: unknown[] | undefined;
-
-            if (pendingMergeKeyToValues) {
-              pendingMergeValues = pendingMergeKeyToValues.get(key);
-            } else {
-              pendingMergeKeyToValues = new Map();
-            }
-
-            if (pendingMergeValues) {
-              pendingMergeValues.push(value);
-            } else if (hasOwnProperty.call(merged, key)) {
-              pendingMergeKeyToValues.set(key, [(merged as any)[key], value]);
-            } else {
-              (merged as any)[key] = value;
-            }
-          }
-
-          return merged;
-        }
-      });
-
-      if (pendingMergeKeyToValues) {
-        for (let [key, values] of pendingMergeKeyToValues) {
-          (merged as any)[key] = merge(values);
-        }
-      }
-
-      return merged;
+      partials.push(partial);
+      issues.push(...partialIssues);
     }
+
+    return [issues.length === 0 ? merge(partials) : undefined, issues];
   }
 
   diagnose(value: unknown): TypeIssue[] {

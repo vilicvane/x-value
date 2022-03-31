@@ -1,6 +1,5 @@
-import {booleanTypeSymbol, numberTypeSymbol, stringTypeSymbol} from '../types';
-
-import {AtomicType} from './atomic-type';
+import {AtomicType} from './type';
+import {booleanTypeSymbol, numberTypeSymbol, stringTypeSymbol} from './types';
 
 export function literal<TType extends string | number | boolean>(
   literal: TType,

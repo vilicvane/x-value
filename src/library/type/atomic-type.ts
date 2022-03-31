@@ -35,14 +35,36 @@ export class AtomicType<
     return super.decode(medium, value);
   }
 
+  encode<TCounterMedium extends Medium<object>>(
+    medium: TCounterMedium,
+    value: TypeOf<this>,
+  ): MediumPackedType<TCounterMedium>;
+  encode(medium: Medium, value: unknown): unknown {
+    return super.encode(medium, value);
+  }
+
   /** @internal */
-  decodeUnpacked(medium: Medium, unpacked: object): [unknown, TypeIssue[]] {
+  decodeUnpacked(medium: Medium, unpacked: unknown): [unknown, TypeIssue[]] {
     let codec = medium.requireCodec(this.symbol);
     let value = codec.decode(unpacked);
 
     let issues = this.diagnose(value);
 
     return [issues.length === 0 ? value : undefined, issues];
+  }
+
+  /** @internal */
+  encodeUnpacked(medium: Medium, value: unknown): [unknown, TypeIssue[]] {
+    let issues = this.diagnose(value);
+
+    if (issues.length > 0) {
+      return [undefined, issues];
+    }
+
+    let codec = medium.requireCodec(this.symbol);
+    let unpacked = codec.encode(value);
+
+    return [unpacked, issues];
   }
 
   diagnose(value: unknown): TypeIssue[] {

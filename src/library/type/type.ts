@@ -16,10 +16,26 @@ export abstract class Type<TCategory extends string = string> {
     return value;
   }
 
+  encode(medium: Medium, value: unknown): unknown {
+    let [unpacked, issues] = this.encodeUnpacked(medium, value);
+
+    if (issues.length > 0) {
+      throw new TypeConstraintError(issues);
+    }
+
+    return medium.pack(unpacked);
+  }
+
   /** @internal */
   abstract decodeUnpacked(
     medium: Medium,
     unpacked: unknown,
+  ): [unknown, TypeIssue[]];
+
+  /** @internal */
+  abstract encodeUnpacked(
+    medium: Medium,
+    value: unknown,
   ): [unknown, TypeIssue[]];
 
   satisfies<T>(value: T): T {

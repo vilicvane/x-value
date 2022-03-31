@@ -15,6 +15,14 @@ export class OptionalType<TType extends Type> extends Type<'optional'> {
     return super.decode(medium, value);
   }
 
+  encode<TCounterMedium extends Medium<object>>(
+    medium: TCounterMedium,
+    value: TypeOf<TType> | undefined,
+  ): MediumPackedType<TCounterMedium>;
+  encode(medium: Medium, value: unknown): unknown {
+    return super.encode(medium, value);
+  }
+
   /** @internal */
   decodeUnpacked(medium: Medium, unpacked: unknown): [unknown, TypeIssue[]] {
     if (unpacked === undefined) {
@@ -22,6 +30,16 @@ export class OptionalType<TType extends Type> extends Type<'optional'> {
     } else {
       let [value, issues] = this.Type.decodeUnpacked(medium, unpacked);
       return [issues.length === 0 ? value : undefined, issues];
+    }
+  }
+
+  /** @internal */
+  encodeUnpacked(medium: Medium, value: unknown): [unknown, TypeIssue[]] {
+    if (value === undefined) {
+      return [undefined, []];
+    } else {
+      let [unpacked, issues] = this.Type.encodeUnpacked(medium, value);
+      return [issues.length === 0 ? unpacked : undefined, issues];
     }
   }
 

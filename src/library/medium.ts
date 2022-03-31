@@ -93,7 +93,7 @@ export type MediumAtomicCodec<
   TSymbol extends keyof TMediumTypes = keyof TMediumTypes,
 > = __MediumAtomicCodec<
   TMediumTypes[TSymbol],
-  TSymbol extends keyof XValue.Types ? XValue.Types[TSymbol] : never
+  TSymbol extends keyof XValue.Types ? XValue.Types[TSymbol] : unknown
 >;
 
 // eslint-disable-next-line @typescript-eslint/naming-convention

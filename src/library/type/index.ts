@@ -21,4 +21,3 @@ export * from './array-type';
 export * from './intersection-type';
 export * from './union-type';
 export * from './optional-type';
-export * from './literal-type';

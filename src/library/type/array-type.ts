@@ -15,6 +15,14 @@ export class ArrayType<TElement extends Type> extends Type<'array'> {
     return super.decode(medium, value);
   }
 
+  encode<TCounterMedium extends Medium<object>>(
+    medium: TCounterMedium,
+    value: TypeOf<TElement>[],
+  ): MediumPackedType<TCounterMedium>;
+  encode(medium: Medium, value: unknown): unknown {
+    return super.encode(medium, value);
+  }
+
   /** @internal */
   decodeUnpacked(medium: Medium, unpacked: unknown): [unknown, TypeIssue[]] {
     // TODO: implicit conversion to array.
@@ -46,6 +54,37 @@ export class ArrayType<TElement extends Type> extends Type<'array'> {
     }
 
     return [issues.length === 0 ? value : undefined, issues];
+  }
+
+  /** @internal */
+  encodeUnpacked(medium: Medium, value: unknown): [unknown, TypeIssue[]] {
+    if (!Array.isArray(value)) {
+      return [
+        undefined,
+        [
+          {
+            message: `Expecting value to be an array, getting ${value}.`,
+          },
+        ],
+      ];
+    }
+
+    let Element = this.Element;
+
+    let unpacked: unknown[] = [];
+    let issues: TypeIssue[] = [];
+
+    for (let valueElement of value) {
+      let [unpackedElement, entryIssues] = Element.encodeUnpacked(
+        medium,
+        valueElement,
+      );
+
+      unpacked.push(unpackedElement);
+      issues.push(...entryIssues);
+    }
+
+    return [issues.length === 0 ? unpacked : undefined, issues];
   }
 
   diagnose(value: unknown): TypeIssue[] {
