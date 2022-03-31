@@ -38,7 +38,7 @@ const I = x.intersection(
 
 ## Mediums and Value
 
-Assuming we have 3 mediums: `browserMedium`, `serverMedium`, and `rpcMedium`. Considering types `ObjectId` and `Date`, their types in the 3 mediums are listed below.
+Assuming we have 3 mediums: `browserMedium`, `serverMedium`, `rpcMedium`; and 2 types `ObjectId`, `Date`. Their types in mediums and value are listed below.
 
 | Type\Medium | Browser  | RPC                | Server     | Value    |
 | ----------- | -------- | ------------------ | ---------- | -------- |
