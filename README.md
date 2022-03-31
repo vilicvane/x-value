@@ -47,18 +47,19 @@ Assuming we have 3 mediums: `browser`, `server`, `rpc`; and 2 types: `ObjectId`,
 
 We can encode value to a medium:
 
+<!-- prettier-ignore -->
 ```ts
 let id = '6246056b1be8cbf6ca18401f';
 
 ObjectId.encode(browser, id); // string '6246056b1be8cbf6ca18401f'
-ObjectId.encode(rpc, id); // packed string '"6246056b1be8cbf6ca18401f"'
-ObjectId.encode(server, id); // new ObjectId('6246056b1be8cbf6ca18401f')
+ObjectId.encode(rpc, id);     // packed string '"6246056b1be8cbf6ca18401f"'
+ObjectId.encode(server, id);  // new ObjectId('6246056b1be8cbf6ca18401f')
 
 let date = new Date('2022-03-31T16:00:00.000Z');
 
 Date.encode(browser, date); // new Date('2022-03-31T16:00:00.000Z')
-Date.encode(rpc, date); // packed string '"2022-03-31T16:00:00.000Z"'
-Date.encode(server, date); // new Date('2022-03-31T16:00:00.000Z')
+Date.encode(rpc, date);     // packed string '"2022-03-31T16:00:00.000Z"'
+Date.encode(server, date);  // new Date('2022-03-31T16:00:00.000Z')
 ```
 
 Or decode packed data of a medium to value:
