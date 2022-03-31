@@ -14,6 +14,13 @@ it('intersection type results in never should work with built-in json medium', (
     TypeConstraintError,
   );
 
+  expect(() => Type.encode(x.json, value1 as never)).toThrow(
+    TypeConstraintError,
+  );
+  expect(() => Type.encode(x.json, value2 as never)).toThrow(
+    TypeConstraintError,
+  );
+
   expect(Type.is(value1)).toBe(false);
   expect(Type.is(value2)).toBe(false);
 });
@@ -47,6 +54,10 @@ it('intersection type should work with built-in json medium', () => {
   expect(() => Type.decode(x.json, JSON.stringify(value3))).toThrow(
     TypeConstraintError,
   );
+
+  expect(JSON.parse(Type.encode(x.json, value1))).toEqual(value1);
+  expect(() => Type.encode(x.json, value2 as any)).toThrow(TypeConstraintError);
+  expect(() => Type.encode(x.json, value3 as any)).toThrow(TypeConstraintError);
 
   expect(Type.is(value1)).toBe(true);
   expect(Type.is(value2)).toBe(false);

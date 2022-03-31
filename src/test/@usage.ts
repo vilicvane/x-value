@@ -11,7 +11,17 @@ export const extendedJSON = x.json.extend<ExtendedJSONTypes>('Extended JSON', {
         return date.toISOString();
       },
       decode(date) {
-        return new Date(date);
+        if (typeof date !== 'string') {
+          throw new TypeError('Invalid date value');
+        }
+
+        let value = new Date(date);
+
+        if (isNaN(value.getTime())) {
+          throw new TypeError('Invalid date value');
+        }
+
+        return value;
       },
     },
   },

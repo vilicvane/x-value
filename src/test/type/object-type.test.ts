@@ -2,7 +2,7 @@ import * as x from '../../library';
 import {TypeConstraintError, TypeOf} from '../../library';
 import {extendedJSON} from '../@usage';
 
-it('simple object type should decode built-in json medium', () => {
+it('simple object type should work with built-in json medium', () => {
   const Type = x.object({
     id: x.string,
     name: x.string,
@@ -24,6 +24,19 @@ it('simple object type should decode built-in json medium', () => {
       }),
     ),
   ).toEqual(value);
+
+  expect(Type.encode(x.json, value)).toEqual(JSON.stringify(value));
+  expect(
+    Type.encode(x.json, {
+      ...value,
+      wild: 'oops',
+    } as any),
+  ).toEqual(JSON.stringify(value));
+  expect(() => Type.encode(x.json, {} as any)).toThrow(TypeConstraintError);
+
+  expect(Type.is(value)).toBe(true);
+  expect(Type.is({})).toBe(false);
+  expect(Type.is(123)).toBe(false);
 });
 
 it('nested object type should decode extended json medium', () => {
@@ -84,7 +97,6 @@ it('object type with optional property should work with built-in json medium', (
       }),
     ),
   ).toEqual(value);
-
   expect(() =>
     Type.decode(
       x.json,
@@ -98,6 +110,21 @@ it('object type with optional property should work with built-in json medium', (
     ),
   ).toThrow(TypeConstraintError);
 
+  expect(Type.encode(x.json, value)).toBe(JSON.stringify(value));
+  expect(Type.encode(x.json, {...value, wild: 'oops'} as any)).toBe(
+    JSON.stringify(value),
+  );
+  expect(() =>
+    Type.encode(x.json, {
+      ...value,
+      profile: {
+        ...value.profile,
+        age: 'invalid',
+      },
+    } as any),
+  ).toThrow(TypeConstraintError);
+
+  expect(Type.is(value)).toBe(true);
   expect(
     Type.is({
       ...value,
@@ -158,6 +185,10 @@ it('object type with union type property should work with built-in json medium',
     TypeConstraintError,
   );
 
+  expect(Type.encode(x.json, value1)).toEqual(JSON.stringify(value1));
+  expect(Type.encode(x.json, value2)).toEqual(JSON.stringify(value2));
+  expect(() => Type.encode(x.json, value3 as any)).toThrow(TypeConstraintError);
+
   expect(Type.is(value1)).toBe(true);
   expect(Type.is(value2)).toBe(true);
   expect(Type.is(value3)).toBe(false);
@@ -212,6 +243,10 @@ it('object type with intersection type property should work with built-in json m
   expect(() => Type.decode(x.json, JSON.stringify(value3))).toThrow(
     TypeConstraintError,
   );
+
+  expect(JSON.parse(Type.encode(x.json, value1))).toEqual(value1);
+  expect(JSON.parse(Type.encode(x.json, value2))).toEqual(value2);
+  expect(() => Type.encode(x.json, value3 as any)).toThrow(TypeConstraintError);
 
   expect(Type.is(value1)).toBe(true);
   expect(Type.is(value2)).toBe(true);
