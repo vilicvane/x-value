@@ -1,29 +1,29 @@
-import {Medium, MediumPackedType} from '../medium';
+import {Medium, MediumTypesPackedType} from '../medium';
 
 import {__ObjectTypeDefinitionToMediumType} from './@utils';
 import {Type, TypeIssue} from './type';
+
+export interface ObjectType<TTypeDefinition> {
+  decode<TMediumTypes extends object>(
+    medium: Medium<TMediumTypes>,
+    value: MediumTypesPackedType<TMediumTypes>,
+  ): __ObjectTypeDefinitionToMediumType<TTypeDefinition, XValue.Types>;
+
+  encode<TMediumTypes extends object>(
+    medium: Medium<TMediumTypes>,
+    value: __ObjectTypeDefinitionToMediumType<TTypeDefinition, XValue.Types>,
+  ): MediumTypesPackedType<TMediumTypes>;
+
+  is(
+    value: unknown,
+  ): value is __ObjectTypeDefinitionToMediumType<TTypeDefinition, XValue.Types>;
+}
 
 export class ObjectType<
   TTypeDefinition extends Record<string, Type>,
 > extends Type<'object'> {
   constructor(readonly definition: TTypeDefinition) {
     super();
-  }
-
-  decode<TCounterMedium extends Medium<object>>(
-    medium: TCounterMedium,
-    value: MediumPackedType<TCounterMedium>,
-  ): __ObjectTypeDefinitionToMediumType<TTypeDefinition, XValue.Types>;
-  decode(medium: Medium, value: unknown): unknown {
-    return super.decode(medium, value);
-  }
-
-  encode<TCounterMedium extends Medium<object>>(
-    medium: TCounterMedium,
-    value: __ObjectTypeDefinitionToMediumType<TTypeDefinition, XValue.Types>,
-  ): MediumPackedType<TCounterMedium>;
-  encode(medium: Medium, value: unknown): unknown {
-    return super.encode(medium, value);
   }
 
   /** @internal */

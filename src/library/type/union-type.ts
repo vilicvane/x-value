@@ -1,6 +1,20 @@
-import {Medium, MediumPackedType} from '../medium';
+import {Medium, MediumTypesPackedType} from '../medium';
 
 import {Type, TypeIssue, TypeOf} from './type';
+
+export interface UnionType<TType> {
+  decode<TMediumTypes extends object>(
+    medium: Medium<TMediumTypes>,
+    value: MediumTypesPackedType<TMediumTypes>,
+  ): TypeOf<TType>;
+
+  encode<TMediumTypes extends object>(
+    medium: Medium<TMediumTypes>,
+    value: TypeOf<TType>,
+  ): MediumTypesPackedType<TMediumTypes>;
+
+  is(value: unknown): value is TypeOf<TType>;
+}
 
 export class UnionType<TType extends Type> extends Type<'union'> {
   constructor(readonly Types: TType[]) {
@@ -9,22 +23,6 @@ export class UnionType<TType extends Type> extends Type<'union'> {
     }
 
     super();
-  }
-
-  decode<TCounterMedium extends Medium<object>>(
-    medium: TCounterMedium,
-    value: MediumPackedType<TCounterMedium>,
-  ): TypeOf<TType>;
-  decode(medium: Medium, value: unknown): unknown {
-    return super.decode(medium, value);
-  }
-
-  encode<TCounterMedium extends Medium<object>>(
-    medium: TCounterMedium,
-    value: TypeOf<TType>,
-  ): MediumPackedType<TCounterMedium>;
-  encode(medium: Medium, value: unknown): unknown {
-    return super.encode(medium, value);
   }
 
   /** @internal */

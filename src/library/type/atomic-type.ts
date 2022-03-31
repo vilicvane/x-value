@@ -1,6 +1,7 @@
-import {Medium, MediumPackedType} from '../medium';
+import {Medium, MediumTypesPackedType} from '../medium';
 
-import {Type, TypeConstraint, TypeIssue, TypeOf} from './type';
+import {__AtomicMediumType} from './@utils';
+import {Type, TypeConstraint, TypeIssue} from './type';
 
 export type AtomicTypeType<
   TType,
@@ -10,6 +11,20 @@ export type AtomicTypeType<
     ? T
     : never
   : TType;
+
+export interface AtomicType<TType, TSymbol> {
+  decode<TMediumTypes extends object>(
+    medium: Medium<TMediumTypes>,
+    value: MediumTypesPackedType<TMediumTypes>,
+  ): __AtomicMediumType<TType, TSymbol, XValue.Types>;
+
+  encode<TMediumTypes extends object>(
+    medium: TMediumTypes,
+    value: __AtomicMediumType<TType, TSymbol, XValue.Types>,
+  ): MediumTypesPackedType<TMediumTypes>;
+
+  is(value: unknown): value is __AtomicMediumType<TType, TSymbol, XValue.Types>;
+}
 
 export class AtomicType<
   TType,
@@ -25,22 +40,6 @@ export class AtomicType<
     constraint: TypeConstraint<AtomicTypeType<TType, TSymbol>>,
   ): AtomicType<TRefinedType> {
     return new AtomicType(this.symbol, [...this.constraints, constraint]);
-  }
-
-  decode<TCounterMedium extends Medium<object>>(
-    medium: TCounterMedium,
-    value: MediumPackedType<TCounterMedium>,
-  ): TypeOf<this>;
-  decode(medium: Medium, value: unknown): unknown {
-    return super.decode(medium, value);
-  }
-
-  encode<TCounterMedium extends Medium<object>>(
-    medium: TCounterMedium,
-    value: TypeOf<this>,
-  ): MediumPackedType<TCounterMedium>;
-  encode(medium: Medium, value: unknown): unknown {
-    return super.encode(medium, value);
   }
 
   /** @internal */

@@ -1,26 +1,24 @@
-import {Medium, MediumPackedType} from '../medium';
+import {Medium, MediumTypesPackedType} from '../medium';
 
 import {Type, TypeIssue, TypeOf} from './type';
+
+export interface ArrayType<TElement> {
+  decode<TMediumTypes extends object>(
+    medium: Medium<TMediumTypes>,
+    value: MediumTypesPackedType<TMediumTypes>,
+  ): TypeOf<TElement>[];
+
+  encode<TMediumTypes extends object>(
+    medium: Medium<TMediumTypes>,
+    value: TypeOf<TElement>[],
+  ): MediumTypesPackedType<TMediumTypes>;
+
+  is(value: unknown): value is TypeOf<TElement>[];
+}
 
 export class ArrayType<TElement extends Type> extends Type<'array'> {
   constructor(readonly Element: TElement) {
     super();
-  }
-
-  decode<TCounterMedium extends Medium<object>>(
-    medium: TCounterMedium,
-    value: MediumPackedType<TCounterMedium>,
-  ): TypeOf<TElement>[];
-  decode(medium: Medium, value: unknown): unknown {
-    return super.decode(medium, value);
-  }
-
-  encode<TCounterMedium extends Medium<object>>(
-    medium: TCounterMedium,
-    value: TypeOf<TElement>[],
-  ): MediumPackedType<TCounterMedium>;
-  encode(medium: Medium, value: unknown): unknown {
-    return super.encode(medium, value);
   }
 
   /** @internal */

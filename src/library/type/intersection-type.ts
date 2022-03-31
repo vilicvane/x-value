@@ -1,7 +1,21 @@
-import {Medium, MediumPackedType} from '../medium';
+import {Medium, MediumTypesPackedType} from '../medium';
 
 import {__UnionToIntersection, merge} from './@utils';
 import {Type, TypeIssue, TypeOf} from './type';
+
+export interface IntersectionType<TType> {
+  decode<TMediumTypes extends object>(
+    medium: Medium<TMediumTypes>,
+    value: MediumTypesPackedType<TMediumTypes>,
+  ): __UnionToIntersection<TypeOf<TType>>;
+
+  encode<TMediumTypes extends object>(
+    medium: Medium<TMediumTypes>,
+    value: __UnionToIntersection<TypeOf<TType>>,
+  ): MediumTypesPackedType<TMediumTypes>;
+
+  is(value: unknown): value is __UnionToIntersection<TypeOf<TType>>;
+}
 
 export class IntersectionType<TType extends Type> extends Type<'intersection'> {
   constructor(readonly Types: TType[]) {
@@ -10,22 +24,6 @@ export class IntersectionType<TType extends Type> extends Type<'intersection'> {
     }
 
     super();
-  }
-
-  decode<TCounterMedium extends Medium<object>>(
-    medium: TCounterMedium,
-    value: MediumPackedType<TCounterMedium>,
-  ): __UnionToIntersection<TypeOf<TType>>;
-  decode(medium: Medium, value: unknown): unknown {
-    return super.decode(medium, value);
-  }
-
-  encode<TCounterMedium extends Medium<object>>(
-    medium: TCounterMedium,
-    value: __UnionToIntersection<TypeOf<TType>>,
-  ): MediumPackedType<TCounterMedium>;
-  encode(medium: Medium, value: unknown): unknown {
-    return super.encode(medium, value);
   }
 
   /** @internal */

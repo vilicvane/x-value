@@ -48,7 +48,7 @@ export abstract class Type<TCategory extends string = string> {
     throw new TypeConstraintError(issues);
   }
 
-  is<T>(value: T): boolean {
+  is(value: unknown): boolean {
     return this.diagnose(value).length === 0;
   }
 

@@ -15,11 +15,7 @@ export type __MediumTypeOf<TType, TMediumTypes> = TType extends ObjectType<
   : TType extends ArrayType<infer TElementType>
   ? __MediumTypeOf<TElementType, TMediumTypes>[]
   : TType extends AtomicType<infer TAtomicType, infer TTypeSymbol>
-  ? unknown extends TAtomicType
-    ? TMediumTypes extends {[TKey in TTypeSymbol]: infer TMediumType}
-      ? TMediumType
-      : never
-    : TAtomicType
+  ? __AtomicMediumType<TAtomicType, TTypeSymbol, TMediumTypes>
   : TType extends UnionType<infer TElementType>
   ? __MediumTypeOf<TElementType, TMediumTypes>
   : TType extends IntersectionType<infer TElementType>
@@ -38,6 +34,16 @@ export type __ObjectTypeDefinitionToMediumType<TDefinition, TMediumTypes> = {
     TMediumTypes
   >;
 };
+
+export type __AtomicMediumType<
+  TType,
+  TSymbol extends symbol,
+  TMediumTypes,
+> = unknown extends TType
+  ? TMediumTypes extends {[TKey in TSymbol]: infer TMediumType}
+    ? TMediumType
+    : never
+  : TType;
 
 export type __KeyOfOptional<TType> = Extract<
   {

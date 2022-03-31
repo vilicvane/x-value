@@ -99,16 +99,14 @@ export type MediumAtomicCodec<
 // eslint-disable-next-line @typescript-eslint/naming-convention
 interface __MediumAtomicCodec<TMediumAtomic = unknown, TValue = unknown> {
   encode(value: TValue): TMediumAtomic;
-  decode(value: TMediumAtomic): TValue;
+  decode(value: unknown): TValue;
 }
 
-export type MediumTypesPackedType<TMediumTypes extends object> =
-  TMediumTypes extends {packed: infer T} ? T : never;
-
-export type MediumPackedType<TMedium extends Medium<object>> =
-  TMedium extends Medium<infer TMediumTypes>
-    ? MediumTypesPackedType<TMediumTypes>
-    : never;
+export type MediumTypesPackedType<TMediumTypes> = TMediumTypes extends {
+  packed: infer T;
+}
+  ? T
+  : never;
 
 export function medium<TMediumTypes extends object>(
   description: string,

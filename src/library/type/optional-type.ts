@@ -1,26 +1,24 @@
-import {Medium, MediumPackedType} from '../medium';
+import {Medium, MediumTypesPackedType} from '../medium';
 
 import {Type, TypeIssue, TypeOf} from './type';
+
+export interface OptionalType<TType> {
+  decode<TMediumTypes extends object>(
+    medium: Medium<TMediumTypes>,
+    value: MediumTypesPackedType<TMediumTypes>,
+  ): TypeOf<TType> | undefined;
+
+  encode<TMediumTypes extends object>(
+    medium: Medium<TMediumTypes>,
+    value: TypeOf<TType> | undefined,
+  ): MediumTypesPackedType<TMediumTypes>;
+
+  is(value: unknown): value is TypeOf<TType> | undefined;
+}
 
 export class OptionalType<TType extends Type> extends Type<'optional'> {
   constructor(readonly Type: TType) {
     super();
-  }
-
-  decode<TCounterMedium extends Medium<object>>(
-    medium: TCounterMedium,
-    value: MediumPackedType<TCounterMedium>,
-  ): TypeOf<TType> | undefined;
-  decode(medium: Medium, value: unknown): unknown {
-    return super.decode(medium, value);
-  }
-
-  encode<TCounterMedium extends Medium<object>>(
-    medium: TCounterMedium,
-    value: TypeOf<TType> | undefined,
-  ): MediumPackedType<TCounterMedium>;
-  encode(medium: Medium, value: unknown): unknown {
-    return super.encode(medium, value);
   }
 
   /** @internal */
