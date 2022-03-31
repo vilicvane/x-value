@@ -38,7 +38,7 @@ const I = x.intersection(
 
 ## Mediums and Value
 
-Assuming we have 3 mediums: `browserMedium`, `serverMedium`, `rpcMedium`; and 2 types `ObjectId`, `Date`. Their types in mediums and value are listed below.
+Assuming we have 3 mediums: `browser`, `server`, `rpc`; and 2 types `ObjectId`, `Date`. Their types in mediums and value are listed below.
 
 | Type\Medium | Browser  | RPC                | Server     | Value    |
 | ----------- | -------- | ------------------ | ---------- | -------- |
@@ -51,34 +51,34 @@ We can encoding value to a medium:
 let id = '6246056b1be8cbf6ca18401f';
 
 // string '6246056b1be8cbf6ca18401f'
-ObjectId.encode(browserMedium, id);
+ObjectId.encode(browser, id);
 // packed string '"6246056b1be8cbf6ca18401f"'
-ObjectId.encode(rpcMedium, id);
+ObjectId.encode(rpc, id);
 // new ObjectId('6246056b1be8cbf6ca18401f')
-ObjectId.encode(serverMedium, id);
+ObjectId.encode(server, id);
 
 let date = new Date('2022-03-31T16:00:00.000Z');
 
 // new Date('2022-03-31T16:00:00.000Z')
-Date.encode(browserMedium, date);
+Date.encode(browser, date);
 // packed string '"2022-03-31T16:00:00.000Z"'
-Date.encode(rpcMedium, date);
+Date.encode(rpc, date);
 // new Date('2022-03-31T16:00:00.000Z')
-Date.encode(serverMedium, date);
+Date.encode(server, date);
 ```
 
 Or decoding packed data of a medium to value:
 
 ```ts
 // All results in '6246056b1be8cbf6ca18401f'
-ObjectId.decode(browserMedium, '6246056b1be8cbf6ca18401f');
-ObjectId.decode(rpcMedium, '"6246056b1be8cbf6ca18401f"');
-ObjectId.decode(serverMedium, new ObjectId('6246056b1be8cbf6ca18401f'));
+ObjectId.decode(browser, '6246056b1be8cbf6ca18401f');
+ObjectId.decode(rpc, '"6246056b1be8cbf6ca18401f"');
+ObjectId.decode(server, new ObjectId('6246056b1be8cbf6ca18401f'));
 
 // All results in new Date('2022-03-31T16:00:00.000Z')
-Date.decode(browserMedium, new Date('2022-03-31T16:00:00.000Z'));
-Date.decode(rpcMedium, '"2022-03-31T16:00:00.000Z"');
-Date.decode(serverMedium, new Date('2022-03-31T16:00:00.000Z'));
+Date.decode(browser, new Date('2022-03-31T16:00:00.000Z'));
+Date.decode(rpc, '"2022-03-31T16:00:00.000Z"');
+Date.decode(server, new Date('2022-03-31T16:00:00.000Z'));
 ```
 
 ## License
