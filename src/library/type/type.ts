@@ -25,6 +25,17 @@ export abstract class Type<TCategory extends string = string> {
     return medium.pack(unpacked);
   }
 
+  convert(from: Medium, to: Medium, packed: unknown): unknown {
+    let unpacked = from.unpack(packed);
+    let [convertedUnpacked, issues] = this.convertUnpacked(from, to, unpacked);
+
+    if (issues.length > 0) {
+      throw new TypeConstraintError(issues);
+    }
+
+    return to.pack(convertedUnpacked);
+  }
+
   /** @internal */
   abstract decodeUnpacked(
     medium: Medium,
@@ -35,6 +46,13 @@ export abstract class Type<TCategory extends string = string> {
   abstract encodeUnpacked(
     medium: Medium,
     value: unknown,
+  ): [unknown, TypeIssue[]];
+
+  /** @internal */
+  abstract convertUnpacked(
+    from: Medium,
+    to: Medium,
+    unpacked: unknown,
   ): [unknown, TypeIssue[]];
 
   satisfies<T>(value: T): T {

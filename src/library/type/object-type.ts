@@ -6,7 +6,7 @@ import {Type, TypeIssue} from './type';
 export interface ObjectType<TTypeDefinition> {
   decode<TMediumTypes extends object>(
     medium: Medium<TMediumTypes>,
-    value: MediumTypesPackedType<
+    packed: MediumTypesPackedType<
       TMediumTypes,
       __ObjectTypeDefinitionToMediumType<TTypeDefinition, TMediumTypes, true>
     >,
@@ -22,6 +22,22 @@ export interface ObjectType<TTypeDefinition> {
   ): MediumTypesPackedType<
     TMediumTypes,
     __ObjectTypeDefinitionToMediumType<TTypeDefinition, TMediumTypes, true>
+  >;
+
+  convert<TFromMediumTypes extends object, TToMediumTypes extends object>(
+    from: Medium<TFromMediumTypes>,
+    to: Medium<TToMediumTypes>,
+    packed: MediumTypesPackedType<
+      TFromMediumTypes,
+      __ObjectTypeDefinitionToMediumType<
+        TTypeDefinition,
+        TFromMediumTypes,
+        true
+      >
+    >,
+  ): MediumTypesPackedType<
+    TToMediumTypes,
+    __ObjectTypeDefinitionToMediumType<TTypeDefinition, TToMediumTypes, true>
   >;
 
   is(
@@ -97,6 +113,43 @@ export class ObjectType<
       );
 
       entries.push([key, unpacked]);
+      issues.push(...entryIssues);
+    }
+
+    return [
+      issues.length === 0 ? Object.fromEntries(entries) : undefined,
+      issues,
+    ];
+  }
+
+  /** @internal */
+  convertUnpacked(
+    from: Medium,
+    to: Medium,
+    unpacked: unknown,
+  ): [unknown, TypeIssue[]] {
+    if (typeof unpacked !== 'object' || unpacked === null) {
+      return [
+        undefined,
+        [
+          {
+            message: `Expecting unpacked value to be a non-null object, getting ${unpacked}.`,
+          },
+        ],
+      ];
+    }
+
+    let entries: [string, unknown][] = [];
+    let issues: TypeIssue[] = [];
+
+    for (let [key, Type] of Object.entries(this.definition)) {
+      let [convertedUnpacked, entryIssues] = Type.convertUnpacked(
+        from,
+        to,
+        (unpacked as any)[key],
+      );
+
+      entries.push([key, convertedUnpacked]);
       issues.push(...entryIssues);
     }
 

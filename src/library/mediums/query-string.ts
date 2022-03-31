@@ -2,15 +2,11 @@ import {atomicTypeSymbol, medium} from '../medium';
 
 import {EXTENDED_CODECS, ExtendedTypes} from './@extended';
 
-declare global {
-  namespace XValue {
-    interface QueryStringTypes {
-      packed: string;
-    }
-  }
+export interface QueryStringTypes {
+  packed: string;
 }
 
-export const queryString = medium<XValue.QueryStringTypes>('Query String', {
+export const queryString = medium<QueryStringTypes>('Query String', {
   packing: {
     pack(data) {
       return stringify(data);
@@ -32,7 +28,7 @@ export const queryString = medium<XValue.QueryStringTypes>('Query String', {
 });
 
 export interface ExtendedQueryStringTypes
-  extends XValue.QueryStringTypes,
+  extends QueryStringTypes,
     ExtendedTypes {}
 
 export const extendedQueryString = queryString.extend<ExtendedQueryStringTypes>(

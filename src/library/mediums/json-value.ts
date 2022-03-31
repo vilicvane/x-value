@@ -8,18 +8,14 @@ import {
 
 import {EXTENDED_CODECS, ExtendedTypes} from './@extended';
 
-declare global {
-  namespace XValue {
-    interface JSONValueTypes {
-      [nullTypeSymbol]: null;
-      [stringTypeSymbol]: string;
-      [numberTypeSymbol]: number;
-      [booleanTypeSymbol]: boolean;
-    }
-  }
+export interface JSONValueTypes {
+  [nullTypeSymbol]: null;
+  [stringTypeSymbol]: string;
+  [numberTypeSymbol]: number;
+  [booleanTypeSymbol]: boolean;
 }
 
-export const jsonValue = medium<XValue.JSONValueTypes>('JSON Value', {
+export const jsonValue = medium<JSONValueTypes>('JSON Value', {
   codecs: {
     [atomicTypeSymbol]: {
       encode(value) {
@@ -32,9 +28,7 @@ export const jsonValue = medium<XValue.JSONValueTypes>('JSON Value', {
   },
 });
 
-export interface ExtendedJSONValueTypes
-  extends XValue.JSONValueTypes,
-    ExtendedTypes {}
+export interface ExtendedJSONValueTypes extends JSONValueTypes, ExtendedTypes {}
 
 export const extendedJSONValue = jsonValue.extend<ExtendedJSONValueTypes>(
   'Extended JSON Value',

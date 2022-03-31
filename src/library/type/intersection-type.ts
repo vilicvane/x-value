@@ -20,6 +20,18 @@ export interface IntersectionType<TType> {
     __UnionToIntersection<__MediumTypeOf<TType, TMediumTypes, true>>
   >;
 
+  convert<TFromMediumTypes extends object, TToMediumTypes extends object>(
+    from: Medium<TFromMediumTypes>,
+    to: Medium<TToMediumTypes>,
+    value: MediumTypesPackedType<
+      TFromMediumTypes,
+      __UnionToIntersection<__MediumTypeOf<TType, TFromMediumTypes, true>>
+    >,
+  ): MediumTypesPackedType<
+    TToMediumTypes,
+    __UnionToIntersection<__MediumTypeOf<TType, TToMediumTypes, true>>
+  >;
+
   is(value: unknown): value is __UnionToIntersection<TypeOf<TType>>;
 }
 
@@ -54,6 +66,25 @@ export class IntersectionType<TType extends Type> extends Type<'intersection'> {
 
     for (let Type of this.Types) {
       let [partial, partialIssues] = Type.encodeUnpacked(medium, value);
+
+      partials.push(partial);
+      issues.push(...partialIssues);
+    }
+
+    return [issues.length === 0 ? merge(partials) : undefined, issues];
+  }
+
+  /** @internal */
+  convertUnpacked(
+    from: Medium,
+    to: Medium,
+    unpacked: unknown,
+  ): [unknown, TypeIssue[]] {
+    let partials: unknown[] = [];
+    let issues: TypeIssue[] = [];
+
+    for (let Type of this.Types) {
+      let [partial, partialIssues] = Type.convertUnpacked(from, to, unpacked);
 
       partials.push(partial);
       issues.push(...partialIssues);

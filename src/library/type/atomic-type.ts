@@ -29,6 +29,18 @@ export interface AtomicType<TType, TSymbol> {
     __AtomicMediumType<unknown, TSymbol, TMediumTypes>
   >;
 
+  convert<TFromMediumTypes extends object, TToMediumTypes extends object>(
+    from: Medium<TFromMediumTypes>,
+    to: Medium<TToMediumTypes>,
+    value: MediumTypesPackedType<
+      TFromMediumTypes,
+      __AtomicMediumType<unknown, TSymbol, TFromMediumTypes>
+    >,
+  ): MediumTypesPackedType<
+    TToMediumTypes,
+    __AtomicMediumType<unknown, TSymbol, TToMediumTypes>
+  >;
+
   is(value: unknown): value is __AtomicMediumType<TType, TSymbol, XValue.Types>;
 }
 
@@ -50,8 +62,7 @@ export class AtomicType<
 
   /** @internal */
   decodeUnpacked(medium: Medium, unpacked: unknown): [unknown, TypeIssue[]] {
-    let codec = medium.requireCodec(this.symbol);
-    let value = codec.decode(unpacked);
+    let value = medium.requireCodec(this.symbol).decode(unpacked);
 
     let issues = this.diagnose(value);
 
@@ -66,10 +77,30 @@ export class AtomicType<
       return [undefined, issues];
     }
 
-    let codec = medium.requireCodec(this.symbol);
-    let unpacked = codec.encode(value);
+    let unpacked = medium.requireCodec(this.symbol).encode(value);
 
     return [unpacked, issues];
+  }
+
+  /** @internal */
+  convertUnpacked(
+    from: Medium,
+    to: Medium,
+    unpacked: unknown,
+  ): [unknown, TypeIssue[]] {
+    let symbol = this.symbol;
+
+    let value = from.requireCodec(symbol).decode(unpacked);
+
+    let issues = this.diagnose(value);
+
+    if (issues.length > 0) {
+      return [undefined, issues];
+    }
+
+    let convertedUnpacked = to.requireCodec(symbol).encode(value);
+
+    return [convertedUnpacked, issues];
   }
 
   diagnose(value: unknown): TypeIssue[] {

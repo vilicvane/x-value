@@ -20,6 +20,18 @@ export interface ArrayType<TElement> {
     __MediumTypeOf<TElement, TMediumTypes, true>[]
   >;
 
+  convert<TFromMediumTypes extends object, TToMediumTypes extends object>(
+    from: Medium<TFromMediumTypes>,
+    to: Medium<TToMediumTypes>,
+    value: MediumTypesPackedType<
+      TFromMediumTypes,
+      __MediumTypeOf<TElement, TFromMediumTypes, true>[]
+    >,
+  ): MediumTypesPackedType<
+    TToMediumTypes,
+    __MediumTypeOf<TElement, TToMediumTypes, true>[]
+  >;
+
   is(value: unknown): value is TypeOf<TElement>[];
 }
 
@@ -90,6 +102,44 @@ export class ArrayType<TElement extends Type> extends Type<'array'> {
     }
 
     return [issues.length === 0 ? unpacked : undefined, issues];
+  }
+
+  /** @internal */
+  convertUnpacked(
+    from: Medium,
+    to: Medium,
+    unpacked: unknown,
+  ): [unknown, TypeIssue[]] {
+    // TODO: implicit conversion to array.
+
+    if (!Array.isArray(unpacked)) {
+      return [
+        undefined,
+        [
+          {
+            message: `Expecting unpacked value to be an array, getting ${unpacked}.`,
+          },
+        ],
+      ];
+    }
+
+    let Element = this.Element;
+
+    let value: unknown[] = [];
+    let issues: TypeIssue[] = [];
+
+    for (let unpackedElement of unpacked) {
+      let [element, entryIssues] = Element.convertUnpacked(
+        from,
+        to,
+        unpackedElement,
+      );
+
+      value.push(element);
+      issues.push(...entryIssues);
+    }
+
+    return [issues.length === 0 ? value : undefined, issues];
   }
 
   diagnose(value: unknown): TypeIssue[] {

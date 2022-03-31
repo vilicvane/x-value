@@ -6,7 +6,7 @@ import {Type, TypeIssue, TypeOf} from './type';
 export interface UnionType<TType> {
   decode<TMediumTypes extends object>(
     medium: Medium<TMediumTypes>,
-    value: MediumTypesPackedType<
+    packed: MediumTypesPackedType<
       TMediumTypes,
       __MediumTypeOf<TType, TMediumTypes, true>
     >,
@@ -18,6 +18,18 @@ export interface UnionType<TType> {
   ): MediumTypesPackedType<
     TMediumTypes,
     __MediumTypeOf<TType, TMediumTypes, true>
+  >;
+
+  convert<TFromMediumTypes extends object, TToMediumTypes extends object>(
+    from: Medium<TFromMediumTypes>,
+    to: Medium<TToMediumTypes>,
+    packed: MediumTypesPackedType<
+      TFromMediumTypes,
+      __MediumTypeOf<TType, TFromMediumTypes, true>
+    >,
+  ): MediumTypesPackedType<
+    TToMediumTypes,
+    __MediumTypeOf<TType, TToMediumTypes, true>
   >;
 
   is(value: unknown): value is TypeOf<TType>;
@@ -67,6 +79,40 @@ export class UnionType<TType extends Type> extends Type<'union'> {
 
       if (issues.length === 0) {
         return [unpacked, issues];
+      }
+
+      lastIssues = issues;
+    }
+
+    return [
+      undefined,
+      [
+        {
+          message:
+            'The unpacked value satisfies none of the type in the union type',
+        },
+        ...lastIssues,
+      ],
+    ];
+  }
+
+  /** @internal */
+  convertUnpacked(
+    from: Medium,
+    to: Medium,
+    unpacked: unknown,
+  ): [unknown, TypeIssue[]] {
+    let lastIssues!: TypeIssue[];
+
+    for (let Type of this.Types) {
+      let [convertedUnpacked, issues] = Type.convertUnpacked(
+        from,
+        to,
+        unpacked,
+      );
+
+      if (issues.length === 0) {
+        return [convertedUnpacked, issues];
       }
 
       lastIssues = issues;

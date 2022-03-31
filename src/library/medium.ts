@@ -1,3 +1,5 @@
+import {__MediumTypeOf} from './@utils';
+
 export const atomicTypeSymbol = Symbol();
 
 export type GeneralMediumTypes =
@@ -117,3 +119,9 @@ export function medium<TMediumTypes extends object>(
 ): Medium<TMediumTypes> {
   return new Medium(description, options);
 }
+
+export type MediumTypeOf<TType, TMediumTypes> = __MediumTypeOf<
+  TType,
+  TMediumTypes,
+  true
+>;
