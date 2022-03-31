@@ -2,7 +2,7 @@
 
 X-Value (X stands for "cross") is a medium-somewhat-neutral alternative to libraries like [io-ts](https://github.com/gcanti/io-ts) and [Zod](https://github.com/colinhacks/zod).
 
-Comparing to the input/output concept of io-ts or Zod, X-Value uses Medium and allows multiple input "mediums", and the output is referred as "value".
+Comparing to the input/output concept of io-ts or Zod, X-Value uses medium/value concept and allows multiple input "mediums", and the output is referred as "value".
 
 **Currently under development.**
 
