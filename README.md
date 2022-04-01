@@ -16,6 +16,14 @@ Comparing to the input/output concept of io-ts or Zod, X-Value uses medium/value
 
 > I seriously doubt the usefulness of the medium/value concept in practice, after I prototyped X-Value.
 
+## Installation
+
+```sh
+yarn add x-value
+# or
+npm install x-value
+```
+
 ## Usages
 
 Defining types with X-Value is similar to io-ts/Zod.
