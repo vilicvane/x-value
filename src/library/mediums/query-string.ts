@@ -1,4 +1,5 @@
 import {atomicTypeSymbol, medium} from '../medium';
+import {booleanTypeSymbol, numberTypeSymbol} from '../types';
 
 import {EXTENDED_CODECS, ExtendedTypes} from './@extended';
 
@@ -16,6 +17,30 @@ export const queryString = medium<QueryStringTypes>('Query String', {
     },
   },
   codecs: {
+    [numberTypeSymbol]: {
+      encode(value) {
+        return String(value);
+      },
+      decode(value) {
+        return Number(value);
+      },
+    },
+    [booleanTypeSymbol]: {
+      encode(value) {
+        return String(value);
+      },
+      decode(value) {
+        value = String(value);
+
+        let numberValue = Number(value);
+
+        if (!isNaN(numberValue)) {
+          return numberValue !== 0;
+        }
+
+        return value === 'true';
+      },
+    },
     [atomicTypeSymbol]: {
       encode(value) {
         return String(value);
