@@ -1,5 +1,5 @@
-import * as x from '../../library';
-import {TypeConstraintError, TypeOf} from '../../library';
+import * as x from '../library';
+import {TypeConstraintError, TypeOf} from '../library';
 
 it('simple object type should work with json medium', () => {
   const Type = x.object({

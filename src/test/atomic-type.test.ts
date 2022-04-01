@@ -1,5 +1,5 @@
-import * as x from '../../library';
-import {TypeConstraintError, TypeOf} from '../../library';
+import * as x from '../library';
+import {TypeConstraintError, TypeOf} from '../library';
 
 export const Sunday = x.Date.refine<Date & {__nominal: 'Sunday'}>(
   date => date.getDay() === 0,
