@@ -117,7 +117,7 @@ export class AtomicType<
     let issues: TypeIssue[] = [];
 
     for (let constraint of this.constraints) {
-      let result = constraint(value) ?? true;
+      let result = constraint(value);
 
       if (result === true) {
         continue;

@@ -128,6 +128,8 @@ export function merge(partials: unknown[]): unknown {
 
       return merged;
     }
+
+    return partial;
   });
 
   if (pendingMergeKeyToValues) {

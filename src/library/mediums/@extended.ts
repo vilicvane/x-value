@@ -1,3 +1,4 @@
+import {toString} from '../@utils';
 import {MediumAtomicCodecs} from '../medium';
 import {dateTypeSymbol} from '../types';
 
@@ -12,7 +13,9 @@ export const EXTENDED_CODECS: MediumAtomicCodecs<ExtendedTypes> = {
     },
     decode(date) {
       if (typeof date !== 'string') {
-        throw new TypeError('Invalid date value');
+        throw new TypeError(
+          `Expected ISO date string, getting ${toString.call(date)}`,
+        );
       }
 
       let value = new Date(date);

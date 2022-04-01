@@ -54,6 +54,18 @@ it('convert medium A to medium B and back', () => {
     ...common,
   };
 
+  let c = {
+    id: idBuffer,
+    ...common,
+    data: 123,
+  };
+
+  let d = {
+    id: idBuffer,
+    ...common,
+    data: [123, {x: true, y: 'abc'}],
+  };
+
   let value: TypeOf<typeof Type> = {
     id: idBuffer.toString('hex'),
     ...common,
@@ -63,6 +75,22 @@ it('convert medium A to medium B and back', () => {
   expect(Type.convert(mediumB, mediumA, b)).toEqual(a);
   expect(() => Type.convert(mediumA, mediumB, b as any)).toThrow(TypeError);
   expect(() => Type.convert(mediumB, mediumA, a as any)).toThrow(TypeError);
+  expect(() => Type.convert(mediumA, mediumB, c as any))
+    .toThrowErrorMatchingInlineSnapshot(`
+    "Failed to convert medium:
+      [\\"data\\"] Expecting unpacked value to be an array, getting [object Number]."
+  `);
+  // The duplicates are the result of the intersection type, leave it as-is for
+  // now.
+  expect(() => Type.convert(mediumA, mediumB, d as any))
+    .toThrowErrorMatchingInlineSnapshot(`
+    "Failed to convert medium:
+      [\\"data\\"][0] Expecting unpacked value to be a non-null object, getting [object Number].
+      [\\"data\\"][0] Expecting unpacked value to be a non-null object, getting [object Number].
+      [\\"data\\"][1][\\"x\\"] The unpacked value satisfies none of the type in the union type.
+      [\\"data\\"][1][\\"x\\"] Expected string, getting [object Boolean].
+      [\\"data\\"][1][\\"y\\"] Expected number, getting [object String]."
+  `);
 
   expect(Type.decode(mediumA, a)).toEqual(value);
   expect(Type.decode(mediumB, b)).toEqual(value);

@@ -74,7 +74,7 @@ export class Medium<TMediumTypes extends object = GeneralMediumTypes> {
       codecs[atomicTypeSymbol];
 
     if (!codec) {
-      throw new Error();
+      throw new Error('Unknown codec symbol');
     }
 
     return codec;

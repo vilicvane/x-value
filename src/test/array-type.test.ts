@@ -101,3 +101,63 @@ it('simple array type should work with extended json value medium', () => {
     TypeConstraintError,
   );
 });
+
+it('object array type should work with json medium', () => {
+  const Type = x.array(
+    x.object({
+      foo: x.string,
+      bar: x.number,
+    }),
+  );
+
+  const value1: TypeOf<typeof Type> = [
+    {
+      foo: 'abc',
+      bar: 123,
+    },
+    {
+      foo: 'def',
+      bar: 456,
+    },
+  ];
+  const value2: TypeOf<typeof Type> = [];
+  const value3 = [123];
+  const value4 = 'oops';
+
+  expect(Type.decode(x.json, JSON.stringify(value1))).toEqual(value1);
+  expect(Type.decode(x.json, JSON.stringify(value2))).toEqual(value2);
+  expect(() => Type.decode(x.json, JSON.stringify(value3)))
+    .toThrowErrorMatchingInlineSnapshot(`
+    "Failed to decode from medium:
+      [0] Expecting unpacked value to be a non-null object, getting [object Number]."
+  `);
+  expect(() => Type.decode(x.json, JSON.stringify(value4))).toThrow(
+    TypeConstraintError,
+  );
+
+  expect(Type.encode(x.json, value1)).toEqual(JSON.stringify(value1));
+  expect(Type.encode(x.json, value2)).toEqual(JSON.stringify(value2));
+  expect(() => Type.encode(x.json, value3 as any)).toThrow(TypeConstraintError);
+  expect(() => Type.encode(x.json, value4 as any)).toThrow(TypeConstraintError);
+
+  expect(Type.diagnose(value1)).toEqual([]);
+  expect(Type.diagnose(value2)).toEqual([]);
+  expect(Type.diagnose(value3)).toMatchInlineSnapshot(`
+    Array [
+      Object {
+        "message": "Expecting a non-null object, getting [object Number].",
+        "path": Array [
+          0,
+        ],
+      },
+    ]
+  `);
+  expect(Type.diagnose(value4)).toMatchInlineSnapshot(`
+    Array [
+      Object {
+        "message": "Expecting an array, getting [object String].",
+        "path": Array [],
+      },
+    ]
+  `);
+});

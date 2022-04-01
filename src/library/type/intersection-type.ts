@@ -37,8 +37,8 @@ export interface IntersectionType<TType> {
 
 export class IntersectionType<TType extends Type> extends Type<'intersection'> {
   constructor(readonly Types: TType[]) {
-    if (Types.length === 0) {
-      throw new TypeError();
+    if (Types.length < 2) {
+      throw new TypeError('Expecting at least 2 types for intersection type');
     }
 
     super();
@@ -108,7 +108,7 @@ export class IntersectionType<TType extends Type> extends Type<'intersection'> {
   }
 }
 
-export function intersection<TTypes extends Type[]>(
+export function intersection<TTypes extends [Type, Type, ...Type[]]>(
   ...Types: TTypes
 ): IntersectionType<TTypes[number]> {
   return new IntersectionType(Types);

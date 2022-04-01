@@ -37,8 +37,8 @@ export interface UnionType<TType> {
 
 export class UnionType<TType extends Type> extends Type<'union'> {
   constructor(readonly Types: TType[]) {
-    if (Types.length === 0) {
-      throw new TypeError();
+    if (Types.length < 2) {
+      throw new TypeError('Expecting at least 2 type for union type');
     }
 
     super();
@@ -156,7 +156,7 @@ export class UnionType<TType extends Type> extends Type<'union'> {
   }
 }
 
-export function union<TTypes extends Type[]>(
+export function union<TTypes extends [Type, Type, ...Type[]]>(
   ...Types: TTypes
 ): UnionType<TTypes[number]> {
   return new UnionType(Types);

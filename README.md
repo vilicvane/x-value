@@ -12,7 +12,6 @@ Comparing to the input/output concept of io-ts or Zod, X-Value uses medium/value
 
 - [ ] Self referencing types.
 - [ ] Documentation.
-- [ ] 100% test coverage.
 
 > I seriously doubt the usefulness of the medium/value concept in practice, after I prototyped X-Value.
 

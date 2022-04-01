@@ -1,4 +1,4 @@
-import {__ObjectTypeDefinitionToMediumType} from '../@utils';
+import {__ObjectTypeDefinitionToMediumType, toString} from '../@utils';
 import {Medium, MediumTypesPackedType} from '../medium';
 
 import {Type, TypeIssue, TypePath} from './type';
@@ -70,7 +70,9 @@ export class ObjectType<
         [
           {
             path,
-            message: `Expecting unpacked value to be a non-null object, getting ${unpacked}.`,
+            message: `Expecting unpacked value to be a non-null object, getting ${toString.call(
+              unpacked,
+            )}.`,
           },
         ],
       ];
@@ -107,7 +109,9 @@ export class ObjectType<
         [
           {
             path,
-            message: `Expecting value to be a non-null object, getting ${value}.`,
+            message: `Expecting value to be a non-null object, getting ${toString.call(
+              value,
+            )}.`,
           },
         ],
       ];
@@ -145,7 +149,9 @@ export class ObjectType<
         [
           {
             path,
-            message: `Expecting unpacked value to be a non-null object, getting ${unpacked}.`,
+            message: `Expecting unpacked value to be a non-null object, getting ${toString.call(
+              unpacked,
+            )}.`,
           },
         ],
       ];
@@ -178,7 +184,9 @@ export class ObjectType<
       return [
         {
           path,
-          message: `Expecting a non-null object, getting ${value}.`,
+          message: `Expecting a non-null object, getting ${toString.call(
+            value,
+          )}.`,
         },
       ];
     }

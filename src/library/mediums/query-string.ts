@@ -1,3 +1,4 @@
+import {toString} from '../@utils';
 import {atomicTypeSymbol, medium} from '../medium';
 import {booleanTypeSymbol, numberTypeSymbol} from '../types';
 
@@ -63,12 +64,15 @@ export const extendedQueryString = queryString.extend<ExtendedQueryStringTypes>(
   },
 );
 
-export function stringify(dict: unknown): string {
+function stringify(dict: unknown): string {
   if (typeof dict !== 'object' || dict === null) {
-    throw new TypeError('Expecting a non-null object');
+    throw new TypeError(
+      `Expected non-null object, getting ${toString.call(dict)}`,
+    );
   }
 
   return Object.entries(dict)
+    .filter(([, value]) => value !== undefined)
     .map(
       ([key, value]) =>
         `${encodeURIComponent(key)}=${encodeURIComponent(value)}`,
@@ -76,7 +80,7 @@ export function stringify(dict: unknown): string {
     .join('&');
 }
 
-export function parse(queryString: string): Record<string, string> {
+function parse(queryString: string): Record<string, string> {
   if (queryString.length === 0) {
     return {};
   }

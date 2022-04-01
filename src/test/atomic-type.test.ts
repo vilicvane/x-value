@@ -5,6 +5,74 @@ export const Sunday = x.Date.refine<Date & {__nominal: 'Sunday'}>(
   date => date.getDay() === 0,
 );
 
+it('pre-defined atomic types should decode/encode ecmascript medium', () => {
+  expect(x.undefined.decode(x.ecmascript, undefined)).toBe(undefined);
+  expect(x.nullType.decode(x.ecmascript, null)).toBe(null);
+  expect(x.string.decode(x.ecmascript, 'text')).toBe('text');
+  expect(x.number.decode(x.ecmascript, 123)).toBe(123);
+  expect(x.boolean.decode(x.ecmascript, true)).toBe(true);
+
+  expect(x.undefined.encode(x.ecmascript, undefined)).toBe(undefined);
+  expect(x.nullType.encode(x.ecmascript, null)).toBe(null);
+  expect(x.string.encode(x.ecmascript, 'text')).toBe('text');
+  expect(x.number.encode(x.ecmascript, 123)).toBe(123);
+  expect(x.boolean.encode(x.ecmascript, true)).toBe(true);
+});
+
+it('pre-defined atomic types should error decode/encode ecmascript medium with wrong packed value', () => {
+  expect(() => x.undefined.decode(x.ecmascript, true as any))
+    .toThrowErrorMatchingInlineSnapshot(`
+    "Failed to decode from medium:
+      Expected undefined, getting [object Boolean]."
+  `);
+  expect(() => x.nullType.decode(x.ecmascript, undefined as any))
+    .toThrowErrorMatchingInlineSnapshot(`
+    "Failed to decode from medium:
+      Expected null, getting [object Undefined]."
+  `);
+  expect(() => x.string.decode(x.ecmascript, null as any))
+    .toThrowErrorMatchingInlineSnapshot(`
+    "Failed to decode from medium:
+      Expected string, getting [object Null]."
+  `);
+  expect(() => x.number.decode(x.ecmascript, 'text' as any))
+    .toThrowErrorMatchingInlineSnapshot(`
+    "Failed to decode from medium:
+      Expected number, getting [object String]."
+  `);
+  expect(() => x.boolean.decode(x.ecmascript, 123 as any))
+    .toThrowErrorMatchingInlineSnapshot(`
+    "Failed to decode from medium:
+      Expected boolean, getting [object Number]."
+  `);
+
+  expect(() => x.undefined.encode(x.ecmascript, true as any))
+    .toThrowErrorMatchingInlineSnapshot(`
+    "Failed to encode to medium:
+      Expected undefined, getting [object Boolean]."
+  `);
+  expect(() => x.nullType.encode(x.ecmascript, undefined as any))
+    .toThrowErrorMatchingInlineSnapshot(`
+    "Failed to encode to medium:
+      Expected null, getting [object Undefined]."
+  `);
+  expect(() => x.string.encode(x.ecmascript, null as any))
+    .toThrowErrorMatchingInlineSnapshot(`
+    "Failed to encode to medium:
+      Expected string, getting [object Null]."
+  `);
+  expect(() => x.number.encode(x.ecmascript, 'text' as any))
+    .toThrowErrorMatchingInlineSnapshot(`
+    "Failed to encode to medium:
+      Expected number, getting [object String]."
+  `);
+  expect(() => x.boolean.encode(x.ecmascript, 123 as any))
+    .toThrowErrorMatchingInlineSnapshot(`
+    "Failed to encode to medium:
+      Expected boolean, getting [object Number]."
+  `);
+});
+
 it('pre-defined atomic types should decode/encode json medium', () => {
   expect(x.nullType.decode(x.json, 'null')).toBe(null);
   expect(x.string.decode(x.json, '"text"')).toBe('text');
@@ -17,7 +85,7 @@ it('pre-defined atomic types should decode/encode json medium', () => {
   expect(x.boolean.encode(x.json, true)).toBe('true');
 });
 
-it('pre-defined atomic types should error decode/encode json medium with wrong unpacked value', () => {
+it('pre-defined atomic types should error decode/encode json medium with wrong packed value', () => {
   expect(() => x.nullType.decode(x.json, '"text"'))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to decode from medium:
@@ -53,7 +121,7 @@ it('date atomic type should error decoding json medium', () => {
   // expect(() => x.Date.encode(x.json, new Date())).toThrow(TypeConstraintError);
 });
 
-it('date atomic type should decode/encode extended json medium', () => {
+it('date atomic type should work with extended json medium', () => {
   let date = new Date();
 
   expect(x.Date.decode(x.extendedJSON, JSON.stringify(date)).getTime()).toBe(
@@ -61,6 +129,10 @@ it('date atomic type should decode/encode extended json medium', () => {
   );
 
   expect(x.Date.encode(x.extendedJSON, date)).toBe(JSON.stringify(date));
+
+  expect(() =>
+    x.Date.decode(x.extendedJSON, '"invalid date"'),
+  ).toThrowErrorMatchingInlineSnapshot(`"Invalid date value"`);
 });
 
 it('date atomic refinement sunday should work with extended json medium', () => {
