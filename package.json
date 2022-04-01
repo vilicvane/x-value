@@ -10,7 +10,8 @@
     "build": "rimraf ./bld && tsc --build",
     "lint": "run-in-every eslint-project --parallel --echo -- eslint --config {configFileName} .",
     "lint-prettier": "prettier --check .",
-    "test": "yarn lint-prettier && yarn build && yarn lint && jest"
+    "test": "yarn lint-prettier && yarn build && yarn lint && jest",
+    "prepublishOnly": "yarn build"
   },
   "dependencies": {
     "tslib": "^2.3.1"
