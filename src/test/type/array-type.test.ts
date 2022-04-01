@@ -11,9 +11,11 @@ it('simple array type should work with json medium', () => {
 
   expect(Type.decode(x.json, JSON.stringify(value1))).toEqual(value1);
   expect(Type.decode(x.json, JSON.stringify(value2))).toEqual(value2);
-  expect(() => Type.decode(x.json, JSON.stringify(value3))).toThrow(
-    TypeConstraintError,
-  );
+  expect(() => Type.decode(x.json, JSON.stringify(value3)))
+    .toThrowErrorMatchingInlineSnapshot(`
+    "Failed to decode from medium:
+      [0] Expected string, getting [object Number]."
+  `);
   expect(() => Type.decode(x.json, JSON.stringify(value4))).toThrow(
     TypeConstraintError,
   );
@@ -40,9 +42,11 @@ it('simple array type should work with extended json medium', () => {
   expect(() => Type.decode(x.extendedJSON, JSON.stringify(value3))).toThrow(
     TypeError,
   );
-  expect(() => Type.decode(x.extendedJSON, JSON.stringify(value4))).toThrow(
-    TypeConstraintError,
-  );
+  expect(() => Type.decode(x.extendedJSON, JSON.stringify(value4)))
+    .toThrowErrorMatchingInlineSnapshot(`
+    "Failed to decode from medium:
+      Expecting unpacked value to be an array, getting [object String]."
+  `);
 
   expect(Type.encode(x.extendedJSON, value1)).toEqual(JSON.stringify(value1));
   expect(Type.encode(x.extendedJSON, value2)).toEqual(JSON.stringify(value2));

@@ -61,6 +61,8 @@ it('convert medium A to medium B and back', () => {
 
   expect(Type.convert(mediumA, mediumB, a)).toEqual(b);
   expect(Type.convert(mediumB, mediumA, b)).toEqual(a);
+  expect(() => Type.convert(mediumA, mediumB, b as any)).toThrow(TypeError);
+  expect(() => Type.convert(mediumB, mediumA, a as any)).toThrow(TypeError);
 
   expect(Type.decode(mediumA, a)).toEqual(value);
   expect(Type.decode(mediumB, b)).toEqual(value);

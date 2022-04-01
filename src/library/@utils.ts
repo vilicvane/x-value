@@ -8,7 +8,9 @@ import {
   UnionType,
 } from './type';
 
-const hasOwnProperty = Object.prototype.hasOwnProperty;
+export const hasOwnProperty = Object.prototype.hasOwnProperty;
+
+export const toString = Object.prototype.toString;
 
 export type __MediumTypeOf<
   TType,

@@ -18,9 +18,11 @@ it('pre-defined atomic types should decode/encode json medium', () => {
 });
 
 it('pre-defined atomic types should error decode/encode json medium with wrong unpacked value', () => {
-  expect(() => x.nullType.decode(x.json, '"text"')).toThrow(
-    TypeConstraintError,
-  );
+  expect(() => x.nullType.decode(x.json, '"text"'))
+    .toThrowErrorMatchingInlineSnapshot(`
+    "Failed to decode from medium:
+      Expected null, getting [object String]."
+  `);
   expect(() => x.string.decode(x.json, '123')).toThrow(TypeConstraintError);
   expect(() => x.number.decode(x.json, 'true')).toThrow(TypeConstraintError);
   expect(() => x.boolean.decode(x.json, 'null')).toThrow(TypeConstraintError);
@@ -40,9 +42,11 @@ it('pre-defined atomic types should error decode/encode json medium with wrong u
 });
 
 it('date atomic type should error decoding json medium', () => {
-  expect(() =>
-    x.Date.decode(x.json, JSON.stringify(new Date().toISOString())),
-  ).toThrow(TypeConstraintError);
+  expect(() => x.Date.decode(x.json, JSON.stringify(new Date().toISOString())))
+    .toThrowErrorMatchingInlineSnapshot(`
+    "Failed to decode from medium:
+      Expected instance of Date, getting [object String]."
+  `);
 
   // Will not throw because json medium has defined atomicTypeSymbol codec as
   // fallback:
@@ -83,7 +87,8 @@ it('date atomic refinement sunday should work with extended json medium', () => 
   expect(Sunday.diagnose(monday)).toMatchInlineSnapshot(`
     Array [
       Object {
-        "message": "Unexpected value",
+        "message": "Unexpected value.",
+        "path": Array [],
       },
     ]
   `);

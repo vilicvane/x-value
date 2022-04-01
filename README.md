@@ -6,7 +6,6 @@ Comparing to the input/output concept of io-ts or Zod, X-Value uses medium/value
 
 **Currently under development.**
 
-- [ ] Better `TypeConstraintError`.
 - [ ] Self referencing types.
 - [ ] Documentation.
 - [ ] 100% test coverage.

@@ -9,13 +9,21 @@ it('union type of atomic types should work with json medium', () => {
 
   expect(Type.decode(x.json, JSON.stringify(value1))).toEqual(value1);
   expect(Type.decode(x.json, JSON.stringify(value2))).toEqual(value2);
-  expect(() => Type.decode(x.json, JSON.stringify(true))).toThrow(
-    TypeConstraintError,
-  );
+  expect(() => Type.decode(x.json, JSON.stringify(true)))
+    .toThrowErrorMatchingInlineSnapshot(`
+    "Failed to decode from medium:
+      The unpacked value satisfies none of the type in the union type.
+      Expected number, getting [object Boolean]."
+  `);
 
   expect(JSON.parse(Type.encode(x.json, value1))).toEqual(value1);
   expect(JSON.parse(Type.encode(x.json, value2))).toEqual(value2);
-  expect(() => Type.encode(x.json, true as any)).toThrow(TypeConstraintError);
+  expect(() => Type.encode(x.json, true as any))
+    .toThrowErrorMatchingInlineSnapshot(`
+    "Failed to encode to medium:
+      The unpacked value satisfies none of the type in the union type.
+      Expected number, getting [object Boolean]."
+  `);
 
   expect(Type.is(value1)).toBe(true);
   expect(Type.is(value2)).toBe(true);
@@ -44,14 +52,25 @@ it('union type of mixed types should work with json medium', () => {
 
   expect(Type.decode(x.json, JSON.stringify(value1))).toEqual(value1);
   expect(Type.decode(x.json, JSON.stringify(value2))).toEqual(value2);
-  expect(() => Type.decode(x.json, JSON.stringify(true))).toThrow(
-    TypeConstraintError,
-  );
+  expect(() => Type.decode(x.json, JSON.stringify(true)))
+    .toThrowErrorMatchingInlineSnapshot(`
+    "Failed to decode from medium:
+      The unpacked value satisfies none of the type in the union type.
+      Expected number, getting [object Boolean]."
+  `);
 
   expect(JSON.parse(Type.encode(x.json, value1))).toEqual(value1);
   expect(JSON.parse(Type.encode(x.json, value2))).toEqual(value2);
-  expect(() => Type.encode(x.json, value3)).toThrow(TypeConstraintError);
-  expect(() => Type.encode(x.json, value4)).toThrow(TypeConstraintError);
+  expect(() => Type.encode(x.json, value3)).toThrowErrorMatchingInlineSnapshot(`
+    "Failed to encode to medium:
+      The unpacked value satisfies none of the type in the union type.
+      Expected number, getting [object Boolean]."
+  `);
+  expect(() => Type.encode(x.json, value4)).toThrowErrorMatchingInlineSnapshot(`
+    "Failed to encode to medium:
+      The unpacked value satisfies none of the type in the union type.
+      Expected number, getting [object Object]."
+  `);
 
   expect(Type.is(value1)).toBe(true);
   expect(Type.is(value2)).toBe(true);
@@ -81,9 +100,8 @@ it('union type of mixed types should work with json value medium', () => {
 
   expect(Type.decode(x.jsonValue, value1)).toEqual(value1);
   expect(Type.decode(x.jsonValue, value2)).toEqual(value2);
-  expect(() => Type.decode(x.jsonValue, true as any)).toThrow(
-    TypeConstraintError,
-  );
+  expect(() => Type.decode(x.jsonValue, value3)).toThrow(TypeConstraintError);
+  expect(() => Type.decode(x.jsonValue, value4)).toThrow(TypeConstraintError);
 
   expect(Type.encode(x.jsonValue, value1)).toEqual(value1);
   expect(Type.encode(x.jsonValue, value2)).toEqual(value2);

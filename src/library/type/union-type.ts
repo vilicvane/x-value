@@ -1,7 +1,7 @@
 import {__MediumTypeOf} from '../@utils';
 import {Medium, MediumTypesPackedType} from '../medium';
 
-import {Type, TypeIssue, TypeOf} from './type';
+import {Type, TypeIssue, TypeOf, TypePath} from './type';
 
 export interface UnionType<TType> {
   decode<TMediumTypes extends object>(
@@ -45,11 +45,15 @@ export class UnionType<TType extends Type> extends Type<'union'> {
   }
 
   /** @internal */
-  decodeUnpacked(medium: Medium, unpacked: unknown): [unknown, TypeIssue[]] {
+  _decode(
+    medium: Medium,
+    unpacked: unknown,
+    path: TypePath,
+  ): [unknown, TypeIssue[]] {
     let lastIssues!: TypeIssue[];
 
     for (let Type of this.Types) {
-      let [value, issues] = Type.decodeUnpacked(medium, unpacked);
+      let [value, issues] = Type._decode(medium, unpacked, path);
 
       if (issues.length === 0) {
         return [value, issues];
@@ -62,8 +66,9 @@ export class UnionType<TType extends Type> extends Type<'union'> {
       undefined,
       [
         {
+          path,
           message:
-            'The unpacked value satisfies none of the type in the union type',
+            'The unpacked value satisfies none of the type in the union type.',
         },
         ...lastIssues,
       ],
@@ -71,11 +76,15 @@ export class UnionType<TType extends Type> extends Type<'union'> {
   }
 
   /** @internal */
-  encodeUnpacked(medium: Medium, value: unknown): [unknown, TypeIssue[]] {
+  _encode(
+    medium: Medium,
+    value: unknown,
+    path: TypePath,
+  ): [unknown, TypeIssue[]] {
     let lastIssues!: TypeIssue[];
 
     for (let Type of this.Types) {
-      let [unpacked, issues] = Type.encodeUnpacked(medium, value);
+      let [unpacked, issues] = Type._encode(medium, value, path);
 
       if (issues.length === 0) {
         return [unpacked, issues];
@@ -88,8 +97,9 @@ export class UnionType<TType extends Type> extends Type<'union'> {
       undefined,
       [
         {
+          path,
           message:
-            'The unpacked value satisfies none of the type in the union type',
+            'The unpacked value satisfies none of the type in the union type.',
         },
         ...lastIssues,
       ],
@@ -97,19 +107,16 @@ export class UnionType<TType extends Type> extends Type<'union'> {
   }
 
   /** @internal */
-  convertUnpacked(
+  _convert(
     from: Medium,
     to: Medium,
     unpacked: unknown,
+    path: TypePath,
   ): [unknown, TypeIssue[]] {
     let lastIssues!: TypeIssue[];
 
     for (let Type of this.Types) {
-      let [convertedUnpacked, issues] = Type.convertUnpacked(
-        from,
-        to,
-        unpacked,
-      );
+      let [convertedUnpacked, issues] = Type._convert(from, to, unpacked, path);
 
       if (issues.length === 0) {
         return [convertedUnpacked, issues];
@@ -122,19 +129,21 @@ export class UnionType<TType extends Type> extends Type<'union'> {
       undefined,
       [
         {
+          path,
           message:
-            'The unpacked value satisfies none of the type in the union type',
+            'The unpacked value satisfies none of the type in the union type.',
         },
         ...lastIssues,
       ],
     ];
   }
 
-  diagnose(value: unknown): TypeIssue[] {
+  /** @internal */
+  _diagnose(value: unknown, path: TypePath): TypeIssue[] {
     let lastIssues!: TypeIssue[];
 
     for (let Type of this.Types) {
-      let issues = Type.diagnose(value);
+      let issues = Type._diagnose(value, path);
 
       lastIssues = issues;
 

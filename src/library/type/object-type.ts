@@ -1,7 +1,7 @@
 import {__ObjectTypeDefinitionToMediumType} from '../@utils';
 import {Medium, MediumTypesPackedType} from '../medium';
 
-import {Type, TypeIssue} from './type';
+import {Type, TypeIssue, TypePath} from './type';
 
 export interface ObjectType<TTypeDefinition> {
   decode<TMediumTypes extends object>(
@@ -57,7 +57,11 @@ export class ObjectType<
   }
 
   /** @internal */
-  decodeUnpacked(medium: Medium, unpacked: unknown): [unknown, TypeIssue[]] {
+  _decode(
+    medium: Medium,
+    unpacked: unknown,
+    path: TypePath,
+  ): [unknown, TypeIssue[]] {
     // TODO: implicit conversion to object?
 
     if (typeof unpacked !== 'object' || unpacked === null) {
@@ -65,6 +69,7 @@ export class ObjectType<
         undefined,
         [
           {
+            path,
             message: `Expecting unpacked value to be a non-null object, getting ${unpacked}.`,
           },
         ],
@@ -75,10 +80,10 @@ export class ObjectType<
     let issues: TypeIssue[] = [];
 
     for (let [key, Type] of Object.entries(this.definition)) {
-      let [value, entryIssues] = Type.decodeUnpacked(
-        medium,
-        (unpacked as any)[key],
-      );
+      let [value, entryIssues] = Type._decode(medium, (unpacked as any)[key], [
+        ...path,
+        key,
+      ]);
 
       entries.push([key, value]);
       issues.push(...entryIssues);
@@ -91,12 +96,17 @@ export class ObjectType<
   }
 
   /** @internal */
-  encodeUnpacked(medium: Medium, value: unknown): [unknown, TypeIssue[]] {
+  _encode(
+    medium: Medium,
+    value: unknown,
+    path: TypePath,
+  ): [unknown, TypeIssue[]] {
     if (typeof value !== 'object' || value === null) {
       return [
         undefined,
         [
           {
+            path,
             message: `Expecting value to be a non-null object, getting ${value}.`,
           },
         ],
@@ -107,10 +117,10 @@ export class ObjectType<
     let issues: TypeIssue[] = [];
 
     for (let [key, Type] of Object.entries(this.definition)) {
-      let [unpacked, entryIssues] = Type.encodeUnpacked(
-        medium,
-        (value as any)[key],
-      );
+      let [unpacked, entryIssues] = Type._encode(medium, (value as any)[key], [
+        ...path,
+        key,
+      ]);
 
       entries.push([key, unpacked]);
       issues.push(...entryIssues);
@@ -123,16 +133,18 @@ export class ObjectType<
   }
 
   /** @internal */
-  convertUnpacked(
+  _convert(
     from: Medium,
     to: Medium,
     unpacked: unknown,
+    path: TypePath,
   ): [unknown, TypeIssue[]] {
     if (typeof unpacked !== 'object' || unpacked === null) {
       return [
         undefined,
         [
           {
+            path,
             message: `Expecting unpacked value to be a non-null object, getting ${unpacked}.`,
           },
         ],
@@ -143,10 +155,11 @@ export class ObjectType<
     let issues: TypeIssue[] = [];
 
     for (let [key, Type] of Object.entries(this.definition)) {
-      let [convertedUnpacked, entryIssues] = Type.convertUnpacked(
+      let [convertedUnpacked, entryIssues] = Type._convert(
         from,
         to,
         (unpacked as any)[key],
+        [...path, key],
       );
 
       entries.push([key, convertedUnpacked]);
@@ -159,17 +172,19 @@ export class ObjectType<
     ];
   }
 
-  diagnose(value: unknown): TypeIssue[] {
+  /** @internal */
+  _diagnose(value: unknown, path: TypePath): TypeIssue[] {
     if (typeof value !== 'object' || value === null) {
       return [
         {
+          path,
           message: `Expecting a non-null object, getting ${value}.`,
         },
       ];
     }
 
     return Object.entries(this.definition).flatMap(([key, Type]) =>
-      Type.diagnose((value as any)[key]),
+      Type._diagnose((value as any)[key], [...path, key]),
     );
   }
 }

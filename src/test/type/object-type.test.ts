@@ -31,6 +31,7 @@ it('simple object type should work with json medium', () => {
       wild: 'oops',
     } as any),
   ).toEqual(JSON.stringify(value));
+
   expect(() => Type.encode(x.json, {} as any)).toThrow(TypeConstraintError);
 
   expect(Type.is(value)).toBe(true);

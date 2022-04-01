@@ -1,7 +1,7 @@
-import {__MediumTypeOf} from '../@utils';
+import {__MediumTypeOf, toString} from '../@utils';
 import {Medium, MediumTypesPackedType} from '../medium';
 
-import {Type, TypeIssue, TypeOf} from './type';
+import {Type, TypeIssue, TypeOf, TypePath} from './type';
 
 export interface ArrayType<TElement> {
   decode<TMediumTypes extends object>(
@@ -41,7 +41,11 @@ export class ArrayType<TElement extends Type> extends Type<'array'> {
   }
 
   /** @internal */
-  decodeUnpacked(medium: Medium, unpacked: unknown): [unknown, TypeIssue[]] {
+  _decode(
+    medium: Medium,
+    unpacked: unknown,
+    path: TypePath,
+  ): [unknown, TypeIssue[]] {
     // TODO: implicit conversion to array.
 
     if (!Array.isArray(unpacked)) {
@@ -49,7 +53,10 @@ export class ArrayType<TElement extends Type> extends Type<'array'> {
         undefined,
         [
           {
-            message: `Expecting unpacked value to be an array, getting ${unpacked}.`,
+            path,
+            message: `Expecting unpacked value to be an array, getting ${toString.call(
+              unpacked,
+            )}.`,
           },
         ],
       ];
@@ -60,11 +67,11 @@ export class ArrayType<TElement extends Type> extends Type<'array'> {
     let value: unknown[] = [];
     let issues: TypeIssue[] = [];
 
-    for (let unpackedElement of unpacked) {
-      let [element, entryIssues] = Element.decodeUnpacked(
-        medium,
-        unpackedElement,
-      );
+    for (let [index, unpackedElement] of unpacked.entries()) {
+      let [element, entryIssues] = Element._decode(medium, unpackedElement, [
+        ...path,
+        index,
+      ]);
 
       value.push(element);
       issues.push(...entryIssues);
@@ -74,13 +81,20 @@ export class ArrayType<TElement extends Type> extends Type<'array'> {
   }
 
   /** @internal */
-  encodeUnpacked(medium: Medium, value: unknown): [unknown, TypeIssue[]] {
+  _encode(
+    medium: Medium,
+    value: unknown,
+    path: TypePath,
+  ): [unknown, TypeIssue[]] {
     if (!Array.isArray(value)) {
       return [
         undefined,
         [
           {
-            message: `Expecting value to be an array, getting ${value}.`,
+            path,
+            message: `Expecting value to be an array, getting ${toString.call(
+              value,
+            )}.`,
           },
         ],
       ];
@@ -91,10 +105,11 @@ export class ArrayType<TElement extends Type> extends Type<'array'> {
     let unpacked: unknown[] = [];
     let issues: TypeIssue[] = [];
 
-    for (let valueElement of value) {
-      let [unpackedElement, entryIssues] = Element.encodeUnpacked(
+    for (let [index, valueElement] of value.entries()) {
+      let [unpackedElement, entryIssues] = Element._encode(
         medium,
         valueElement,
+        [...path, index],
       );
 
       unpacked.push(unpackedElement);
@@ -105,10 +120,11 @@ export class ArrayType<TElement extends Type> extends Type<'array'> {
   }
 
   /** @internal */
-  convertUnpacked(
+  _convert(
     from: Medium,
     to: Medium,
     unpacked: unknown,
+    path: TypePath,
   ): [unknown, TypeIssue[]] {
     // TODO: implicit conversion to array.
 
@@ -117,7 +133,10 @@ export class ArrayType<TElement extends Type> extends Type<'array'> {
         undefined,
         [
           {
-            message: `Expecting unpacked value to be an array, getting ${unpacked}.`,
+            path,
+            message: `Expecting unpacked value to be an array, getting ${toString.call(
+              unpacked,
+            )}.`,
           },
         ],
       ];
@@ -128,12 +147,11 @@ export class ArrayType<TElement extends Type> extends Type<'array'> {
     let value: unknown[] = [];
     let issues: TypeIssue[] = [];
 
-    for (let unpackedElement of unpacked) {
-      let [element, entryIssues] = Element.convertUnpacked(
-        from,
-        to,
-        unpackedElement,
-      );
+    for (let [index, unpackedElement] of unpacked.entries()) {
+      let [element, entryIssues] = Element._convert(from, to, unpackedElement, [
+        ...path,
+        index,
+      ]);
 
       value.push(element);
       issues.push(...entryIssues);
@@ -142,18 +160,22 @@ export class ArrayType<TElement extends Type> extends Type<'array'> {
     return [issues.length === 0 ? value : undefined, issues];
   }
 
-  diagnose(value: unknown): TypeIssue[] {
+  /** @internal */
+  _diagnose(value: unknown, path: TypePath): TypeIssue[] {
     if (!Array.isArray(value)) {
       return [
         {
-          message: `Expecting an array, getting ${value}.`,
+          path,
+          message: `Expecting an array, getting ${toString.call(value)}.`,
         },
       ];
     }
 
     let Element = this.Element;
 
-    return value.flatMap(element => Element.diagnose(element));
+    return value.flatMap((element, index) =>
+      Element._diagnose(element, [...path, index]),
+    );
   }
 }
 

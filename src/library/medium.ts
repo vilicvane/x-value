@@ -39,7 +39,7 @@ export class Medium<TMediumTypes extends object = GeneralMediumTypes> {
   private codecs: MediumAtomicCodecs<TMediumTypes>;
 
   constructor(
-    readonly description: string,
+    readonly name: string,
     {packing, codecs}: MediumOptions<TMediumTypes>,
   ) {
     this.packing = packing;

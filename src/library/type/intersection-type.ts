@@ -1,7 +1,7 @@
 import {__MediumTypeOf, __UnionToIntersection, merge} from '../@utils';
 import {Medium, MediumTypesPackedType} from '../medium';
 
-import {Type, TypeIssue, TypeOf} from './type';
+import {Type, TypeIssue, TypeOf, TypePath} from './type';
 
 export interface IntersectionType<TType> {
   decode<TMediumTypes extends object>(
@@ -45,46 +45,16 @@ export class IntersectionType<TType extends Type> extends Type<'intersection'> {
   }
 
   /** @internal */
-  decodeUnpacked(medium: Medium, unpacked: unknown): [unknown, TypeIssue[]] {
-    let partials: unknown[] = [];
-    let issues: TypeIssue[] = [];
-
-    for (let Type of this.Types) {
-      let [partial, partialIssues] = Type.decodeUnpacked(medium, unpacked);
-
-      partials.push(partial);
-      issues.push(...partialIssues);
-    }
-
-    return [issues.length === 0 ? merge(partials) : undefined, issues];
-  }
-
-  /** @internal */
-  encodeUnpacked(medium: Medium, value: unknown): [unknown, TypeIssue[]] {
-    let partials: unknown[] = [];
-    let issues: TypeIssue[] = [];
-
-    for (let Type of this.Types) {
-      let [partial, partialIssues] = Type.encodeUnpacked(medium, value);
-
-      partials.push(partial);
-      issues.push(...partialIssues);
-    }
-
-    return [issues.length === 0 ? merge(partials) : undefined, issues];
-  }
-
-  /** @internal */
-  convertUnpacked(
-    from: Medium,
-    to: Medium,
+  _decode(
+    medium: Medium,
     unpacked: unknown,
+    path: TypePath,
   ): [unknown, TypeIssue[]] {
     let partials: unknown[] = [];
     let issues: TypeIssue[] = [];
 
     for (let Type of this.Types) {
-      let [partial, partialIssues] = Type.convertUnpacked(from, to, unpacked);
+      let [partial, partialIssues] = Type._decode(medium, unpacked, path);
 
       partials.push(partial);
       issues.push(...partialIssues);
@@ -93,8 +63,48 @@ export class IntersectionType<TType extends Type> extends Type<'intersection'> {
     return [issues.length === 0 ? merge(partials) : undefined, issues];
   }
 
-  diagnose(value: unknown): TypeIssue[] {
-    return this.Types.flatMap(Type => Type.diagnose(value));
+  /** @internal */
+  _encode(
+    medium: Medium,
+    value: unknown,
+    path: TypePath,
+  ): [unknown, TypeIssue[]] {
+    let partials: unknown[] = [];
+    let issues: TypeIssue[] = [];
+
+    for (let Type of this.Types) {
+      let [partial, partialIssues] = Type._encode(medium, value, path);
+
+      partials.push(partial);
+      issues.push(...partialIssues);
+    }
+
+    return [issues.length === 0 ? merge(partials) : undefined, issues];
+  }
+
+  /** @internal */
+  _convert(
+    from: Medium,
+    to: Medium,
+    unpacked: unknown,
+    path: TypePath,
+  ): [unknown, TypeIssue[]] {
+    let partials: unknown[] = [];
+    let issues: TypeIssue[] = [];
+
+    for (let Type of this.Types) {
+      let [partial, partialIssues] = Type._convert(from, to, unpacked, path);
+
+      partials.push(partial);
+      issues.push(...partialIssues);
+    }
+
+    return [issues.length === 0 ? merge(partials) : undefined, issues];
+  }
+
+  /** @internal */
+  _diagnose(value: unknown, path: TypePath): TypeIssue[] {
+    return this.Types.flatMap(Type => Type._diagnose(value, path));
   }
 }
 

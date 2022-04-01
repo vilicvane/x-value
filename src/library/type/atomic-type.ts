@@ -1,7 +1,7 @@
 import {__AtomicMediumType} from '../@utils';
 import {Medium, MediumTypesPackedType} from '../medium';
 
-import {Type, TypeConstraint, TypeIssue} from './type';
+import {Type, TypeConstraint, TypeIssue, TypePath} from './type';
 
 export type AtomicTypeType<
   TType,
@@ -61,17 +61,25 @@ export class AtomicType<
   }
 
   /** @internal */
-  decodeUnpacked(medium: Medium, unpacked: unknown): [unknown, TypeIssue[]] {
+  _decode(
+    medium: Medium,
+    unpacked: unknown,
+    path: TypePath,
+  ): [unknown, TypeIssue[]] {
     let value = medium.requireCodec(this.symbol).decode(unpacked);
 
-    let issues = this.diagnose(value);
+    let issues = this._diagnose(value, path);
 
     return [issues.length === 0 ? value : undefined, issues];
   }
 
   /** @internal */
-  encodeUnpacked(medium: Medium, value: unknown): [unknown, TypeIssue[]] {
-    let issues = this.diagnose(value);
+  _encode(
+    medium: Medium,
+    value: unknown,
+    path: TypePath,
+  ): [unknown, TypeIssue[]] {
+    let issues = this._diagnose(value, path);
 
     if (issues.length > 0) {
       return [undefined, issues];
@@ -83,16 +91,17 @@ export class AtomicType<
   }
 
   /** @internal */
-  convertUnpacked(
+  _convert(
     from: Medium,
     to: Medium,
     unpacked: unknown,
+    path: TypePath,
   ): [unknown, TypeIssue[]] {
     let symbol = this.symbol;
 
     let value = from.requireCodec(symbol).decode(unpacked);
 
-    let issues = this.diagnose(value);
+    let issues = this._diagnose(value, path);
 
     if (issues.length > 0) {
       return [undefined, issues];
@@ -103,7 +112,8 @@ export class AtomicType<
     return [convertedUnpacked, issues];
   }
 
-  diagnose(value: unknown): TypeIssue[] {
+  /** @internal */
+  _diagnose(value: unknown, path: TypePath): TypeIssue[] {
     let issues: TypeIssue[] = [];
 
     for (let constraint of this.constraints) {
@@ -114,7 +124,8 @@ export class AtomicType<
       }
 
       issues.push({
-        message: typeof result === 'string' ? result : 'Unexpected value',
+        path,
+        message: typeof result === 'string' ? result : 'Unexpected value.',
       });
     }
 

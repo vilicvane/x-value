@@ -1,7 +1,7 @@
 import {__MediumTypeOf} from '../@utils';
 import {Medium, MediumTypesPackedType} from '../medium';
 
-import {Type, TypeIssue, TypeOf} from './type';
+import {Type, TypeIssue, TypeOf, TypePath} from './type';
 
 export interface OptionalType<TType> {
   decode<TMediumTypes extends object>(
@@ -35,45 +35,56 @@ export class OptionalType<TType extends Type> extends Type<'optional'> {
   }
 
   /** @internal */
-  decodeUnpacked(medium: Medium, unpacked: unknown): [unknown, TypeIssue[]] {
+  _decode(
+    medium: Medium,
+    unpacked: unknown,
+    path: TypePath,
+  ): [unknown, TypeIssue[]] {
     if (unpacked === undefined) {
       return [undefined, []];
     } else {
-      let [value, issues] = this.Type.decodeUnpacked(medium, unpacked);
+      let [value, issues] = this.Type._decode(medium, unpacked, path);
       return [issues.length === 0 ? value : undefined, issues];
     }
   }
 
   /** @internal */
-  encodeUnpacked(medium: Medium, value: unknown): [unknown, TypeIssue[]] {
+  _encode(
+    medium: Medium,
+    value: unknown,
+    path: TypePath,
+  ): [unknown, TypeIssue[]] {
     if (value === undefined) {
       return [undefined, []];
     } else {
-      let [unpacked, issues] = this.Type.encodeUnpacked(medium, value);
+      let [unpacked, issues] = this.Type._encode(medium, value, path);
       return [issues.length === 0 ? unpacked : undefined, issues];
     }
   }
 
   /** @internal */
-  convertUnpacked(
+  _convert(
     from: Medium,
     to: Medium,
     unpacked: unknown,
+    path: TypePath,
   ): [unknown, TypeIssue[]] {
     if (unpacked === undefined) {
       return [undefined, []];
     } else {
-      let [convertedUnpacked, issues] = this.Type.convertUnpacked(
+      let [convertedUnpacked, issues] = this.Type._convert(
         from,
         to,
         unpacked,
+        path,
       );
       return [issues.length === 0 ? convertedUnpacked : undefined, issues];
     }
   }
 
-  diagnose(value: unknown): TypeIssue[] {
-    return value === undefined ? [] : this.Type.diagnose(value);
+  /** @internal */
+  _diagnose(value: unknown, path: TypePath): TypeIssue[] {
+    return value === undefined ? [] : this.Type._diagnose(value, path);
   }
 }
 
