@@ -13,6 +13,7 @@ Comparing to the input/output concept of io-ts or Zod, X-Value uses medium/value
 
 **Currently under development.**
 
+- [ ] Missing types.
 - [ ] Self referencing types.
 - [ ] Documentation.
 
