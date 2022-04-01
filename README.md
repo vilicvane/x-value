@@ -48,6 +48,17 @@ const I = x.intersection(
 );
 ```
 
+Refine atomic type:
+
+```ts
+const Email = x.string.refine(value => value.includes('@'));
+
+// Or with nominal type.
+const Email = x.string.refine<string & {__nominal: 'email'}>(value =>
+  value.includes('@'),
+);
+```
+
 Decode from medium:
 
 ```ts
@@ -95,6 +106,10 @@ Assuming we have 3 mediums: `browser`, `server`, `rpc`; and 2 types: `ObjectId`,
 | `ObjectId`  | `string` | packed as `string` | `ObjectId` | `string` |
 | `Date`      | `Date`   | packed as `string` | `Date`     | `Date`   |
 
+Mediums are what's used to store values, and values are forms of data supported across environments using JavaScript language features.
+
+So usually mediums are in form of string and buffer (it could also be structured JavaScript values). And values are valid JavaScript runtime values.
+
 We can encode value to a medium:
 
 <!-- prettier-ignore -->
@@ -124,6 +139,62 @@ ObjectId.decode(server, new ObjectId('6246056b1be8cbf6ca18401f'));
 Date.decode(browser, new Date('2022-03-31T16:00:00.000Z'));
 Date.decode(rpc, '"2022-03-31T16:00:00.000Z"');
 Date.decode(server, new Date('2022-03-31T16:00:00.000Z'));
+```
+
+## New Atomic Type
+
+Before we can add medium support for a new type of atomic value, we need to add new atomic value. It is quite easy to do so:
+
+```ts
+import * as x from 'x-value';
+
+// 1. Create a symbol for the new atomic type.
+const newAtomicTypeSymbol = Symbol();
+
+// 3. Create the new atomic type with constraint.
+const NewAtomic = x.atomic(newAtomicTypeSymbol, value =>
+  Buffer.isBuffer(value),
+);
+
+declare global {
+  namespace XValue {
+    interface Types {
+      // 2. Define the symbol to value type mapping.
+      [newAtomicTypeSymbol]: Buffer;
+    }
+  }
+}
+```
+
+## New Medium
+
+After creating the new atomic type, we need to create/extend a new medium that supports this type:
+
+```ts
+interface SuperJSONTypes extends x.JSONTypes {
+  [newAtomicTypeSymbol]: string;
+}
+
+const superJSON = x.json.extend<SuperJSONTypes>('Super JSON', {
+  codecs: {
+    [newAtomicTypeSymbol]: {
+      decode(value) {
+        if (typeof value !== 'string') {
+          throw new TypeError(
+            `Expected hex string, getting ${Object.prototype.toString.call(
+              value,
+            )}`,
+          );
+        }
+
+        return Buffer.from(value, 'hex');
+      },
+      encode(value) {
+        return value.toString('hex');
+      },
+    },
+  },
+});
 ```
 
 ## License
