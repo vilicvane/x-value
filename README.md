@@ -9,12 +9,12 @@ X-Value (X stands for "cross") is a medium-somewhat-neutral alternative to libra
 
 Comparing to the input/output concept of io-ts or Zod, X-Value uses medium/value concept and allows multiple input "mediums", and the output is referred as "value".
 
+> I seriously doubt the usefulness of the medium/value concept in practice after I prototyped X-Value. But this cannot stop me from finishing what I've started anyway.
+
 **Currently under development.**
 
 - [ ] Self referencing types.
 - [ ] Documentation.
-
-> I seriously doubt the usefulness of the medium/value concept in practice, after I prototyped X-Value.
 
 ## Installation
 
