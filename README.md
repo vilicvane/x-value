@@ -12,7 +12,7 @@ Comparing to the input/output concept of io-ts or Zod, X-Value uses medium/value
 
 > I seriously doubt the usefulness of the medium/value concept in practice, after I prototyped X-Value.
 
-## Defining Types
+## Usages
 
 Defining types with X-Value is similar to io-ts/Zod.
 
@@ -34,6 +34,44 @@ const I = x.intersection(
     yoha: x.boolean,
   }),
 );
+```
+
+Decode from medium:
+
+```ts
+let value = Oops.decode(x.json, '{"foo":"abc","bar":123}');
+```
+
+Encode to medium:
+
+```ts
+let json = Oops.decode(x.json, {foo: 'abc', bar: 123});
+```
+
+Convert from medium to medium:
+
+```ts
+let json = Oops.convert(x.queryString, x.json, 'foo=abc&bar=123');
+```
+
+Type `is` guard:
+
+```ts
+if (Oops.is(value)) {
+  // ...
+}
+```
+
+Type `satisfies` assertion (will throw if does not satisfy):
+
+```ts
+let oops = Oops.satisfies(value);
+```
+
+Diagnose for type issues:
+
+```ts
+let issues = Oops.diagnose(value);
 ```
 
 ## Mediums and Value
