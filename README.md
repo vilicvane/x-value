@@ -5,17 +5,9 @@
 
 # X-Value
 
-X-Value (X stands for "cross") is a medium-somewhat-neutral alternative to libraries like [io-ts](https://github.com/gcanti/io-ts) and [Zod](https://github.com/colinhacks/zod).
+X-Value (X stands for "cross") is a medium-somewhat-neutral runtime type validation library.
 
-Comparing to the input/output concept of io-ts or Zod, X-Value uses medium/value concept and allows multiple input "mediums", and the output is referred as "value".
-
-> I seriously doubt the usefulness of the medium/value concept in practice after I prototyped X-Value. But this cannot stop me from finishing what I've started anyway.
-
-**Currently under development.**
-
-- [ ] Missing types.
-- [ ] Self referencing types.
-- [ ] Documentation.
+Comparing to alternatives like [io-ts](https://github.com/gcanti/io-ts) and [Zod](https://github.com/colinhacks/zod), X-Value uses medium/value concept and allows values to be decoded from and encoded to different mediums.
 
 ## Installation
 
