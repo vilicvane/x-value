@@ -109,7 +109,11 @@ Diagnose for type issues:
 let issues = Oops.diagnose(value);
 ```
 
-## Mediums and Value
+## Mediums and Values
+
+Mediums are what's used to store values: JSON strings, query strings, buffers etc.
+
+For example, a string `"2022-03-31T16:00:00.000Z"` in JSON medium with type `Date` represents value `new Date('2022-03-31T16:00:00.000Z')`.
 
 Assuming we have 3 mediums: `browser`, `server`, `rpc`; and 2 types: `ObjectId`, `Date`. Their types in mediums and value are listed below.
 
@@ -118,13 +122,7 @@ Assuming we have 3 mediums: `browser`, `server`, `rpc`; and 2 types: `ObjectId`,
 | `ObjectId`  | `string` | packed as `string` | `ObjectId` | `string` |
 | `Date`      | `Date`   | packed as `string` | `Date`     | `Date`   |
 
-Mediums are what's used to store values: JSON strings, query strings, buffers etc.
-
-For example, a string `"2022-03-31T16:00:00.000Z"` in JSON medium with type `Date` represents value `new Date('2022-03-31T16:00:00.000Z')`.
-
-> Ideally there's no need to have "value" as a separate concept because it's essentially "ECMAScript runtime medium". But to make decode/encode easier among different mediums, "value" is promoted as an interchangeable medium.
-
-We can encode value to mediums:
+We can encode values to mediums:
 
 <!-- prettier-ignore -->
 ```ts
@@ -154,6 +152,8 @@ Date.decode(browser, new Date('2022-03-31T16:00:00.000Z'));
 Date.decode(rpc, '"2022-03-31T16:00:00.000Z"');
 Date.decode(server, new Date('2022-03-31T16:00:00.000Z'));
 ```
+
+> Ideally there's no need to have "value" as a separate concept because it's essentially "ECMAScript runtime medium". But to make decode/encode easier among different mediums, "value" is promoted as an interchangeable medium.
 
 ## New Atomic Type
 
