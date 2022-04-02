@@ -11,7 +11,7 @@
     "lint": "run-in-every eslint-project --parallel --echo -- eslint --config {configFileName} .",
     "lint-prettier": "prettier --check .",
     "test": "yarn lint-prettier && yarn build && yarn lint && jest",
-    "prepublishOnly": "yarn build"
+    "prepublishOnly": "yarn test"
   },
   "dependencies": {
     "tslib": "^2.3.1"
