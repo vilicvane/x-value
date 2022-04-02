@@ -118,11 +118,13 @@ Assuming we have 3 mediums: `browser`, `server`, `rpc`; and 2 types: `ObjectId`,
 | `ObjectId`  | `string` | packed as `string` | `ObjectId` | `string` |
 | `Date`      | `Date`   | packed as `string` | `Date`     | `Date`   |
 
-Mediums are what's used to store values, and values are forms of data supported across environments using JavaScript language features.
+Mediums are what's used to store values: JSON strings, query strings, buffers etc.
 
-So usually mediums are in form of string and buffer (it could also be structured JavaScript values). And values are valid JavaScript runtime values.
+For example, a string `"2022-03-31T16:00:00.000Z"` in JSON medium with type `Date` represents value `new Date('2022-03-31T16:00:00.000Z')`.
 
-We can encode value to a medium:
+> Ideally there's no need to have "value" as a separate concept because it's essentially "ECMAScript runtime medium". But to make decode/encode easier among different mediums, "value" is promoted as an interchangeable medium.
+
+We can encode value to mediums:
 
 <!-- prettier-ignore -->
 ```ts
@@ -139,7 +141,7 @@ Date.encode(rpc, date);     // packed string '"2022-03-31T16:00:00.000Z"'
 Date.encode(server, date);  // new Date('2022-03-31T16:00:00.000Z')
 ```
 
-Or decode packed data of a medium to value:
+Or decode packed data of mediums to values:
 
 ```ts
 // All result in '6246056b1be8cbf6ca18401f'
