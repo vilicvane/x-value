@@ -4,7 +4,9 @@ import {
   IntersectionType,
   ObjectType,
   OptionalType,
+  RecordType,
   Type,
+  TypeOf,
   UnionType,
 } from './type';
 
@@ -21,6 +23,11 @@ export type __MediumTypeOf<
       TDefinition,
       TMediumTypes,
       TAtomicSymbolOnly
+    >
+  : TType extends RecordType<infer TKey, infer TValue>
+  ? Record<
+      TypeOf<TKey>,
+      __MediumTypeOf<TValue, TMediumTypes, TAtomicSymbolOnly>
     >
   : TType extends ArrayType<infer TElementType>
   ? __MediumTypeOf<TElementType, TMediumTypes, TAtomicSymbolOnly>[]

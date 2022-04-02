@@ -39,6 +39,8 @@ const Oops = x.object({
 
 const Aha = x.array(Oops);
 
+const Rock = x.record(x.string, x.number);
+
 const Um = x.union(Oops, x.boolean);
 
 const I = x.intersection(

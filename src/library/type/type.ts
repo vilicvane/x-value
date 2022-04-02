@@ -80,7 +80,12 @@ export abstract class Type<TCategory extends string = string> {
   abstract _diagnose(value: unknown, path: TypePath): TypeIssue[];
 }
 
-export type TypePath = (string | symbol | number)[];
+export type TypePath = (
+  | string
+  | number
+  | symbol
+  | {key: string | number | symbol}
+)[];
 
 export interface TypeIssue {
   path: TypePath;
@@ -102,7 +107,16 @@ ${this.issues
     ({path, message}) =>
       `  ${
         path.length > 0
-          ? `${path.map(segment => `[${JSON.stringify(segment)}]`).join('')} `
+          ? `${path
+              .map(
+                segment =>
+                  `[${
+                    typeof segment === 'object'
+                      ? `key:${JSON.stringify(segment.key)}`
+                      : JSON.stringify(segment)
+                  }]`,
+              )
+              .join('')} `
           : ''
       }${message}`,
   )
