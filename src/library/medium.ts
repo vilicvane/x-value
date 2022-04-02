@@ -120,8 +120,7 @@ export function medium<TMediumTypes extends object>(
   return new Medium(description, options);
 }
 
-export type MediumTypeOf<TType, TMediumTypes> = __MediumTypeOf<
-  TType,
+export type MediumTypeOf<TType, TMediumTypes> = MediumTypesPackedType<
   TMediumTypes,
-  true
+  __MediumTypeOf<TType, TMediumTypes, true>
 >;

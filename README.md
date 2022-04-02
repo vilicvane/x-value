@@ -53,6 +53,13 @@ const I = x.intersection(
 );
 ```
 
+Get static type of type object:
+
+```ts
+type Oops = x.TypeOf<typeof Oops>;
+type JSONOops = x.MediumTypeOf<typeof Oops, x.JSONTypes>;
+```
+
 Refine atomic type:
 
 ```ts
