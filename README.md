@@ -186,11 +186,13 @@ After creating the new atomic type, we need to create/extend a new medium that s
 
 ```ts
 interface SuperJSONTypes extends x.JSONTypes {
+  // 1. Define the unpacked type for decode/encode operation.
   [newAtomicTypeSymbol]: string;
 }
 
 const superJSON = x.json.extend<SuperJSONTypes>('Super JSON', {
   codecs: {
+    // 2. Define the codec.
     [newAtomicTypeSymbol]: {
       decode(value) {
         if (typeof value !== 'string') {
@@ -210,6 +212,33 @@ const superJSON = x.json.extend<SuperJSONTypes>('Super JSON', {
   },
 });
 ```
+
+## Medium Packing
+
+When `decode()` from a medium, X-Value unpacks data for a structured input (e.g., `JSON.parse()`). It packs the data again on `encode()` (e.g., `JSON.stringify()`).
+
+For medium that requires packing:
+
+```ts
+interface PackedTypes {
+  // 1. Define the packed type.
+  packed: string;
+}
+
+const packed = x.medium<PackedTypes>('Packed ', {
+  // 2. Define packing methods.
+  packing: {
+    pack(data) {
+      return JSON.stringify(data);
+    },
+    unpack(json) {
+      return JSON.parse(json);
+    },
+  },
+});
+```
+
+> The `superJSON` medium is actually a packed medium. However, the related definitions are inherited.
 
 ## License
 
