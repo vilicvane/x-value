@@ -46,6 +46,8 @@ export type __MediumTypeOf<
   ? __UnionToIntersection<
       __MediumTypeOf<TElementType, TMediumTypes, TAtomicSymbolOnly>
     >
+  : TType extends OptionalType<infer TType>
+  ? __MediumTypeOf<TType, TMediumTypes, TAtomicSymbolOnly> | undefined
   : never;
 
 export type __ObjectTypeDefinitionToMediumType<
