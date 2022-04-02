@@ -5,6 +5,7 @@ import {
   ObjectType,
   OptionalType,
   RecordType,
+  TupleType,
   Type,
   TypeOf,
   UnionType,
@@ -31,6 +32,8 @@ export type __MediumTypeOf<
     >
   : TType extends ArrayType<infer TElementType>
   ? __MediumTypeOf<TElementType, TMediumTypes, TAtomicSymbolOnly>[]
+  : TType extends TupleType<infer TTuple>
+  ? __TupleMediumType<TTuple, TMediumTypes, TAtomicSymbolOnly>
   : TType extends AtomicType<infer TAtomicType, infer TTypeSymbol>
   ? __AtomicMediumType<
       TAtomicSymbolOnly extends true ? unknown : TAtomicType,
@@ -58,6 +61,18 @@ export type __ObjectTypeDefinitionToMediumType<
 } & {
   [TKey in __KeyOfNonOptional<TDefinition>]: __MediumTypeOf<
     TDefinition[TKey],
+    TMediumTypes,
+    TAtomicSymbolOnly
+  >;
+};
+
+export type __TupleMediumType<
+  TElements,
+  TMediumTypes,
+  TAtomicSymbolOnly extends boolean,
+> = {
+  [TIndex in keyof TElements]: __MediumTypeOf<
+    TElements[TIndex],
     TMediumTypes,
     TAtomicSymbolOnly
   >;

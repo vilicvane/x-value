@@ -37,9 +37,11 @@ const Oops = x.object({
   bar: x.optional(x.number),
 });
 
+const Rock = x.record(x.string, x.number);
+
 const Aha = x.array(Oops);
 
-const Rock = x.record(x.string, x.number);
+const Tick = x.tuple(x.string, x.number);
 
 const Um = x.union(Oops, x.boolean);
 

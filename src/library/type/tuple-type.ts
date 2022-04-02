@@ -1,23 +1,23 @@
-import {__MediumTypeOf, toString} from '../@utils';
+import {__MediumTypeOf, __TupleMediumType, toString} from '../@utils';
 import {Medium, MediumTypesPackedType} from '../medium';
 
-import {Type, TypeIssue, TypeOf, TypePath} from './type';
+import {Type, TypeIssue, TypePath} from './type';
 
-export interface ArrayType<TElement> {
+export interface TupleType<TElements> {
   decode<TMediumTypes extends object>(
     medium: Medium<TMediumTypes>,
     value: MediumTypesPackedType<
       TMediumTypes,
-      __MediumTypeOf<TElement, TMediumTypes, true>[]
+      __TupleMediumType<TElements, TMediumTypes, true>
     >,
-  ): TypeOf<TElement>[];
+  ): __TupleMediumType<TElements, XValue.Types, false>;
 
   encode<TMediumTypes extends object>(
     medium: Medium<TMediumTypes>,
-    value: TypeOf<TElement>[],
+    value: __TupleMediumType<TElements, XValue.Types, false>,
   ): MediumTypesPackedType<
     TMediumTypes,
-    __MediumTypeOf<TElement, TMediumTypes, true>[]
+    __TupleMediumType<TElements, TMediumTypes, true>
   >;
 
   convert<TFromMediumTypes extends object, TToMediumTypes extends object>(
@@ -25,18 +25,20 @@ export interface ArrayType<TElement> {
     to: Medium<TToMediumTypes>,
     value: MediumTypesPackedType<
       TFromMediumTypes,
-      __MediumTypeOf<TElement, TFromMediumTypes, true>[]
+      __TupleMediumType<TElements, TFromMediumTypes, true>
     >,
   ): MediumTypesPackedType<
     TToMediumTypes,
-    __MediumTypeOf<TElement, TToMediumTypes, true>[]
+    __TupleMediumType<TElements, TToMediumTypes, true>
   >;
 
-  is(value: unknown): value is TypeOf<TElement>[];
+  is(
+    value: unknown,
+  ): value is __TupleMediumType<TElements, XValue.Types, false>;
 }
 
-export class ArrayType<TElement extends Type> extends Type<'array'> {
-  constructor(readonly Element: TElement) {
+export class TupleType<TElements extends Type[]> extends Type<'tuple'> {
+  constructor(readonly Elements: TElements) {
     super();
   }
 
@@ -62,13 +64,13 @@ export class ArrayType<TElement extends Type> extends Type<'array'> {
       ];
     }
 
-    let Element = this.Element;
+    let Elements = this.Elements;
 
     let value: unknown[] = [];
     let issues: TypeIssue[] = [];
 
-    for (let [index, unpackedElement] of unpacked.entries()) {
-      let [element, entryIssues] = Element._decode(medium, unpackedElement, [
+    for (let [index, Element] of Elements.entries()) {
+      let [element, entryIssues] = Element._decode(medium, unpacked[index], [
         ...path,
         index,
       ]);
@@ -100,15 +102,15 @@ export class ArrayType<TElement extends Type> extends Type<'array'> {
       ];
     }
 
-    let Element = this.Element;
+    let Elements = this.Elements;
 
     let unpacked: unknown[] = [];
     let issues: TypeIssue[] = [];
 
-    for (let [index, valueElement] of value.entries()) {
+    for (let [index, Element] of Elements.entries()) {
       let [unpackedElement, entryIssues] = Element._encode(
         medium,
-        valueElement,
+        value[index],
         [...path, index],
       );
 
@@ -142,13 +144,13 @@ export class ArrayType<TElement extends Type> extends Type<'array'> {
       ];
     }
 
-    let Element = this.Element;
+    let Elements = this.Elements;
 
     let value: unknown[] = [];
     let issues: TypeIssue[] = [];
 
-    for (let [index, unpackedElement] of unpacked.entries()) {
-      let [element, entryIssues] = Element._convert(from, to, unpackedElement, [
+    for (let [index, Element] of Elements.entries()) {
+      let [element, entryIssues] = Element._convert(from, to, unpacked[index], [
         ...path,
         index,
       ]);
@@ -171,16 +173,14 @@ export class ArrayType<TElement extends Type> extends Type<'array'> {
       ];
     }
 
-    let Element = this.Element;
-
-    return value.flatMap((element, index) =>
-      Element._diagnose(element, [...path, index]),
+    return this.Elements.flatMap((Element, index) =>
+      Element._diagnose(value[index], [...path, index]),
     );
   }
 }
 
-export function array<TElement extends Type>(
-  Element: TElement,
-): ArrayType<TElement> {
-  return new ArrayType(Element);
+export function tuple<TElements extends Type[]>(
+  ...Elements: TElements
+): TupleType<TElements> {
+  return new TupleType(Elements);
 }
