@@ -4,6 +4,7 @@ import {atomic} from './type';
 declare global {
   namespace XValue {
     interface Types {
+      [unknownTypeSymbol]: unknown;
       [undefinedTypeSymbol]: undefined;
       [nullTypeSymbol]: null;
       [stringTypeSymbol]: string;
@@ -13,6 +14,9 @@ declare global {
     }
   }
 }
+
+export const unknownTypeSymbol = Symbol();
+export const unknown = atomic(unknownTypeSymbol, () => true);
 
 export const undefinedTypeSymbol = Symbol();
 export const undefined = atomic(undefinedTypeSymbol, value =>

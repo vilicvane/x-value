@@ -6,6 +6,8 @@ export const Sunday = x.Date.refine<Date & {__nominal: 'Sunday'}>(
 );
 
 it('pre-defined atomic types should decode/encode ecmascript medium', () => {
+  expect(x.unknown.decode(x.ecmascript, true)).toBe(true);
+  expect(x.unknown.decode(x.ecmascript, 123)).toBe(123);
   expect(x.undefined.decode(x.ecmascript, undefined)).toBe(undefined);
   expect(x.nullType.decode(x.ecmascript, null)).toBe(null);
   expect(x.string.decode(x.ecmascript, 'text')).toBe('text');

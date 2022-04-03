@@ -6,9 +6,11 @@ import {
   numberTypeSymbol,
   stringTypeSymbol,
   undefinedTypeSymbol,
+  unknownTypeSymbol,
 } from '../types';
 
 export interface ECMAScriptTypes {
+  [unknownTypeSymbol]: unknown;
   [undefinedTypeSymbol]: undefined;
   [nullTypeSymbol]: null;
   [stringTypeSymbol]: string;
