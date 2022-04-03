@@ -20,7 +20,7 @@ export interface ArrayType<TElement> {
     __MediumTypeOf<TElement, TMediumTypes, true>[]
   >;
 
-  convert<TFromMediumTypes extends object, TToMediumTypes extends object>(
+  transform<TFromMediumTypes extends object, TToMediumTypes extends object>(
     from: Medium<TFromMediumTypes>,
     to: Medium<TToMediumTypes>,
     value: MediumTypesPackedType<
@@ -120,7 +120,7 @@ export class ArrayType<TElement extends Type> extends Type<'array'> {
   }
 
   /** @internal */
-  _convert(
+  _transform(
     from: Medium,
     to: Medium,
     unpacked: unknown,
@@ -148,10 +148,12 @@ export class ArrayType<TElement extends Type> extends Type<'array'> {
     let issues: TypeIssue[] = [];
 
     for (let [index, unpackedElement] of unpacked.entries()) {
-      let [element, entryIssues] = Element._convert(from, to, unpackedElement, [
-        ...path,
-        index,
-      ]);
+      let [element, entryIssues] = Element._transform(
+        from,
+        to,
+        unpackedElement,
+        [...path, index],
+      );
 
       value.push(element);
       issues.push(...entryIssues);

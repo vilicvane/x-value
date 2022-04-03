@@ -9,7 +9,7 @@ import {
   mediumB,
 } from './@usage';
 
-it('convert medium A to medium B and back', () => {
+it('transform medium A to medium B and back', () => {
   const Type = x.object({
     id: Identifier,
     name: x.string,
@@ -71,20 +71,20 @@ it('convert medium A to medium B and back', () => {
     ...common,
   };
 
-  expect(Type.convert(mediumA, mediumB, a)).toEqual(b);
-  expect(Type.convert(mediumB, mediumA, b)).toEqual(a);
-  expect(() => Type.convert(mediumA, mediumB, b as any)).toThrow(TypeError);
-  expect(() => Type.convert(mediumB, mediumA, a as any)).toThrow(TypeError);
-  expect(() => Type.convert(mediumA, mediumB, c as any))
+  expect(Type.transform(mediumA, mediumB, a)).toEqual(b);
+  expect(Type.transform(mediumB, mediumA, b)).toEqual(a);
+  expect(() => Type.transform(mediumA, mediumB, b as any)).toThrow(TypeError);
+  expect(() => Type.transform(mediumB, mediumA, a as any)).toThrow(TypeError);
+  expect(() => Type.transform(mediumA, mediumB, c as any))
     .toThrowErrorMatchingInlineSnapshot(`
-    "Failed to convert medium:
+    "Failed to transform medium:
       [\\"data\\"] Expecting unpacked value to be an array, getting [object Number]."
   `);
   // The duplicates are the result of the intersection type, leave it as-is for
   // now.
-  expect(() => Type.convert(mediumA, mediumB, d as any))
+  expect(() => Type.transform(mediumA, mediumB, d as any))
     .toThrowErrorMatchingInlineSnapshot(`
-    "Failed to convert medium:
+    "Failed to transform medium:
       [\\"data\\"][0] Expecting unpacked value to be a non-null object, getting [object Number].
       [\\"data\\"][0] Expecting unpacked value to be a non-null object, getting [object Number].
       [\\"data\\"][1][\\"x\\"] The unpacked value satisfies none of the type in the union type.

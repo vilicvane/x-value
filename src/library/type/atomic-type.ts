@@ -29,7 +29,7 @@ export interface AtomicType<TType, TSymbol> {
     __AtomicMediumType<unknown, TSymbol, TMediumTypes>
   >;
 
-  convert<TFromMediumTypes extends object, TToMediumTypes extends object>(
+  transform<TFromMediumTypes extends object, TToMediumTypes extends object>(
     from: Medium<TFromMediumTypes>,
     to: Medium<TToMediumTypes>,
     value: MediumTypesPackedType<
@@ -91,7 +91,7 @@ export class AtomicType<
   }
 
   /** @internal */
-  _convert(
+  _transform(
     from: Medium,
     to: Medium,
     unpacked: unknown,
@@ -107,9 +107,9 @@ export class AtomicType<
       return [undefined, issues];
     }
 
-    let convertedUnpacked = to.requireCodec(symbol).encode(value);
+    let transformedUnpacked = to.requireCodec(symbol).encode(value);
 
-    return [convertedUnpacked, issues];
+    return [transformedUnpacked, issues];
   }
 
   /** @internal */

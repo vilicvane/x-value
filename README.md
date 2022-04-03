@@ -75,10 +75,10 @@ Encode to medium:
 let json = Oops.decode(x.json, {foo: 'abc', bar: 123});
 ```
 
-Convert from medium to medium:
+Transform from medium to medium:
 
 ```ts
-let json = Oops.convert(x.queryString, x.json, 'foo=abc&bar=123');
+let json = Oops.transform(x.queryString, x.json, 'foo=abc&bar=123');
 ```
 
 Type `is` guard:

@@ -24,7 +24,7 @@ export interface ObjectType<TTypeDefinition> {
     __ObjectTypeDefinitionToMediumType<TTypeDefinition, TMediumTypes, true>
   >;
 
-  convert<TFromMediumTypes extends object, TToMediumTypes extends object>(
+  transform<TFromMediumTypes extends object, TToMediumTypes extends object>(
     from: Medium<TFromMediumTypes>,
     to: Medium<TToMediumTypes>,
     packed: MediumTypesPackedType<
@@ -137,7 +137,7 @@ export class ObjectType<
   }
 
   /** @internal */
-  _convert(
+  _transform(
     from: Medium,
     to: Medium,
     unpacked: unknown,
@@ -161,14 +161,14 @@ export class ObjectType<
     let issues: TypeIssue[] = [];
 
     for (let [key, Type] of Object.entries(this.definition)) {
-      let [convertedUnpacked, entryIssues] = Type._convert(
+      let [transformedUnpacked, entryIssues] = Type._transform(
         from,
         to,
         (unpacked as any)[key],
         [...path, key],
       );
 
-      entries.push([key, convertedUnpacked]);
+      entries.push([key, transformedUnpacked]);
       issues.push(...entryIssues);
     }
 

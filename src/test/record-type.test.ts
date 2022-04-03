@@ -43,20 +43,20 @@ it('record type with string key should work', () => {
       Expecting value to be a non-null object, getting [object Number]."
   `);
 
-  expect(Type.convert(x.jsonValue, x.json, value1)).toStrictEqual(
+  expect(Type.transform(x.jsonValue, x.json, value1)).toStrictEqual(
     JSON.stringify(value1),
   );
-  expect(Type.convert(x.jsonValue, x.json, value2)).toStrictEqual(
+  expect(Type.transform(x.jsonValue, x.json, value2)).toStrictEqual(
     JSON.stringify(value2),
   );
-  expect(() => Type.convert(x.jsonValue, x.json, value3))
+  expect(() => Type.transform(x.jsonValue, x.json, value3))
     .toThrowErrorMatchingInlineSnapshot(`
-    "Failed to convert medium:
+    "Failed to transform medium:
       [\\"key\\"] Expected number, getting [object String]."
   `);
-  expect(() => Type.convert(x.jsonValue, x.json, value4))
+  expect(() => Type.transform(x.jsonValue, x.json, value4))
     .toThrowErrorMatchingInlineSnapshot(`
-    "Failed to convert medium:
+    "Failed to transform medium:
       Expecting unpacked value to be a non-null object, getting [object Number]."
   `);
 
@@ -105,20 +105,20 @@ it('record type with number key should work', () => {
       Expecting value to be a non-null object, getting [object Number]."
   `);
 
-  expect(Type.convert(x.jsonValue, x.json, value1)).toStrictEqual(
+  expect(Type.transform(x.jsonValue, x.json, value1)).toStrictEqual(
     JSON.stringify(value1),
   );
-  expect(Type.convert(x.jsonValue, x.json, value2)).toStrictEqual(
+  expect(Type.transform(x.jsonValue, x.json, value2)).toStrictEqual(
     JSON.stringify(value2),
   );
-  expect(() => Type.convert(x.jsonValue, x.json, value3))
+  expect(() => Type.transform(x.jsonValue, x.json, value3))
     .toThrowErrorMatchingInlineSnapshot(`
-    "Failed to convert medium:
+    "Failed to transform medium:
       [key:\\"invalid key\\"] Expected number, getting [object String]."
   `);
-  expect(() => Type.convert(x.jsonValue, x.json, value4))
+  expect(() => Type.transform(x.jsonValue, x.json, value4))
     .toThrowErrorMatchingInlineSnapshot(`
-    "Failed to convert medium:
+    "Failed to transform medium:
       Expecting unpacked value to be a non-null object, getting [object Number]."
   `);
 
@@ -157,12 +157,12 @@ it('record type with nominal string key should work', () => {
       [key:\\"invalid key\\"] Expected an email address."
   `);
 
-  expect(Type.convert(x.jsonValue, x.json, value1)).toStrictEqual(
+  expect(Type.transform(x.jsonValue, x.json, value1)).toStrictEqual(
     JSON.stringify(value1),
   );
-  expect(() => Type.convert(x.jsonValue, x.json, value2))
+  expect(() => Type.transform(x.jsonValue, x.json, value2))
     .toThrowErrorMatchingInlineSnapshot(`
-    "Failed to convert medium:
+    "Failed to transform medium:
       [key:\\"invalid key\\"] Expected an email address."
   `);
 });

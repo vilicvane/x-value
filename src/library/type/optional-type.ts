@@ -17,7 +17,7 @@ export interface OptionalType<TType> {
     value: TypeOf<TType> | undefined,
   ): __MediumTypeOf<TType, TMediumTypes, true> | undefined;
 
-  convert<TFromMediumTypes extends object, TToMediumTypes extends object>(
+  transform<TFromMediumTypes extends object, TToMediumTypes extends object>(
     from: Medium<TFromMediumTypes>,
     to: Medium<TToMediumTypes>,
     value: MediumTypesPackedType<
@@ -63,7 +63,7 @@ export class OptionalType<TType extends Type> extends Type<'optional'> {
   }
 
   /** @internal */
-  _convert(
+  _transform(
     from: Medium,
     to: Medium,
     unpacked: unknown,
@@ -72,13 +72,13 @@ export class OptionalType<TType extends Type> extends Type<'optional'> {
     if (unpacked === undefined) {
       return [undefined, []];
     } else {
-      let [convertedUnpacked, issues] = this.Type._convert(
+      let [transformedUnpacked, issues] = this.Type._transform(
         from,
         to,
         unpacked,
         path,
       );
-      return [issues.length === 0 ? convertedUnpacked : undefined, issues];
+      return [issues.length === 0 ? transformedUnpacked : undefined, issues];
     }
   }
 

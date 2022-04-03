@@ -24,11 +24,11 @@ it('optional type should work alone', () => {
       Expected string, getting [object Null]."
   `);
 
-  expect(Type.convert(x.ecmascript, x.ecmascript, value1)).toBe(value1);
-  expect(Type.convert(x.ecmascript, x.ecmascript, value2)).toBe(value2);
-  expect(() => Type.convert(x.ecmascript, x.ecmascript, value3))
+  expect(Type.transform(x.ecmascript, x.ecmascript, value1)).toBe(value1);
+  expect(Type.transform(x.ecmascript, x.ecmascript, value2)).toBe(value2);
+  expect(() => Type.transform(x.ecmascript, x.ecmascript, value3))
     .toThrowErrorMatchingInlineSnapshot(`
-    "Failed to convert medium:
+    "Failed to transform medium:
       Expected string, getting [object Null]."
   `);
 });

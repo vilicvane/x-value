@@ -26,7 +26,7 @@ export interface RecordType<TKey, TValue> {
     Record<TypeOf<TKey>, __MediumTypeOf<TValue, TMediumTypes, true>>
   >;
 
-  convert<TFromMediumTypes extends object, TToMediumTypes extends object>(
+  transform<TFromMediumTypes extends object, TToMediumTypes extends object>(
     from: Medium<TFromMediumTypes>,
     to: Medium<TToMediumTypes>,
     packed: MediumTypesPackedType<
@@ -146,7 +146,7 @@ export class RecordType<
   }
 
   /** @internal */
-  _convert(
+  _transform(
     from: Medium,
     to: Medium,
     unpacked: unknown,
@@ -173,14 +173,14 @@ export class RecordType<
     let issues: TypeIssue[] = [];
 
     for (let [key, unpackedValue] of getRecordEntries(unpacked)) {
-      let [convertedUnpacked, valueIssues] = Value._convert(
+      let [transformedUnpacked, valueIssues] = Value._transform(
         from,
         to,
         unpackedValue,
         [...path, key],
       );
 
-      entries.push([key, convertedUnpacked]);
+      entries.push([key, transformedUnpacked]);
       issues.push(...Key._diagnose(key, [...path, {key}]), ...valueIssues);
     }
 

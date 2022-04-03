@@ -20,7 +20,7 @@ export interface UnionType<TType> {
     __MediumTypeOf<TType, TMediumTypes, true>
   >;
 
-  convert<TFromMediumTypes extends object, TToMediumTypes extends object>(
+  transform<TFromMediumTypes extends object, TToMediumTypes extends object>(
     from: Medium<TFromMediumTypes>,
     to: Medium<TToMediumTypes>,
     packed: MediumTypesPackedType<
@@ -107,7 +107,7 @@ export class UnionType<TType extends Type> extends Type<'union'> {
   }
 
   /** @internal */
-  _convert(
+  _transform(
     from: Medium,
     to: Medium,
     unpacked: unknown,
@@ -116,10 +116,15 @@ export class UnionType<TType extends Type> extends Type<'union'> {
     let lastIssues!: TypeIssue[];
 
     for (let Type of this.Types) {
-      let [convertedUnpacked, issues] = Type._convert(from, to, unpacked, path);
+      let [transformedUnpacked, issues] = Type._transform(
+        from,
+        to,
+        unpacked,
+        path,
+      );
 
       if (issues.length === 0) {
-        return [convertedUnpacked, issues];
+        return [transformedUnpacked, issues];
       }
 
       lastIssues = issues;

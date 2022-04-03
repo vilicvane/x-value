@@ -32,17 +32,17 @@ it('tuple type should work', () => {
       Expecting value to be an array, getting [object Number]."
   `);
 
-  expect(Tuple.convert(x.jsonValue, x.json, value1)).toBe(
+  expect(Tuple.transform(x.jsonValue, x.json, value1)).toBe(
     JSON.stringify(value1),
   );
-  expect(() => Tuple.convert(x.jsonValue, x.json, value2))
+  expect(() => Tuple.transform(x.jsonValue, x.json, value2))
     .toThrowErrorMatchingInlineSnapshot(`
-    "Failed to convert medium:
+    "Failed to transform medium:
       [1] Expected number, getting [object String]."
   `);
-  expect(() => Tuple.convert(x.jsonValue, x.json, value3))
+  expect(() => Tuple.transform(x.jsonValue, x.json, value3))
     .toThrowErrorMatchingInlineSnapshot(`
-    "Failed to convert medium:
+    "Failed to transform medium:
       Expecting unpacked value to be an array, getting [object Number]."
   `);
 

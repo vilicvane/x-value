@@ -20,7 +20,7 @@ export interface IntersectionType<TType> {
     __UnionToIntersection<__MediumTypeOf<TType, TMediumTypes, true>>
   >;
 
-  convert<TFromMediumTypes extends object, TToMediumTypes extends object>(
+  transform<TFromMediumTypes extends object, TToMediumTypes extends object>(
     from: Medium<TFromMediumTypes>,
     to: Medium<TToMediumTypes>,
     value: MediumTypesPackedType<
@@ -83,7 +83,7 @@ export class IntersectionType<TType extends Type> extends Type<'intersection'> {
   }
 
   /** @internal */
-  _convert(
+  _transform(
     from: Medium,
     to: Medium,
     unpacked: unknown,
@@ -93,7 +93,7 @@ export class IntersectionType<TType extends Type> extends Type<'intersection'> {
     let issues: TypeIssue[] = [];
 
     for (let Type of this.Types) {
-      let [partial, partialIssues] = Type._convert(from, to, unpacked, path);
+      let [partial, partialIssues] = Type._transform(from, to, unpacked, path);
 
       partials.push(partial);
       issues.push(...partialIssues);

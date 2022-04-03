@@ -25,15 +25,15 @@ export abstract class Type<TCategory extends string = string> {
     return medium.pack(unpacked);
   }
 
-  convert(from: Medium, to: Medium, packed: unknown): unknown {
+  transform(from: Medium, to: Medium, packed: unknown): unknown {
     let unpacked = from.unpack(packed);
-    let [convertedUnpacked, issues] = this._convert(from, to, unpacked, []);
+    let [transformedUnpacked, issues] = this._transform(from, to, unpacked, []);
 
     if (issues.length > 0) {
-      throw new TypeConstraintError(`Failed to convert medium`, issues);
+      throw new TypeConstraintError(`Failed to transform medium`, issues);
     }
 
-    return to.pack(convertedUnpacked);
+    return to.pack(transformedUnpacked);
   }
 
   satisfies<T>(value: T): T {
@@ -69,7 +69,7 @@ export abstract class Type<TCategory extends string = string> {
   ): [unknown, TypeIssue[]];
 
   /** @internal */
-  abstract _convert(
+  abstract _transform(
     from: Medium,
     to: Medium,
     unpacked: unknown,

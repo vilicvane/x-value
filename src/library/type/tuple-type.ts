@@ -20,7 +20,7 @@ export interface TupleType<TElements> {
     __TupleMediumType<TElements, TMediumTypes, true>
   >;
 
-  convert<TFromMediumTypes extends object, TToMediumTypes extends object>(
+  transform<TFromMediumTypes extends object, TToMediumTypes extends object>(
     from: Medium<TFromMediumTypes>,
     to: Medium<TToMediumTypes>,
     value: MediumTypesPackedType<
@@ -122,7 +122,7 @@ export class TupleType<TElements extends Type[]> extends Type<'tuple'> {
   }
 
   /** @internal */
-  _convert(
+  _transform(
     from: Medium,
     to: Medium,
     unpacked: unknown,
@@ -150,10 +150,12 @@ export class TupleType<TElements extends Type[]> extends Type<'tuple'> {
     let issues: TypeIssue[] = [];
 
     for (let [index, Element] of Elements.entries()) {
-      let [element, entryIssues] = Element._convert(from, to, unpacked[index], [
-        ...path,
-        index,
-      ]);
+      let [element, entryIssues] = Element._transform(
+        from,
+        to,
+        unpacked[index],
+        [...path, index],
+      );
 
       value.push(element);
       issues.push(...entryIssues);
