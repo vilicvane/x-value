@@ -30,10 +30,10 @@ export function literal<TType extends string | number | boolean>(
   return new AtomicType(symbol, [value => value === literal]);
 }
 
-export function ref<TType>(object: TType): AtomicType<TType> {
+export function equal<TType>(object: TType): AtomicType<TType> {
   return new AtomicType(unknownTypeSymbol, [value => value === object]);
 }
 
-export function struct<TType>(object: TType): AtomicType<TType> {
+export function deepEqual<TType>(object: TType): AtomicType<TType> {
   return new AtomicType(unknownTypeSymbol, [value => isEqual(value, object)]);
 }

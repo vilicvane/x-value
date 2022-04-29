@@ -3,7 +3,7 @@ import * as x from '../library';
 test('ref type should work', () => {
   const o = {};
 
-  const O = x.ref(o);
+  const O = x.equal(o);
 
   expect(O.is(o)).toBe(true);
   expect(O.is({})).toBe(false);
@@ -14,7 +14,7 @@ test('struct type should work', () => {
     foo: 'abc',
   };
 
-  const O = x.struct(o);
+  const O = x.deepEqual(o);
 
   expect(O.is(o)).toBe(true);
   expect(O.is({foo: 'abc'})).toBe(true);
