@@ -1,5 +1,12 @@
+import isEqual from 'lodash.isequal';
+
 import {AtomicType} from './type';
-import {booleanTypeSymbol, numberTypeSymbol, stringTypeSymbol} from './types';
+import {
+  booleanTypeSymbol,
+  numberTypeSymbol,
+  stringTypeSymbol,
+  unknownTypeSymbol,
+} from './types';
 
 export function literal<TType extends string | number | boolean>(
   literal: TType,
@@ -21,4 +28,12 @@ export function literal<TType extends string | number | boolean>(
   }
 
   return new AtomicType(symbol, [value => value === literal]);
+}
+
+export function ref<TType>(object: TType): AtomicType<TType> {
+  return new AtomicType(unknownTypeSymbol, [value => value === object]);
+}
+
+export function struct<TType>(object: TType): AtomicType<TType> {
+  return new AtomicType(unknownTypeSymbol, [value => isEqual(value, object)]);
 }
