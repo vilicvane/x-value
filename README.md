@@ -72,7 +72,7 @@ let value = Oops.decode(x.json, '{"foo":"abc","bar":123}');
 Encode to medium:
 
 ```ts
-let json = Oops.decode(x.json, {foo: 'abc', bar: 123});
+let json = Oops.encode(x.json, {foo: 'abc', bar: 123});
 ```
 
 Transform from medium to medium:
