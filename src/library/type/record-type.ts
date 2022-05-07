@@ -1,45 +1,35 @@
 import {
   __MediumTypeOf,
+  __MediumTypeOfRecordKeyType,
   __ObjectTypeDefinitionToMediumType,
+  __TypeOfRecordKeyType,
   toString,
 } from '../@utils';
 import {Medium, MediumTypesPackedType} from '../medium';
-import {numberTypeSymbol, stringTypeSymbol} from '../types';
 
-import {AtomicType} from './atomic-type';
 import {Type, TypeIssue, TypeOf, TypePath} from './type';
-import {UnionType} from './union-type';
-
-type RecordKeyType =
-  | AtomicType<unknown, typeof stringTypeSymbol | typeof numberTypeSymbol>
-  | UnionType<
-      AtomicType<unknown, typeof stringTypeSymbol | typeof numberTypeSymbol>
-    >;
-
-type AtomicRecordKeyType<TType extends RecordKeyType> =
-  TType extends AtomicType<unknown>
-    ? TType
-    : TType extends UnionType<infer TTypes>
-    ? TTypes extends RecordKeyType
-      ? AtomicRecordKeyType<TTypes>
-      : never
-    : never;
 
 export interface RecordType<TKey, TValue> {
   decode<TMediumTypes extends object>(
     medium: Medium<TMediumTypes>,
     packed: MediumTypesPackedType<
       TMediumTypes,
-      Record<TypeOf<TKey>, __MediumTypeOf<TValue, TMediumTypes, true>>
+      Record<
+        __MediumTypeOfRecordKeyType<TKey, TMediumTypes, true>,
+        __MediumTypeOf<TValue, TMediumTypes, true>
+      >
     >,
-  ): Record<TypeOf<TKey>, TypeOf<TValue>>;
+  ): Record<__TypeOfRecordKeyType<TKey>, TypeOf<TValue>>;
 
   encode<TMediumTypes extends object>(
     medium: Medium<TMediumTypes>,
-    value: Record<TypeOf<TKey>, TypeOf<TValue>>,
+    value: Record<__TypeOfRecordKeyType<TKey>, TypeOf<TValue>>,
   ): MediumTypesPackedType<
     TMediumTypes,
-    Record<TypeOf<TKey>, __MediumTypeOf<TValue, TMediumTypes, true>>
+    Record<
+      __MediumTypeOfRecordKeyType<TKey, TMediumTypes, true>,
+      __MediumTypeOf<TValue, TMediumTypes, true>
+    >
   >;
 
   transform<TFromMediumTypes extends object, TToMediumTypes extends object>(
@@ -47,11 +37,17 @@ export interface RecordType<TKey, TValue> {
     to: Medium<TToMediumTypes>,
     packed: MediumTypesPackedType<
       TFromMediumTypes,
-      Record<TypeOf<TKey>, __MediumTypeOf<TValue, TFromMediumTypes, true>>
+      Record<
+        __MediumTypeOfRecordKeyType<TKey, TFromMediumTypes, true>,
+        __MediumTypeOf<TValue, TFromMediumTypes, true>
+      >
     >,
   ): MediumTypesPackedType<
     TToMediumTypes,
-    Record<TypeOf<TKey>, __MediumTypeOf<TValue, TToMediumTypes, true>>
+    Record<
+      __MediumTypeOfRecordKeyType<TKey, TToMediumTypes, true>,
+      __MediumTypeOf<TValue, TToMediumTypes, true>
+    >
   >;
 
   is(value: unknown): value is TypeOf<TValue>;
@@ -59,13 +55,10 @@ export interface RecordType<TKey, TValue> {
 
 export class RecordType<
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  TKey extends AtomicType<
-    unknown,
-    typeof stringTypeSymbol | typeof numberTypeSymbol
-  >,
+  TKey extends Type,
   TValue extends Type,
 > extends Type<'record'> {
-  constructor(readonly Key: RecordKeyType, readonly Value: TValue) {
+  constructor(readonly Key: TKey, readonly Value: TValue) {
     super();
   }
 
@@ -223,10 +216,10 @@ export class RecordType<
   }
 }
 
-export function record<TKey extends RecordKeyType, TValue extends Type>(
+export function record<TKey extends Type, TValue extends Type>(
   Key: TKey,
   Value: TValue,
-): RecordType<AtomicRecordKeyType<TKey>, TValue> {
+): RecordType<TKey, TValue> {
   return new RecordType(Key, Value);
 }
 

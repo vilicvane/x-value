@@ -187,7 +187,7 @@ it('record type with union string key should work', () => {
     'invalid key': 'yoha',
   };
 
-  const value3 = {foo: 1} as unknown as TypeOf<typeof Type>;
+  const value3: any = {foo: 1};
 
   expect(Type.decode(x.jsonValue, value1)).toStrictEqual(value1);
   expect(() => Type.decode(x.jsonValue, value2))

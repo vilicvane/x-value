@@ -7,7 +7,6 @@ import {
   RecordType,
   TupleType,
   Type,
-  TypeOf,
   UnionType,
 } from './type';
 
@@ -27,7 +26,7 @@ export type __MediumTypeOf<
     >
   : TType extends RecordType<infer TKey, infer TValue>
   ? Record<
-      TypeOf<TKey>,
+      __MediumTypeOfRecordKeyType<TKey, TMediumTypes, TAtomicSymbolOnly>,
       __MediumTypeOf<TValue, TMediumTypes, TAtomicSymbolOnly>
     >
   : TType extends ArrayType<infer TElementType>
@@ -67,6 +66,20 @@ export type __ObjectTypeDefinitionToMediumType<
     TAtomicSymbolOnly
   >;
 };
+
+export type __TypeOfRecordKeyType<TType> = __MediumTypeOfRecordKeyType<
+  TType,
+  XValue.Types,
+  false
+>;
+
+export type __MediumTypeOfRecordKeyType<
+  TType,
+  TMediumTypes,
+  TAtomicSymbolOnly extends boolean,
+> = __MediumTypeOf<TType, TMediumTypes, TAtomicSymbolOnly> extends infer TKey
+  ? Extract<TKey, string | symbol>
+  : never;
 
 export type __TupleMediumType<
   TElements,
