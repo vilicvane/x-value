@@ -8,6 +8,22 @@ import {numberTypeSymbol, stringTypeSymbol} from '../types';
 
 import {AtomicType} from './atomic-type';
 import {Type, TypeIssue, TypeOf, TypePath} from './type';
+import {UnionType} from './union-type';
+
+type RecordKeyType =
+  | AtomicType<unknown, typeof stringTypeSymbol | typeof numberTypeSymbol>
+  | UnionType<
+      AtomicType<unknown, typeof stringTypeSymbol | typeof numberTypeSymbol>
+    >;
+
+type AtomicRecordKeyType<TType extends RecordKeyType> =
+  TType extends AtomicType<unknown>
+    ? TType
+    : TType extends UnionType<infer TTypes>
+    ? TTypes extends RecordKeyType
+      ? AtomicRecordKeyType<TTypes>
+      : never
+    : never;
 
 export interface RecordType<TKey, TValue> {
   decode<TMediumTypes extends object>(
@@ -49,13 +65,7 @@ export class RecordType<
   >,
   TValue extends Type,
 > extends Type<'record'> {
-  constructor(
-    readonly Key: AtomicType<
-      unknown,
-      typeof stringTypeSymbol | typeof numberTypeSymbol
-    >,
-    readonly Value: TValue,
-  ) {
+  constructor(readonly Key: RecordKeyType, readonly Value: TValue) {
     super();
   }
 
@@ -213,13 +223,10 @@ export class RecordType<
   }
 }
 
-export function record<
-  TKey extends AtomicType<
-    unknown,
-    typeof stringTypeSymbol | typeof numberTypeSymbol
-  >,
-  TValue extends Type,
->(Key: TKey, Value: TValue): RecordType<TKey, TValue> {
+export function record<TKey extends RecordKeyType, TValue extends Type>(
+  Key: TKey,
+  Value: TValue,
+): RecordType<AtomicRecordKeyType<TKey>, TValue> {
   return new RecordType(Key, Value);
 }
 

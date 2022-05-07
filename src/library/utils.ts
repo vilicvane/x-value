@@ -8,6 +8,15 @@ import {
   unknownTypeSymbol,
 } from './types';
 
+export function literal<TType extends string>(
+  literal: TType,
+): AtomicType<TType, typeof stringTypeSymbol>;
+export function literal<TType extends number>(
+  literal: TType,
+): AtomicType<TType, typeof numberTypeSymbol>;
+export function literal<TType extends boolean>(
+  literal: TType,
+): AtomicType<TType, typeof booleanTypeSymbol>;
 export function literal<TType extends string | number | boolean>(
   literal: TType,
 ): AtomicType<TType> {
