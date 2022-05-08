@@ -1,42 +1,62 @@
-import {__MediumTypeOf, __UnionToIntersection, merge} from '../@utils';
-import {Medium, MediumTypesPackedType} from '../medium';
+import {
+  __ElementOrArray,
+  __MediumTypeOf,
+  __MediumTypesPackedType,
+  __Nominal,
+  __UnionToIntersection,
+  merge,
+} from '../@utils';
+import {Medium} from '../medium';
 
-import {Type, TypeIssue, TypeOf, TypePath} from './type';
+import {RefinedType} from './refined-type';
+import {Type, TypeConstraint, TypeIssue, TypeOf, TypePath} from './type';
 
-export interface IntersectionType<TType> {
+export interface IntersectionType<TTypeTuple> {
+  refine<TNominal>(
+    constraints: __ElementOrArray<
+      TypeConstraint<__UnionToIntersection<TypeOf<TTypeTuple[number]>>>
+    >,
+  ): RefinedType<this, __Nominal<TNominal>>;
+
   decode<TMediumTypes extends object>(
     medium: Medium<TMediumTypes>,
-    value: MediumTypesPackedType<
+    value: __MediumTypesPackedType<
       TMediumTypes,
-      __UnionToIntersection<__MediumTypeOf<TType, TMediumTypes, true>>
+      __UnionToIntersection<__MediumTypeOf<TTypeTuple[number], TMediumTypes>>
     >,
-  ): __UnionToIntersection<TypeOf<TType>>;
+  ): __UnionToIntersection<TypeOf<TTypeTuple[number]>>;
 
   encode<TMediumTypes extends object>(
     medium: Medium<TMediumTypes>,
-    value: __UnionToIntersection<TypeOf<TType>>,
-  ): MediumTypesPackedType<
+    value: __UnionToIntersection<TypeOf<TTypeTuple[number]>>,
+  ): __MediumTypesPackedType<
     TMediumTypes,
-    __UnionToIntersection<__MediumTypeOf<TType, TMediumTypes, true>>
+    __UnionToIntersection<__MediumTypeOf<TTypeTuple[number], TMediumTypes>>
   >;
 
   transform<TFromMediumTypes extends object, TToMediumTypes extends object>(
     from: Medium<TFromMediumTypes>,
     to: Medium<TToMediumTypes>,
-    value: MediumTypesPackedType<
+    value: __MediumTypesPackedType<
       TFromMediumTypes,
-      __UnionToIntersection<__MediumTypeOf<TType, TFromMediumTypes, true>>
+      __UnionToIntersection<
+        __MediumTypeOf<TTypeTuple[number], TFromMediumTypes>
+      >
     >,
-  ): MediumTypesPackedType<
+  ): __MediumTypesPackedType<
     TToMediumTypes,
-    __UnionToIntersection<__MediumTypeOf<TType, TToMediumTypes, true>>
+    __UnionToIntersection<__MediumTypeOf<TTypeTuple[number], TToMediumTypes>>
   >;
 
-  is(value: unknown): value is __UnionToIntersection<TypeOf<TType>>;
+  is(
+    value: unknown,
+  ): value is __UnionToIntersection<TypeOf<TTypeTuple[number]>>;
 }
 
-export class IntersectionType<TType extends Type> extends Type<'intersection'> {
-  constructor(readonly Types: TType[]) {
+export class IntersectionType<
+  TTypeTuple extends Type[],
+> extends Type<'intersection'> {
+  constructor(readonly Types: TTypeTuple) {
     if (Types.length < 2) {
       throw new TypeError('Expecting at least 2 types for intersection type');
     }
@@ -68,12 +88,18 @@ export class IntersectionType<TType extends Type> extends Type<'intersection'> {
     medium: Medium,
     value: unknown,
     path: TypePath,
+    diagnose: boolean,
   ): [unknown, TypeIssue[]] {
     let partials: unknown[] = [];
     let issues: TypeIssue[] = [];
 
     for (let Type of this.Types) {
-      let [partial, partialIssues] = Type._encode(medium, value, path);
+      let [partial, partialIssues] = Type._encode(
+        medium,
+        value,
+        path,
+        diagnose,
+      );
 
       partials.push(partial);
       issues.push(...partialIssues);
@@ -108,8 +134,8 @@ export class IntersectionType<TType extends Type> extends Type<'intersection'> {
   }
 }
 
-export function intersection<TTypes extends [Type, Type, ...Type[]]>(
-  ...Types: TTypes
-): IntersectionType<TTypes[number]> {
+export function intersection<TTypeTuple extends [Type, Type, ...Type[]]>(
+  ...Types: TTypeTuple
+): IntersectionType<TTypeTuple> {
   return new IntersectionType(Types);
 }

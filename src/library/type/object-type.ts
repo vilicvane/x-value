@@ -1,52 +1,55 @@
-import {__ObjectTypeDefinitionToMediumType, toString} from '../@utils';
-import {Medium, MediumTypesPackedType} from '../medium';
+import {
+  __ElementOrArray,
+  __MediumTypesPackedType,
+  __Nominal,
+  __ObjectTypeDefinitionToMediumType,
+  toString,
+} from '../@utils';
+import {Medium} from '../medium';
 
-import {Type, TypeIssue, TypePath} from './type';
+import {RefinedType} from './refined-type';
+import {Type, TypeConstraint, TypeIssue, TypePath} from './type';
 
 export interface ObjectType<TTypeDefinition> {
+  refine<TNominal>(
+    constraints: __ElementOrArray<
+      TypeConstraint<
+        __ObjectTypeDefinitionToMediumType<TTypeDefinition, XValue.Types>
+      >
+    >,
+  ): RefinedType<this, __Nominal<TNominal>>;
+
   decode<TMediumTypes extends object>(
     medium: Medium<TMediumTypes>,
-    packed: MediumTypesPackedType<
+    packed: __MediumTypesPackedType<
       TMediumTypes,
-      __ObjectTypeDefinitionToMediumType<TTypeDefinition, TMediumTypes, true>
+      __ObjectTypeDefinitionToMediumType<TTypeDefinition, TMediumTypes>
     >,
-  ): __ObjectTypeDefinitionToMediumType<TTypeDefinition, XValue.Types, false>;
+  ): __ObjectTypeDefinitionToMediumType<TTypeDefinition, XValue.Types>;
 
   encode<TMediumTypes extends object>(
     medium: Medium<TMediumTypes>,
-    value: __ObjectTypeDefinitionToMediumType<
-      TTypeDefinition,
-      XValue.Types,
-      false
-    >,
-  ): MediumTypesPackedType<
+    value: __ObjectTypeDefinitionToMediumType<TTypeDefinition, XValue.Types>,
+  ): __MediumTypesPackedType<
     TMediumTypes,
-    __ObjectTypeDefinitionToMediumType<TTypeDefinition, TMediumTypes, true>
+    __ObjectTypeDefinitionToMediumType<TTypeDefinition, TMediumTypes>
   >;
 
   transform<TFromMediumTypes extends object, TToMediumTypes extends object>(
     from: Medium<TFromMediumTypes>,
     to: Medium<TToMediumTypes>,
-    packed: MediumTypesPackedType<
+    packed: __MediumTypesPackedType<
       TFromMediumTypes,
-      __ObjectTypeDefinitionToMediumType<
-        TTypeDefinition,
-        TFromMediumTypes,
-        true
-      >
+      __ObjectTypeDefinitionToMediumType<TTypeDefinition, TFromMediumTypes>
     >,
-  ): MediumTypesPackedType<
+  ): __MediumTypesPackedType<
     TToMediumTypes,
-    __ObjectTypeDefinitionToMediumType<TTypeDefinition, TToMediumTypes, true>
+    __ObjectTypeDefinitionToMediumType<TTypeDefinition, TToMediumTypes>
   >;
 
   is(
     value: unknown,
-  ): value is __ObjectTypeDefinitionToMediumType<
-    TTypeDefinition,
-    XValue.Types,
-    false
-  >;
+  ): value is __ObjectTypeDefinitionToMediumType<TTypeDefinition, XValue.Types>;
 }
 
 export class ObjectType<
@@ -102,8 +105,9 @@ export class ObjectType<
     medium: Medium,
     value: unknown,
     path: TypePath,
+    diagnose: boolean,
   ): [unknown, TypeIssue[]] {
-    if (typeof value !== 'object' || value === null) {
+    if (diagnose && (typeof value !== 'object' || value === null)) {
       return [
         undefined,
         [
@@ -121,10 +125,12 @@ export class ObjectType<
     let issues: TypeIssue[] = [];
 
     for (let [key, Type] of Object.entries(this.definition)) {
-      let [unpacked, entryIssues] = Type._encode(medium, (value as any)[key], [
-        ...path,
-        key,
-      ]);
+      let [unpacked, entryIssues] = Type._encode(
+        medium,
+        (value as any)[key],
+        [...path, key],
+        diagnose,
+      );
 
       entries.push([key, unpacked]);
       issues.push(...entryIssues);

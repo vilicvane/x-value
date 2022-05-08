@@ -1,44 +1,32 @@
 import {
-  __AtomicMediumType,
   __ElementOrArray,
+  __MediumTypeOf,
   __MediumTypesPackedType,
   __Nominal,
 } from '../@utils';
 import {Medium} from '../medium';
 
-import {RefinedType} from './refined-type';
-import {Type, TypeConstraint, TypeIssue, TypePath} from './type';
+import {Type, TypeConstraint, TypeIssue, TypeOf, TypePath} from './type';
 
-export type AtomicTypeType<
-  TType,
-  TSymbol extends symbol,
-> = unknown extends TType
-  ? XValue.Types extends {[TKey in TSymbol]: infer T}
-    ? T
-    : never
-  : TType;
-
-export interface AtomicType<TSymbol> {
+export interface RefinedType<TType, TNominal> {
   refine<TNominal>(
-    constraints: __ElementOrArray<
-      TypeConstraint<__AtomicMediumType<TSymbol, XValue.Types>>
-    >,
+    constraints: __ElementOrArray<TypeConstraint<TypeOf<TType> & TNominal>>,
   ): RefinedType<this, __Nominal<TNominal>>;
 
   decode<TMediumTypes extends object>(
     medium: Medium<TMediumTypes>,
     value: __MediumTypesPackedType<
       TMediumTypes,
-      __AtomicMediumType<TSymbol, TMediumTypes>
+      __MediumTypeOf<TType, TMediumTypes> & TNominal
     >,
-  ): __AtomicMediumType<TSymbol, XValue.Types>;
+  ): TypeOf<TType> & TNominal;
 
   encode<TMediumTypes extends object>(
     medium: Medium<TMediumTypes>,
-    value: __AtomicMediumType<TSymbol, XValue.Types>,
+    value: TypeOf<TType> & TNominal,
   ): __MediumTypesPackedType<
     TMediumTypes,
-    __AtomicMediumType<TSymbol, TMediumTypes>
+    __MediumTypeOf<TType, TMediumTypes> & TNominal
   >;
 
   transform<TFromMediumTypes extends object, TToMediumTypes extends object>(
@@ -46,19 +34,20 @@ export interface AtomicType<TSymbol> {
     to: Medium<TToMediumTypes>,
     value: __MediumTypesPackedType<
       TFromMediumTypes,
-      __AtomicMediumType<TSymbol, TFromMediumTypes>
+      __MediumTypeOf<TType, TFromMediumTypes> & TNominal
     >,
   ): __MediumTypesPackedType<
     TToMediumTypes,
-    __AtomicMediumType<TSymbol, TToMediumTypes>
+    __MediumTypeOf<TType, TToMediumTypes> & TNominal
   >;
 
-  is(value: unknown): value is __AtomicMediumType<TSymbol, XValue.Types>;
+  is(value: unknown): value is TypeOf<TType> & TNominal;
 }
 
-export class AtomicType<TSymbol extends symbol> extends Type<'atomic'> {
-  constructor(symbol: TSymbol, constraints: TypeConstraint[]);
-  constructor(readonly symbol: symbol, readonly constraints: TypeConstraint[]) {
+export class RefinedType<TType extends Type, TNominal> extends Type<'refined'> {
+  protected __static_type_nominal!: TNominal;
+
+  constructor(readonly Type: TType, readonly constraints: TypeConstraint[]) {
     super();
   }
 
@@ -68,9 +57,11 @@ export class AtomicType<TSymbol extends symbol> extends Type<'atomic'> {
     unpacked: unknown,
     path: TypePath,
   ): [unknown, TypeIssue[]] {
-    let value = medium.requireCodec(this.symbol).decode(unpacked);
+    let [value, issues] = this.Type._decode(medium, unpacked, path);
 
-    let issues = this._diagnose(value, path);
+    if (issues.length === 0) {
+      issues = this.diagnoseConstraints(value, path);
+    }
 
     return [issues.length === 0 ? value : undefined, issues];
   }
@@ -83,16 +74,16 @@ export class AtomicType<TSymbol extends symbol> extends Type<'atomic'> {
     diagnose: boolean,
   ): [unknown, TypeIssue[]] {
     if (diagnose) {
-      let issues = this._diagnose(value, path);
+      let refineIssues = this.diagnoseConstraints(value, path);
 
-      if (issues.length > 0) {
-        return [undefined, issues];
+      if (refineIssues.length > 0) {
+        return [undefined, refineIssues];
       }
     }
 
-    let unpacked = medium.requireCodec(this.symbol).encode(value);
+    let [unpacked, issues] = this.Type._encode(medium, value, path, diagnose);
 
-    return [unpacked, []];
+    return [issues.length === 0 ? unpacked : undefined, issues];
   }
 
   /** @internal */
@@ -102,23 +93,27 @@ export class AtomicType<TSymbol extends symbol> extends Type<'atomic'> {
     unpacked: unknown,
     path: TypePath,
   ): [unknown, TypeIssue[]] {
-    let symbol = this.symbol;
-
-    let value = from.requireCodec(symbol).decode(unpacked);
-
-    let issues = this._diagnose(value, path);
+    let [value, issues] = this._decode(from, unpacked, path);
 
     if (issues.length > 0) {
       return [undefined, issues];
     }
 
-    let transformedUnpacked = to.requireCodec(symbol).encode(value);
-
-    return [transformedUnpacked, issues];
+    return this._encode(to, value, path, false);
   }
 
   /** @internal */
   _diagnose(value: unknown, path: TypePath): TypeIssue[] {
+    let issues = this.Type._diagnose(value, path);
+
+    if (issues.length > 0) {
+      return issues;
+    }
+
+    return this.diagnoseConstraints(value, path);
+  }
+
+  private diagnoseConstraints(value: unknown, path: TypePath): TypeIssue[] {
     let issues: TypeIssue[] = [];
 
     for (let constraint of this.constraints) {
@@ -138,12 +133,12 @@ export class AtomicType<TSymbol extends symbol> extends Type<'atomic'> {
   }
 }
 
-export function atomic<TSymbol extends symbol>(
-  symbol: TSymbol,
+export function refined<TType extends Type, TNominal>(
+  Type: TType,
   constraints: TypeConstraint | TypeConstraint[],
-): AtomicType<TSymbol> {
-  return new AtomicType(
-    symbol,
+): RefinedType<TType, TNominal> {
+  return new RefinedType(
+    Type,
     Array.isArray(constraints) ? constraints : [constraints],
   );
 }

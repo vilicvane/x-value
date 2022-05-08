@@ -1,8 +1,16 @@
 import {__MediumTypeOf} from '../@utils';
 import {Medium} from '../medium';
 
+/* eslint-disable @mufan/import-groups */
+
 export abstract class Type<TCategory extends string = string> {
   protected __static_type_category!: TCategory;
+
+  refine(
+    constraints: TypeConstraint | TypeConstraint[],
+  ): RefinedType<Type, unknown> {
+    return refined(this, constraints);
+  }
 
   decode(medium: Medium, packed: unknown): unknown {
     let unpacked = medium.unpack(packed);
@@ -16,7 +24,7 @@ export abstract class Type<TCategory extends string = string> {
   }
 
   encode(medium: Medium, value: unknown): unknown {
-    let [unpacked, issues] = this._encode(medium, value, []);
+    let [unpacked, issues] = this._encode(medium, value, [], true);
 
     if (issues.length > 0) {
       throw new TypeConstraintError('Failed to encode to medium', issues);
@@ -66,6 +74,7 @@ export abstract class Type<TCategory extends string = string> {
     medium: Medium,
     value: unknown,
     path: TypePath,
+    diagnose: boolean,
   ): [unknown, TypeIssue[]];
 
   /** @internal */
@@ -99,7 +108,7 @@ export class TypeConstraintError extends TypeError {
     super();
   }
 
-  get message(): string {
+  override get message(): string {
     return `\
 ${this._message}:
 ${this.issues
@@ -124,8 +133,9 @@ ${this.issues
   }
 }
 
-export type TypeOf<TType extends Type> = __MediumTypeOf<
-  TType,
-  XValue.Types,
-  false
->;
+export type TypeOf<TType extends Type> = __MediumTypeOf<TType, XValue.Types>;
+
+/* eslint-enable @mufan/import-groups */
+
+// Make sure code in refined-type.ts accessing type.ts after exports ready.
+import {RefinedType, refined} from './refined-type';

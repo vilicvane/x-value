@@ -5,103 +5,77 @@ import {
   ObjectType,
   OptionalType,
   RecordType,
+  RefinedType,
   TupleType,
   Type,
   UnionType,
 } from './type';
+import {Nominal} from './utils';
 
 export const hasOwnProperty = Object.prototype.hasOwnProperty;
 
 export const toString = Object.prototype.toString;
 
-export type __MediumTypeOf<
-  TType,
-  TMediumTypes,
-  TAtomicSymbolOnly extends boolean,
-> = TType extends ObjectType<infer TDefinition>
-  ? __ObjectTypeDefinitionToMediumType<
-      TDefinition,
-      TMediumTypes,
-      TAtomicSymbolOnly
-    >
+export type __MediumTypeOf<TType, TMediumTypes> = TType extends ObjectType<
+  infer TDefinition
+>
+  ? __ObjectTypeDefinitionToMediumType<TDefinition, TMediumTypes>
   : TType extends RecordType<infer TKey, infer TValue>
   ? Record<
-      __MediumTypeOfRecordKeyType<TKey, TMediumTypes, TAtomicSymbolOnly>,
-      __MediumTypeOf<TValue, TMediumTypes, TAtomicSymbolOnly>
+      __MediumTypeOfRecordKeyType<TKey, TMediumTypes>,
+      __MediumTypeOf<TValue, TMediumTypes>
     >
   : TType extends ArrayType<infer TElementType>
-  ? __MediumTypeOf<TElementType, TMediumTypes, TAtomicSymbolOnly>[]
+  ? __MediumTypeOf<TElementType, TMediumTypes>[]
   : TType extends TupleType<infer TTuple>
-  ? __TupleMediumType<TTuple, TMediumTypes, TAtomicSymbolOnly>
-  : TType extends AtomicType<infer TAtomicType, infer TTypeSymbol>
-  ? __AtomicMediumType<
-      TAtomicSymbolOnly extends true ? unknown : TAtomicType,
-      TTypeSymbol,
-      TMediumTypes
-    >
-  : TType extends UnionType<infer TElementType>
-  ? __MediumTypeOf<TElementType, TMediumTypes, TAtomicSymbolOnly>
-  : TType extends IntersectionType<infer TElementType>
-  ? __UnionToIntersection<
-      __MediumTypeOf<TElementType, TMediumTypes, TAtomicSymbolOnly>
-    >
+  ? __TupleMediumType<TTuple, TMediumTypes>
+  : TType extends RefinedType<infer TType, infer TNominal>
+  ? __MediumTypeOf<TType, TMediumTypes> & TNominal
+  : TType extends AtomicType<infer TTypeSymbol>
+  ? __AtomicMediumType<TTypeSymbol, TMediumTypes>
+  : TType extends UnionType<infer TTypeTuple>
+  ? __MediumTypeOf<TTypeTuple[number], TMediumTypes>
+  : TType extends IntersectionType<infer TTypeTuple>
+  ? __UnionToIntersection<__MediumTypeOf<TTypeTuple[number], TMediumTypes>>
   : TType extends OptionalType<infer TType>
-  ? __MediumTypeOf<TType, TMediumTypes, TAtomicSymbolOnly> | undefined
+  ? __MediumTypeOf<TType, TMediumTypes> | undefined
   : never;
 
-export type __ObjectTypeDefinitionToMediumType<
-  TDefinition,
-  TMediumTypes,
-  TAtomicSymbolOnly extends boolean,
-> = {
+export type __ObjectTypeDefinitionToMediumType<TDefinition, TMediumTypes> = {
   [TKey in __KeyOfOptional<TDefinition>]?: TDefinition[TKey] extends OptionalType<
     infer TNestedType
   >
-    ? __MediumTypeOf<TNestedType, TMediumTypes, TAtomicSymbolOnly>
+    ? __MediumTypeOf<TNestedType, TMediumTypes>
     : never;
 } & {
   [TKey in __KeyOfNonOptional<TDefinition>]: __MediumTypeOf<
     TDefinition[TKey],
-    TMediumTypes,
-    TAtomicSymbolOnly
+    TMediumTypes
   >;
 };
 
 export type __TypeOfRecordKeyType<TType> = __MediumTypeOfRecordKeyType<
   TType,
-  XValue.Types,
-  false
+  XValue.Types
 >;
 
-export type __MediumTypeOfRecordKeyType<
+export type __MediumTypeOfRecordKeyType<TType, TMediumTypes> = __MediumTypeOf<
   TType,
-  TMediumTypes,
-  TAtomicSymbolOnly extends boolean,
-> = __MediumTypeOf<TType, TMediumTypes, TAtomicSymbolOnly> extends infer TKey
+  TMediumTypes
+> extends infer TKey
   ? Extract<TKey, string | symbol>
   : never;
 
-export type __TupleMediumType<
-  TElements,
-  TMediumTypes,
-  TAtomicSymbolOnly extends boolean,
-> = {
-  [TIndex in keyof TElements]: __MediumTypeOf<
-    TElements[TIndex],
-    TMediumTypes,
-    TAtomicSymbolOnly
-  >;
+export type __TupleMediumType<TElements, TMediumTypes> = {
+  [TIndex in keyof TElements]: __MediumTypeOf<TElements[TIndex], TMediumTypes>;
 };
 
 export type __AtomicMediumType<
-  TType,
   TSymbol extends symbol,
   TMediumTypes,
-> = unknown extends TType
-  ? TMediumTypes extends {[TKey in TSymbol]: infer TMediumType}
-    ? TMediumType
-    : never
-  : TType;
+> = TMediumTypes extends {[TKey in TSymbol]: infer TMediumType}
+  ? TMediumType
+  : never;
 
 export type __KeyOfOptional<TType> = Extract<
   {
@@ -126,6 +100,21 @@ export type __UnionToIntersection<TUnion> = (
 ) extends (_: infer TIntersection) => unknown
   ? TIntersection
   : never;
+
+export type __MediumTypesPackedType<
+  TMediumTypes,
+  TFallback = never,
+> = TMediumTypes extends {
+  packed: infer TPacked;
+}
+  ? TPacked
+  : TFallback;
+
+export type __Nominal<TNominal> = TNominal extends string | symbol
+  ? Nominal<TNominal>
+  : TNominal;
+
+export type __ElementOrArray<T> = T | T[];
 
 export function merge(partials: unknown[]): unknown {
   let pendingMergeKeyToValues: Map<string | number, unknown[]> | undefined;

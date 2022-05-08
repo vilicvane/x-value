@@ -1,4 +1,4 @@
-import {__MediumTypeOf} from './@utils';
+import {__MediumTypeOf, __MediumTypesPackedType} from './@utils';
 
 export const atomicTypeSymbol = Symbol();
 
@@ -28,13 +28,13 @@ export interface MediumPacking<TPacked> {
 export interface MediumOptions<
   TMediumTypes extends object = GeneralMediumTypes,
 > {
-  packing?: MediumPacking<MediumTypesPackedType<TMediumTypes>>;
+  packing?: MediumPacking<__MediumTypesPackedType<TMediumTypes>>;
   codecs: MediumAtomicCodecs<TMediumTypes>;
 }
 
 export class Medium<TMediumTypes extends object = GeneralMediumTypes> {
   private packing:
-    | MediumPacking<MediumTypesPackedType<TMediumTypes>>
+    | MediumPacking<__MediumTypesPackedType<TMediumTypes>>
     | undefined;
   private codecs: MediumAtomicCodecs<TMediumTypes>;
 
@@ -80,11 +80,11 @@ export class Medium<TMediumTypes extends object = GeneralMediumTypes> {
     return codec;
   }
 
-  unpack(packed: MediumTypesPackedType<TMediumTypes>): unknown {
+  unpack(packed: __MediumTypesPackedType<TMediumTypes>): unknown {
     return this.packing ? this.packing.unpack(packed) : packed;
   }
 
-  pack(unpacked: unknown): MediumTypesPackedType<TMediumTypes>;
+  pack(unpacked: unknown): __MediumTypesPackedType<TMediumTypes>;
   pack(unpacked: unknown): unknown {
     return this.packing ? this.packing.pack(unpacked) : unpacked;
   }
@@ -104,15 +104,6 @@ interface __MediumAtomicCodec<TMediumAtomic = unknown, TValue = unknown> {
   decode(value: unknown): TValue;
 }
 
-export type MediumTypesPackedType<
-  TMediumTypes,
-  TFallback = never,
-> = TMediumTypes extends {
-  packed: infer TPacked;
-}
-  ? TPacked
-  : TFallback;
-
 export function medium<TMediumTypes extends object>(
   description: string,
   options: MediumOptions<TMediumTypes>,
@@ -120,7 +111,7 @@ export function medium<TMediumTypes extends object>(
   return new Medium(description, options);
 }
 
-export type MediumTypeOf<TType, TMediumTypes> = MediumTypesPackedType<
+export type MediumTypeOf<TType, TMediumTypes> = __MediumTypesPackedType<
   TMediumTypes,
-  __MediumTypeOf<TType, TMediumTypes, true>
+  __MediumTypeOf<TType, TMediumTypes>
 >;

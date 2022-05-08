@@ -1,35 +1,46 @@
-import {__MediumTypeOf, toString} from '../@utils';
-import {Medium, MediumTypesPackedType} from '../medium';
+import {
+  __ElementOrArray,
+  __MediumTypeOf,
+  __MediumTypesPackedType,
+  __Nominal,
+  toString,
+} from '../@utils';
+import {Medium} from '../medium';
 
-import {Type, TypeIssue, TypeOf, TypePath} from './type';
+import {RefinedType} from './refined-type';
+import {Type, TypeConstraint, TypeIssue, TypeOf, TypePath} from './type';
 
 export interface ArrayType<TElement> {
+  refine<TNominal>(
+    constraints: __ElementOrArray<TypeConstraint<TypeOf<TElement>[]>>,
+  ): RefinedType<this, __Nominal<TNominal>>;
+
   decode<TMediumTypes extends object>(
     medium: Medium<TMediumTypes>,
-    value: MediumTypesPackedType<
+    value: __MediumTypesPackedType<
       TMediumTypes,
-      __MediumTypeOf<TElement, TMediumTypes, true>[]
+      __MediumTypeOf<TElement, TMediumTypes>[]
     >,
   ): TypeOf<TElement>[];
 
   encode<TMediumTypes extends object>(
     medium: Medium<TMediumTypes>,
     value: TypeOf<TElement>[],
-  ): MediumTypesPackedType<
+  ): __MediumTypesPackedType<
     TMediumTypes,
-    __MediumTypeOf<TElement, TMediumTypes, true>[]
+    __MediumTypeOf<TElement, TMediumTypes>[]
   >;
 
   transform<TFromMediumTypes extends object, TToMediumTypes extends object>(
     from: Medium<TFromMediumTypes>,
     to: Medium<TToMediumTypes>,
-    value: MediumTypesPackedType<
+    value: __MediumTypesPackedType<
       TFromMediumTypes,
-      __MediumTypeOf<TElement, TFromMediumTypes, true>[]
+      __MediumTypeOf<TElement, TFromMediumTypes>[]
     >,
-  ): MediumTypesPackedType<
+  ): __MediumTypesPackedType<
     TToMediumTypes,
-    __MediumTypeOf<TElement, TToMediumTypes, true>[]
+    __MediumTypeOf<TElement, TToMediumTypes>[]
   >;
 
   is(value: unknown): value is TypeOf<TElement>[];
@@ -85,8 +96,9 @@ export class ArrayType<TElement extends Type> extends Type<'array'> {
     medium: Medium,
     value: unknown,
     path: TypePath,
+    diagnose: boolean,
   ): [unknown, TypeIssue[]] {
-    if (!Array.isArray(value)) {
+    if (diagnose && !Array.isArray(value)) {
       return [
         undefined,
         [
@@ -105,11 +117,12 @@ export class ArrayType<TElement extends Type> extends Type<'array'> {
     let unpacked: unknown[] = [];
     let issues: TypeIssue[] = [];
 
-    for (let [index, valueElement] of value.entries()) {
+    for (let [index, valueElement] of (value as unknown[]).entries()) {
       let [unpackedElement, entryIssues] = Element._encode(
         medium,
         valueElement,
         [...path, index],
+        diagnose,
       );
 
       unpacked.push(unpackedElement);

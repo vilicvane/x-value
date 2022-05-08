@@ -1,40 +1,52 @@
-import {__MediumTypeOf, __TupleMediumType, toString} from '../@utils';
-import {Medium, MediumTypesPackedType} from '../medium';
+import {
+  __ElementOrArray,
+  __MediumTypeOf,
+  __MediumTypesPackedType,
+  __Nominal,
+  __TupleMediumType,
+  toString,
+} from '../@utils';
+import {Medium} from '../medium';
 
-import {Type, TypeIssue, TypePath} from './type';
+import {RefinedType} from './refined-type';
+import {Type, TypeConstraint, TypeIssue, TypePath} from './type';
 
 export interface TupleType<TElements> {
+  refine<TNominal>(
+    constraints: __ElementOrArray<
+      TypeConstraint<__TupleMediumType<TElements, XValue.Types>>
+    >,
+  ): RefinedType<this, __Nominal<TNominal>>;
+
   decode<TMediumTypes extends object>(
     medium: Medium<TMediumTypes>,
-    value: MediumTypesPackedType<
+    value: __MediumTypesPackedType<
       TMediumTypes,
-      __TupleMediumType<TElements, TMediumTypes, true>
+      __TupleMediumType<TElements, TMediumTypes>
     >,
-  ): __TupleMediumType<TElements, XValue.Types, false>;
+  ): __TupleMediumType<TElements, XValue.Types>;
 
   encode<TMediumTypes extends object>(
     medium: Medium<TMediumTypes>,
-    value: __TupleMediumType<TElements, XValue.Types, false>,
-  ): MediumTypesPackedType<
+    value: __TupleMediumType<TElements, XValue.Types>,
+  ): __MediumTypesPackedType<
     TMediumTypes,
-    __TupleMediumType<TElements, TMediumTypes, true>
+    __TupleMediumType<TElements, TMediumTypes>
   >;
 
   transform<TFromMediumTypes extends object, TToMediumTypes extends object>(
     from: Medium<TFromMediumTypes>,
     to: Medium<TToMediumTypes>,
-    value: MediumTypesPackedType<
+    value: __MediumTypesPackedType<
       TFromMediumTypes,
-      __TupleMediumType<TElements, TFromMediumTypes, true>
+      __TupleMediumType<TElements, TFromMediumTypes>
     >,
-  ): MediumTypesPackedType<
+  ): __MediumTypesPackedType<
     TToMediumTypes,
-    __TupleMediumType<TElements, TToMediumTypes, true>
+    __TupleMediumType<TElements, TToMediumTypes>
   >;
 
-  is(
-    value: unknown,
-  ): value is __TupleMediumType<TElements, XValue.Types, false>;
+  is(value: unknown): value is __TupleMediumType<TElements, XValue.Types>;
 }
 
 export class TupleType<TElements extends Type[]> extends Type<'tuple'> {
@@ -87,8 +99,9 @@ export class TupleType<TElements extends Type[]> extends Type<'tuple'> {
     medium: Medium,
     value: unknown,
     path: TypePath,
+    diagnose: boolean,
   ): [unknown, TypeIssue[]] {
-    if (!Array.isArray(value)) {
+    if (diagnose && !Array.isArray(value)) {
       return [
         undefined,
         [
@@ -110,8 +123,9 @@ export class TupleType<TElements extends Type[]> extends Type<'tuple'> {
     for (let [index, Element] of Elements.entries()) {
       let [unpackedElement, entryIssues] = Element._encode(
         medium,
-        value[index],
+        (value as unknown[])[index],
         [...path, index],
+        diagnose,
       );
 
       unpacked.push(unpackedElement);

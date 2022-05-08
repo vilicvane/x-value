@@ -1,43 +1,53 @@
-import {__MediumTypeOf} from '../@utils';
-import {Medium, MediumTypesPackedType} from '../medium';
+import {
+  __ElementOrArray,
+  __MediumTypeOf,
+  __MediumTypesPackedType,
+  __Nominal,
+} from '../@utils';
+import {Medium} from '../medium';
 
-import {Type, TypeIssue, TypeOf, TypePath} from './type';
+import {RefinedType} from './refined-type';
+import {Type, TypeConstraint, TypeIssue, TypeOf, TypePath} from './type';
 
-export interface UnionType<TType> {
+export interface UnionType<TTypeTuple> {
+  refine<TNominal>(
+    constraints: __ElementOrArray<TypeConstraint<TypeOf<TTypeTuple[number]>>>,
+  ): RefinedType<this, __Nominal<TNominal>>;
+
   decode<TMediumTypes extends object>(
     medium: Medium<TMediumTypes>,
-    packed: MediumTypesPackedType<
+    packed: __MediumTypesPackedType<
       TMediumTypes,
-      __MediumTypeOf<TType, TMediumTypes, true>
+      __MediumTypeOf<TTypeTuple[number], TMediumTypes>
     >,
-  ): TypeOf<TType>;
+  ): TypeOf<TTypeTuple[number]>;
 
   encode<TMediumTypes extends object>(
     medium: Medium<TMediumTypes>,
-    value: TypeOf<TType>,
-  ): MediumTypesPackedType<
+    value: TypeOf<TTypeTuple[number]>,
+  ): __MediumTypesPackedType<
     TMediumTypes,
-    __MediumTypeOf<TType, TMediumTypes, true>
+    __MediumTypeOf<TTypeTuple[number], TMediumTypes>
   >;
 
   transform<TFromMediumTypes extends object, TToMediumTypes extends object>(
     from: Medium<TFromMediumTypes>,
     to: Medium<TToMediumTypes>,
-    packed: MediumTypesPackedType<
+    packed: __MediumTypesPackedType<
       TFromMediumTypes,
-      __MediumTypeOf<TType, TFromMediumTypes, true>
+      __MediumTypeOf<TTypeTuple[number], TFromMediumTypes>
     >,
-  ): MediumTypesPackedType<
+  ): __MediumTypesPackedType<
     TToMediumTypes,
-    __MediumTypeOf<TType, TToMediumTypes, true>
+    __MediumTypeOf<TTypeTuple[number], TToMediumTypes>
   >;
 
-  is(value: unknown): value is TypeOf<TType>;
+  is(value: unknown): value is TypeOf<TTypeTuple[number]>;
 }
 
-export class UnionType<TType extends Type> extends Type<'union'> {
-  constructor(readonly Types: TType[]) {
-    if (Types.length < 2) {
+export class UnionType<TTypeTuple extends Type[]> extends Type<'union'> {
+  constructor(readonly TypeTuple: TTypeTuple) {
+    if (TypeTuple.length < 2) {
       throw new TypeError('Expecting at least 2 type for union type');
     }
 
@@ -52,7 +62,7 @@ export class UnionType<TType extends Type> extends Type<'union'> {
   ): [unknown, TypeIssue[]] {
     let lastIssues!: TypeIssue[];
 
-    for (let Type of this.Types) {
+    for (let Type of this.TypeTuple) {
       let [value, issues] = Type._decode(medium, unpacked, path);
 
       if (issues.length === 0) {
@@ -80,11 +90,12 @@ export class UnionType<TType extends Type> extends Type<'union'> {
     medium: Medium,
     value: unknown,
     path: TypePath,
+    diagnose: boolean,
   ): [unknown, TypeIssue[]] {
     let lastIssues!: TypeIssue[];
 
-    for (let Type of this.Types) {
-      let [unpacked, issues] = Type._encode(medium, value, path);
+    for (let Type of this.TypeTuple) {
+      let [unpacked, issues] = Type._encode(medium, value, path, diagnose);
 
       if (issues.length === 0) {
         return [unpacked, issues];
@@ -92,6 +103,8 @@ export class UnionType<TType extends Type> extends Type<'union'> {
 
       lastIssues = issues;
     }
+
+    // If diagnose is `false`, it will never reach here.
 
     return [
       undefined,
@@ -115,7 +128,7 @@ export class UnionType<TType extends Type> extends Type<'union'> {
   ): [unknown, TypeIssue[]] {
     let lastIssues!: TypeIssue[];
 
-    for (let Type of this.Types) {
+    for (let Type of this.TypeTuple) {
       let [transformedUnpacked, issues] = Type._transform(
         from,
         to,
@@ -147,7 +160,7 @@ export class UnionType<TType extends Type> extends Type<'union'> {
   _diagnose(value: unknown, path: TypePath): TypeIssue[] {
     let lastIssues!: TypeIssue[];
 
-    for (let Type of this.Types) {
+    for (let Type of this.TypeTuple) {
       let issues = Type._diagnose(value, path);
 
       lastIssues = issues;
@@ -161,8 +174,8 @@ export class UnionType<TType extends Type> extends Type<'union'> {
   }
 }
 
-export function union<TTypes extends [Type, Type, ...Type[]]>(
-  ...Types: TTypes
-): UnionType<TTypes[number]> {
+export function union<TTypeTuple extends [Type, Type, ...Type[]]>(
+  ...Types: TTypeTuple
+): UnionType<TTypeTuple> {
   return new UnionType(Types);
 }

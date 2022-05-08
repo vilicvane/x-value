@@ -1,22 +1,32 @@
 import {
+  __ElementOrArray,
   __MediumTypeOf,
   __MediumTypeOfRecordKeyType,
+  __MediumTypesPackedType,
+  __Nominal,
   __ObjectTypeDefinitionToMediumType,
   __TypeOfRecordKeyType,
   toString,
 } from '../@utils';
-import {Medium, MediumTypesPackedType} from '../medium';
+import {Medium} from '../medium';
 
-import {Type, TypeIssue, TypeOf, TypePath} from './type';
+import {RefinedType} from './refined-type';
+import {Type, TypeConstraint, TypeIssue, TypeOf, TypePath} from './type';
 
 export interface RecordType<TKey, TValue> {
+  refine<TNominal>(
+    constraints: __ElementOrArray<
+      TypeConstraint<Record<__TypeOfRecordKeyType<TKey>, TypeOf<TValue>>>
+    >,
+  ): RefinedType<this, __Nominal<TNominal>>;
+
   decode<TMediumTypes extends object>(
     medium: Medium<TMediumTypes>,
-    packed: MediumTypesPackedType<
+    packed: __MediumTypesPackedType<
       TMediumTypes,
       Record<
-        __MediumTypeOfRecordKeyType<TKey, TMediumTypes, true>,
-        __MediumTypeOf<TValue, TMediumTypes, true>
+        __MediumTypeOfRecordKeyType<TKey, TMediumTypes>,
+        __MediumTypeOf<TValue, TMediumTypes>
       >
     >,
   ): Record<__TypeOfRecordKeyType<TKey>, TypeOf<TValue>>;
@@ -24,33 +34,35 @@ export interface RecordType<TKey, TValue> {
   encode<TMediumTypes extends object>(
     medium: Medium<TMediumTypes>,
     value: Record<__TypeOfRecordKeyType<TKey>, TypeOf<TValue>>,
-  ): MediumTypesPackedType<
+  ): __MediumTypesPackedType<
     TMediumTypes,
     Record<
-      __MediumTypeOfRecordKeyType<TKey, TMediumTypes, true>,
-      __MediumTypeOf<TValue, TMediumTypes, true>
+      __MediumTypeOfRecordKeyType<TKey, TMediumTypes>,
+      __MediumTypeOf<TValue, TMediumTypes>
     >
   >;
 
   transform<TFromMediumTypes extends object, TToMediumTypes extends object>(
     from: Medium<TFromMediumTypes>,
     to: Medium<TToMediumTypes>,
-    packed: MediumTypesPackedType<
+    packed: __MediumTypesPackedType<
       TFromMediumTypes,
       Record<
-        __MediumTypeOfRecordKeyType<TKey, TFromMediumTypes, true>,
-        __MediumTypeOf<TValue, TFromMediumTypes, true>
+        __MediumTypeOfRecordKeyType<TKey, TFromMediumTypes>,
+        __MediumTypeOf<TValue, TFromMediumTypes>
       >
     >,
-  ): MediumTypesPackedType<
+  ): __MediumTypesPackedType<
     TToMediumTypes,
     Record<
-      __MediumTypeOfRecordKeyType<TKey, TToMediumTypes, true>,
-      __MediumTypeOf<TValue, TToMediumTypes, true>
+      __MediumTypeOfRecordKeyType<TKey, TToMediumTypes>,
+      __MediumTypeOf<TValue, TToMediumTypes>
     >
   >;
 
-  is(value: unknown): value is TypeOf<TValue>;
+  is(
+    value: unknown,
+  ): value is Record<__TypeOfRecordKeyType<TKey>, TypeOf<TValue>>;
 }
 
 export class RecordType<
@@ -111,8 +123,9 @@ export class RecordType<
     medium: Medium,
     value: unknown,
     path: TypePath,
+    diagnose: boolean,
   ): [unknown, TypeIssue[]] {
-    if (typeof value !== 'object' || value === null) {
+    if (diagnose && (typeof value !== 'object' || value === null)) {
       return [
         undefined,
         [
@@ -132,18 +145,20 @@ export class RecordType<
     let entries: [string | number, unknown][] = [];
     let issues: TypeIssue[] = [];
 
-    for (let [key, nestedValue] of getRecordEntries(value)) {
-      let [unpacked, valueIssues] = Value._encode(medium, nestedValue, [
-        ...path,
-        key,
-      ]);
+    for (let [key, nestedValue] of getRecordEntries(value as object)) {
+      let [unpacked, valueIssues] = Value._encode(
+        medium,
+        nestedValue,
+        [...path, key],
+        diagnose,
+      );
 
       entries.push([key, unpacked]);
       issues.push(...Key._diagnose(key, [...path, {key}]), ...valueIssues);
     }
 
     return [
-      issues.length === 0 ? buildRecord(entries, value) : undefined,
+      issues.length === 0 ? buildRecord(entries, value as object) : undefined,
       issues,
     ];
   }

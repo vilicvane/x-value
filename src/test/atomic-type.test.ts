@@ -1,9 +1,14 @@
 import * as x from '../library';
-import {TypeConstraintError, TypeOf} from '../library';
+import {
+  ExtendedJSONValueTypes,
+  MediumTypeOf,
+  TypeConstraintError,
+  TypeOf,
+  atomic,
+  stringTypeSymbol,
+} from '../library';
 
-export const Sunday = x.Date.refine<Date & {__nominal: 'Sunday'}>(
-  date => date.getDay() === 0,
-);
+const Sunday = x.Date.refine<'sunday'>(date => date.getDay() === 0);
 
 it('pre-defined atomic types should decode/encode ecmascript medium', () => {
   expect(x.unknown.decode(x.ecmascript, true)).toBe(true);
@@ -176,10 +181,16 @@ it('date atomic refinement sunday should work with extended json value medium', 
   let monday = new Date('2022-3-28');
 
   expect(
-    Sunday.decode(x.extendedJSONValue, sunday.toISOString()).getTime(),
+    Sunday.decode(
+      x.extendedJSONValue,
+      sunday.toISOString() as MediumTypeOf<
+        typeof Sunday,
+        ExtendedJSONValueTypes
+      >,
+    ).getTime(),
   ).toBe(sunday.getTime());
   expect(() =>
-    Sunday.decode(x.extendedJSONValue, monday.toISOString()),
+    Sunday.decode(x.extendedJSONValue, monday.toISOString() as any),
   ).toThrow(TypeConstraintError);
 
   expect(Sunday.encode(x.extendedJSONValue, sunday)).toEqual(
@@ -188,4 +199,18 @@ it('date atomic refinement sunday should work with extended json value medium', 
   expect(() => Sunday.encode(x.extendedJSONValue, monday as any)).toThrow(
     TypeConstraintError,
   );
+});
+
+it('atomic with constraints array should work', () => {
+  const Type = atomic(stringTypeSymbol, [value => typeof value === 'string']);
+
+  expect(Type.diagnose('')).toEqual([]);
+  expect(Type.diagnose(123)).toMatchInlineSnapshot(`
+    Array [
+      Object {
+        "message": "Unexpected value.",
+        "path": Array [],
+      },
+    ]
+  `);
 });

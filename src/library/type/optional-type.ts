@@ -1,30 +1,46 @@
-import {__MediumTypeOf} from '../@utils';
-import {Medium, MediumTypesPackedType} from '../medium';
+import {
+  __ElementOrArray,
+  __MediumTypeOf,
+  __MediumTypesPackedType,
+  __Nominal,
+} from '../@utils';
+import {Medium} from '../medium';
 
-import {Type, TypeIssue, TypeOf, TypePath} from './type';
+import {RefinedType} from './refined-type';
+import {Type, TypeConstraint, TypeIssue, TypeOf, TypePath} from './type';
 
 export interface OptionalType<TType> {
+  refine<TNominal>(
+    constraints: __ElementOrArray<TypeConstraint<TypeOf<TType> | undefined>>,
+  ): RefinedType<this, __Nominal<TNominal>>;
+
   decode<TMediumTypes extends object>(
     medium: Medium<TMediumTypes>,
-    value: MediumTypesPackedType<
+    value: __MediumTypesPackedType<
       TMediumTypes,
-      __MediumTypeOf<TType, TMediumTypes, true> | undefined
+      __MediumTypeOf<TType, TMediumTypes> | undefined
     >,
   ): TypeOf<TType> | undefined;
 
   encode<TMediumTypes extends object>(
     medium: Medium<TMediumTypes>,
     value: TypeOf<TType> | undefined,
-  ): __MediumTypeOf<TType, TMediumTypes, true> | undefined;
+  ): __MediumTypesPackedType<
+    TMediumTypes,
+    __MediumTypeOf<TType, TMediumTypes> | undefined
+  >;
 
   transform<TFromMediumTypes extends object, TToMediumTypes extends object>(
     from: Medium<TFromMediumTypes>,
     to: Medium<TToMediumTypes>,
-    value: MediumTypesPackedType<
+    value: __MediumTypesPackedType<
       TFromMediumTypes,
-      __MediumTypeOf<TType, TFromMediumTypes, true> | undefined
+      __MediumTypeOf<TType, TFromMediumTypes> | undefined
     >,
-  ): __MediumTypeOf<TType, TToMediumTypes, true> | undefined;
+  ): __MediumTypesPackedType<
+    TToMediumTypes,
+    __MediumTypeOf<TType, TToMediumTypes> | undefined
+  >;
 
   is(value: unknown): value is TypeOf<TType> | undefined;
 }
@@ -53,11 +69,12 @@ export class OptionalType<TType extends Type> extends Type<'optional'> {
     medium: Medium,
     value: unknown,
     path: TypePath,
+    diagnose: boolean,
   ): [unknown, TypeIssue[]] {
     if (value === undefined) {
       return [undefined, []];
     } else {
-      let [unpacked, issues] = this.Type._encode(medium, value, path);
+      let [unpacked, issues] = this.Type._encode(medium, value, path, diagnose);
       return [issues.length === 0 ? unpacked : undefined, issues];
     }
   }

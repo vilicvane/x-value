@@ -1,25 +1,37 @@
 import isEqual from 'lodash.isequal';
 
-import {AtomicType} from './type';
+import {AtomicType, RefinedType, Type, TypeOf} from './type';
 import {
   booleanTypeSymbol,
   numberTypeSymbol,
   stringTypeSymbol,
-  unknownTypeSymbol,
+  unknown,
 } from './types';
 
-export function literal<TType extends string>(
-  literal: TType,
-): AtomicType<TType, typeof stringTypeSymbol>;
-export function literal<TType extends number>(
-  literal: TType,
-): AtomicType<TType, typeof numberTypeSymbol>;
-export function literal<TType extends boolean>(
-  literal: TType,
-): AtomicType<TType, typeof booleanTypeSymbol>;
-export function literal<TType extends string | number | boolean>(
-  literal: TType,
-): AtomicType<TType> {
+/**
+ * DECLARATION ONLY.
+ *
+ * Exported to avoid TS4023 error:
+ * https://github.com/Microsoft/TypeScript/issues/5711
+ */
+export declare const nominal: unique symbol;
+
+export type Nominal<TKey extends string | symbol, TType = unknown> = TType & {
+  [TNominalSymbol in typeof nominal]: {
+    [TNominalKey in TKey]: true;
+  };
+};
+
+export function literal<T extends string>(
+  literal: T,
+): AtomicType<typeof stringTypeSymbol>;
+export function literal<T extends number>(
+  literal: T,
+): AtomicType<typeof numberTypeSymbol>;
+export function literal<T extends boolean>(
+  literal: T,
+): AtomicType<typeof booleanTypeSymbol>;
+export function literal(literal: unknown): AtomicType<any> {
   let symbol: symbol;
 
   switch (typeof literal) {
@@ -39,10 +51,16 @@ export function literal<TType extends string | number | boolean>(
   return new AtomicType(symbol, [value => value === literal]);
 }
 
-export function equal<TType>(object: TType): AtomicType<TType> {
-  return new AtomicType(unknownTypeSymbol, [value => value === object]);
-}
-
-export function deepEqual<TType>(object: TType): AtomicType<TType> {
-  return new AtomicType(unknownTypeSymbol, [value => isEqual(value, object)]);
+export function equal(
+  comparison: unknown,
+): RefinedType<typeof unknown, unknown>;
+export function equal<TType extends Type>(
+  comparison: TypeOf<TType>,
+  Type: TType,
+): RefinedType<TType, unknown>;
+export function equal(
+  comparison: unknown,
+  Type = unknown,
+): RefinedType<Type, unknown> {
+  return new RefinedType(Type, [value => isEqual(value, comparison)]);
 }

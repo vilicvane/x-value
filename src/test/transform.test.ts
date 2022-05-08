@@ -98,3 +98,23 @@ it('transform medium A to medium B and back', () => {
   expect(Type.encode(mediumA, value)).toEqual(a);
   expect(Type.encode(mediumB, value)).toEqual(b);
 });
+
+it('transform should work with refined type', () => {
+  const O = x
+    .object({
+      foo: x.string,
+    })
+    .refine(value => value.foo === 'abc');
+
+  let value = {foo: 'abc'};
+
+  expect(O.transform(x.json, x.jsonValue, JSON.stringify(value))).toEqual(
+    value,
+  );
+
+  expect(() => O.transform(x.json, x.jsonValue, JSON.stringify({foo: 'def'})))
+    .toThrowErrorMatchingInlineSnapshot(`
+    "Failed to transform medium:
+      Unexpected value."
+  `);
+});

@@ -10,6 +10,7 @@ declare global {
 }
 
 export const identifierTypeSymbol = Symbol();
+
 export const Identifier = x.atomic(
   identifierTypeSymbol,
   value => typeof value === 'string',
