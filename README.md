@@ -52,15 +52,13 @@ type Oops = x.TypeOf<typeof Oops>;
 type JSONOops = x.MediumTypeOf<typeof Oops, x.JSONTypes>;
 ```
 
-Refine atomic type:
+Refine type:
 
 ```ts
 const Email = x.string.refine(value => value.includes('@'));
 
 // Or with nominal type.
-const Email = x.string.refine<string & {__nominal: 'email'}>(value =>
-  value.includes('@'),
-);
+const Email = x.string.refine<'email'>(value => value.includes('@'));
 ```
 
 Decode from medium:
