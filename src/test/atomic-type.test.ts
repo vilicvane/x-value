@@ -1,12 +1,6 @@
 import * as x from '../library';
-import {
-  ExtendedJSONValueTypes,
-  MediumTypeOf,
-  TypeConstraintError,
-  TypeOf,
-  atomic,
-  stringTypeSymbol,
-} from '../library';
+import type {ExtendedJSONValueTypes, MediumTypeOf, TypeOf} from '../library';
+import {TypeConstraintError, atomic, stringTypeSymbol} from '../library';
 
 const Sunday = x.Date.refine<'sunday'>(date => date.getDay() === 0);
 

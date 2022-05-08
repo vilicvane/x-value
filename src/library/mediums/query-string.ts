@@ -2,7 +2,8 @@ import {toString} from '../@utils';
 import {atomicTypeSymbol, medium} from '../medium';
 import {booleanTypeSymbol, numberTypeSymbol} from '../types';
 
-import {EXTENDED_CODECS, ExtendedTypes} from './@extended';
+import type {ExtendedTypes} from './@extended';
+import {EXTENDED_CODECS} from './@extended';
 
 export interface QueryStringTypes {
   packed: string;

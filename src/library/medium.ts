@@ -1,4 +1,4 @@
-import {__MediumTypeOf, __MediumTypesPackedType} from './@utils';
+import type {__MediumTypeOf, __MediumTypesPackedType} from './@utils';
 
 export const atomicTypeSymbol = Symbol();
 

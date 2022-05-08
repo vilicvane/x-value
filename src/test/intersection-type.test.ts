@@ -1,5 +1,6 @@
 import * as x from '../library';
-import {TypeConstraintError, TypeOf} from '../library';
+import type {TypeOf} from '../library';
+import {TypeConstraintError} from '../library';
 
 it('intersection type results in never should work with json medium', () => {
   const Type = x.intersection(x.string, x.number);

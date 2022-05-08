@@ -1,5 +1,5 @@
 import {atomicTypeSymbol, medium} from '../medium';
-import {
+import type {
   booleanTypeSymbol,
   dateTypeSymbol,
   nullTypeSymbol,

@@ -1,5 +1,6 @@
 import * as x from '../library';
-import {TypeConstraintError, TypeOf} from '../library';
+import type {TypeOf} from '../library';
+import {TypeConstraintError} from '../library';
 
 it('simple array type should work with json medium', () => {
   const Type = x.array(x.string);

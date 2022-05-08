@@ -1,5 +1,5 @@
 import * as x from '../library';
-import {ECMAScriptTypes, JSONValueTypes} from '../library';
+import type {ECMAScriptTypes, JSONValueTypes} from '../library';
 
 declare global {
   namespace XValue {

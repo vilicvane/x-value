@@ -1,6 +1,7 @@
 import {atomicTypeSymbol, medium} from '../medium';
 
-import {EXTENDED_CODECS, ExtendedTypes} from './@extended';
+import type {ExtendedTypes} from './@extended';
+import {EXTENDED_CODECS} from './@extended';
 
 export interface JSONTypes {
   packed: string;

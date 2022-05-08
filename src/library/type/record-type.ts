@@ -1,17 +1,17 @@
-import {
+import type {
   __ElementOrArray,
   __MediumTypeOf,
   __MediumTypeOfRecordKeyType,
   __MediumTypesPackedType,
   __Nominal,
-  __ObjectTypeDefinitionToMediumType,
   __TypeOfRecordKeyType,
-  toString,
 } from '../@utils';
-import {Medium} from '../medium';
+import {__ObjectTypeDefinitionToMediumType, toString} from '../@utils';
+import type {Medium} from '../medium';
 
-import {RefinedType} from './refined-type';
-import {Type, TypeConstraint, TypeIssue, TypeOf, TypePath} from './type';
+import type {RefinedType} from './refined-type';
+import type {TypeConstraint, TypeIssue, TypeOf, TypePath} from './type';
+import {Type} from './type';
 
 export interface RecordType<TKey, TValue> {
   refine<TNominal>(

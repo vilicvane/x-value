@@ -1,9 +1,10 @@
-import {AssertTrue, IsEqual} from 'tslang';
+import type {AssertTrue, IsEqual} from 'tslang';
 
 import * as x from '../library';
-import {MediumTypeOf, Nominal, TypeOf} from '../library';
+import type {MediumTypeOf, Nominal, TypeOf} from '../library';
 
-import {Identifier, MediumATypes, MediumBTypes} from './@usage';
+import type {MediumATypes, MediumBTypes} from './@usage';
+import {Identifier} from './@usage';
 
 let unknownValue: unknown;
 

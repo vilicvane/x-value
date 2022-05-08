@@ -1,5 +1,5 @@
 import * as x from '../library';
-import {TypeOf} from '../library';
+import type {TypeOf} from '../library';
 
 it('optional type should work alone', () => {
   const Type = x.optional(x.string);

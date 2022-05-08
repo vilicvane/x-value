@@ -1,5 +1,5 @@
 import * as x from '../library';
-import {TypeOf} from '../library';
+import type {TypeOf} from '../library';
 
 it('record type with string key should work', () => {
   const Type = x.record(x.string, x.number);

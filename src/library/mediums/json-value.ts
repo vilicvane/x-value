@@ -1,12 +1,14 @@
-import {MediumAtomicCodecs, atomicTypeSymbol, medium} from '../medium';
-import {
+import type {MediumAtomicCodecs} from '../medium';
+import {atomicTypeSymbol, medium} from '../medium';
+import type {
   booleanTypeSymbol,
   nullTypeSymbol,
   numberTypeSymbol,
   stringTypeSymbol,
 } from '../types';
 
-import {EXTENDED_CODECS, ExtendedTypes} from './@extended';
+import type {ExtendedTypes} from './@extended';
+import {EXTENDED_CODECS} from './@extended';
 
 export interface JSONValueTypes {
   [nullTypeSymbol]: null;

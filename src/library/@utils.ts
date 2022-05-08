@@ -1,4 +1,4 @@
-import {
+import type {
   ArrayType,
   AtomicType,
   IntersectionType,
@@ -10,7 +10,7 @@ import {
   Type,
   UnionType,
 } from './type';
-import {Nominal} from './utils';
+import type {Nominal} from './utils';
 
 export const hasOwnProperty = Object.prototype.hasOwnProperty;
 

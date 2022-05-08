@@ -1,13 +1,8 @@
 import * as x from '../library';
-import {MediumTypeOf, TypeOf} from '../library';
+import type {MediumTypeOf, TypeOf} from '../library';
 
-import {
-  Identifier,
-  MediumATypes,
-  MediumBTypes,
-  mediumA,
-  mediumB,
-} from './@usage';
+import type {MediumATypes, MediumBTypes} from './@usage';
+import {Identifier, mediumA, mediumB} from './@usage';
 
 it('transform medium A to medium B and back', () => {
   const Type = x.object({

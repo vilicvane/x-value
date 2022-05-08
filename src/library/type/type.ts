@@ -1,5 +1,5 @@
-import {__MediumTypeOf} from '../@utils';
-import {Medium} from '../medium';
+import type {__MediumTypeOf} from '../@utils';
+import type {Medium} from '../medium';
 
 /* eslint-disable @mufan/import-groups */
 
@@ -138,4 +138,5 @@ export type TypeOf<TType extends Type> = __MediumTypeOf<TType, XValue.Types>;
 /* eslint-enable @mufan/import-groups */
 
 // Make sure code in refined-type.ts accessing type.ts after exports ready.
-import {RefinedType, refined} from './refined-type';
+import type {RefinedType} from './refined-type';
+import {refined} from './refined-type';

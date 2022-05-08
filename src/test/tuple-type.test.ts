@@ -1,5 +1,5 @@
 import * as x from '../library';
-import {TypeOf} from '../library';
+import type {TypeOf} from '../library';
 
 it('tuple type should work', () => {
   const Tuple = x.tuple(x.string, x.number);

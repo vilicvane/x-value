@@ -1,5 +1,5 @@
 import {toString} from '../@utils';
-import {MediumAtomicCodecs} from '../medium';
+import type {MediumAtomicCodecs} from '../medium';
 import {dateTypeSymbol} from '../types';
 
 export interface ExtendedTypes {

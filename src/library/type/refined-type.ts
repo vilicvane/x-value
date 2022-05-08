@@ -1,12 +1,13 @@
-import {
+import type {
   __ElementOrArray,
   __MediumTypeOf,
   __MediumTypesPackedType,
   __Nominal,
 } from '../@utils';
-import {Medium} from '../medium';
+import type {Medium} from '../medium';
 
-import {Type, TypeConstraint, TypeIssue, TypeOf, TypePath} from './type';
+import type {TypeConstraint, TypeIssue, TypeOf, TypePath} from './type';
+import {Type} from './type';
 
 export interface RefinedType<TType, TNominal> {
   refine<TNominal>(

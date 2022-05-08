@@ -1,6 +1,7 @@
 import isEqual from 'lodash.isequal';
 
-import {AtomicType, RefinedType, Type, TypeOf} from './type';
+import type {Type, TypeOf} from './type';
+import {AtomicType, RefinedType} from './type';
 import {
   booleanTypeSymbol,
   numberTypeSymbol,
