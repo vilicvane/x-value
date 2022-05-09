@@ -228,7 +228,7 @@ const packed = x.medium<PackedTypes>('Packed ', {
 });
 ```
 
-> The `superJSON` medium is actually a packed medium. However, the related definitions are inherited.
+> The `superJSON` medium is actually a packed medium. However, the related definitions are inherited from `x.JSONTypes`.
 
 ## License
 
