@@ -1,10 +1,10 @@
 import isEqual from 'lodash.isequal';
 
-import type {Type, TypeOf} from './type';
-import {AtomicType, RefinedType} from './type';
+import {AtomicType, RefinedType, Type, TypeOf, record} from './type';
 import {
   booleanTypeSymbol,
   numberTypeSymbol,
+  string,
   stringTypeSymbol,
   unknown,
 } from './types';
@@ -22,6 +22,8 @@ export type Nominal<TKey extends string | symbol, TType = unknown> = TType & {
     [TNominalKey in TKey]: true;
   };
 };
+
+export const UnknownRecord = record(string, unknown);
 
 export function literal<T extends string>(
   literal: T,

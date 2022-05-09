@@ -8,30 +8,6 @@ import {Identifier} from './@usage';
 
 let unknownValue: unknown;
 
-test('equal should work', () => {
-  const o = {foo: 'bar'};
-
-  const O = x.equal(o);
-
-  expect(O.is(o)).toBe(true);
-  expect(O.is({foo: 'bar'})).toBe(true);
-  expect(O.is({})).toBe(false);
-  expect(O.is(123)).toBe(false);
-
-  expect(O.encode(x.json, o)).toBe(JSON.stringify(o));
-  expect(O.decode(x.json, JSON.stringify(o))).toEqual(o);
-
-  expect(() => O.encode(x.json, {})).toThrowErrorMatchingInlineSnapshot(`
-    "Failed to encode to medium:
-      Unexpected value."
-  `);
-  expect(() => O.decode(x.json, JSON.stringify({})))
-    .toThrowErrorMatchingInlineSnapshot(`
-    "Failed to decode from medium:
-      Unexpected value."
-  `);
-});
-
 test('atomic refinement should work', () => {
   const NonEmptyString = x.string.refine(value =>
     value.length > 0 ? true : 'Empty',

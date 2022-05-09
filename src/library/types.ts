@@ -11,6 +11,7 @@ declare global {
       [numberTypeSymbol]: number;
       [booleanTypeSymbol]: boolean;
       [dateTypeSymbol]: Date;
+      [regexpTypeSymbol]: RegExp;
     }
   }
 }
@@ -20,6 +21,13 @@ export const unknown = atomic(unknownTypeSymbol, () => true);
 
 export const undefinedTypeSymbol = Symbol();
 export const undefined = atomic(undefinedTypeSymbol, value =>
+  value === void 0
+    ? true
+    : `Expected undefined, getting ${toString.call(value)}.`,
+);
+
+export const voidTypeSymbol = Symbol();
+export const voidType = atomic(voidTypeSymbol, value =>
   value === void 0
     ? true
     : `Expected undefined, getting ${toString.call(value)}.`,
@@ -56,4 +64,11 @@ export const Date = atomic(dateTypeSymbol, value =>
   value instanceof globalThis.Date
     ? true
     : `Expected instance of Date, getting ${toString.call(value)}.`,
+);
+
+export const regexpTypeSymbol = Symbol();
+export const RegExp = atomic(regexpTypeSymbol, value =>
+  value instanceof globalThis.RegExp
+    ? true
+    : `Expected instance of RegExp, getting ${toString.call(value)}.`,
 );

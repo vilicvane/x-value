@@ -8,11 +8,13 @@ it('pre-defined atomic types should decode/encode ecmascript medium', () => {
   expect(x.unknown.decode(x.ecmascript, true)).toBe(true);
   expect(x.unknown.decode(x.ecmascript, 123)).toBe(123);
   expect(x.undefined.decode(x.ecmascript, undefined)).toBe(undefined);
+  expect(x.voidType.decode(x.ecmascript, undefined)).toBe(undefined);
   expect(x.nullType.decode(x.ecmascript, null)).toBe(null);
   expect(x.string.decode(x.ecmascript, 'text')).toBe('text');
   expect(x.number.decode(x.ecmascript, 123)).toBe(123);
   expect(x.boolean.decode(x.ecmascript, true)).toBe(true);
 
+  expect(x.undefined.encode(x.ecmascript, undefined)).toBe(undefined);
   expect(x.undefined.encode(x.ecmascript, undefined)).toBe(undefined);
   expect(x.nullType.encode(x.ecmascript, null)).toBe(null);
   expect(x.string.encode(x.ecmascript, 'text')).toBe('text');
@@ -22,6 +24,11 @@ it('pre-defined atomic types should decode/encode ecmascript medium', () => {
 
 it('pre-defined atomic types should error decode/encode ecmascript medium with wrong packed value', () => {
   expect(() => x.undefined.decode(x.ecmascript, true as any))
+    .toThrowErrorMatchingInlineSnapshot(`
+    "Failed to decode from medium:
+      Expected undefined, getting [object Boolean]."
+  `);
+  expect(() => x.voidType.decode(x.ecmascript, true as any))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to decode from medium:
       Expected undefined, getting [object Boolean]."

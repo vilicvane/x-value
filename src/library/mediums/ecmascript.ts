@@ -7,11 +7,13 @@ import type {
   stringTypeSymbol,
   undefinedTypeSymbol,
   unknownTypeSymbol,
+  voidTypeSymbol,
 } from '../types';
 
 export interface ECMAScriptTypes {
   [unknownTypeSymbol]: unknown;
   [undefinedTypeSymbol]: undefined;
+  [voidTypeSymbol]: void;
   [nullTypeSymbol]: null;
   [stringTypeSymbol]: string;
   [numberTypeSymbol]: number;
