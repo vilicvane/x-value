@@ -2,17 +2,20 @@ import type {
   __ElementOrArray,
   __MediumTypeOf,
   __MediumTypesPackedType,
-  __Nominal,
+  __RefinedMediumType,
 } from '../@utils';
 import type {Medium} from '../medium';
+import type {Nominal} from '../utils';
 
-import type {TypeConstraint, TypeIssue, TypeOf, TypePath} from './type';
+import type {TypeConstraint, TypeIssue, TypePath} from './type';
 import {Type} from './type';
 
 export interface RefinedType<TType, TNominal> {
   refine<TNominal>(
-    constraints: __ElementOrArray<TypeConstraint<TypeOf<TType> & TNominal>>,
-  ): RefinedType<this, __Nominal<TNominal>>;
+    constraints: __ElementOrArray<
+      TypeConstraint<__RefinedMediumType<TType, TNominal, XValue.Types>>
+    >,
+  ): RefinedType<this, Nominal<TNominal>>;
 
   decode<TMediumTypes extends object>(
     medium: Medium<TMediumTypes>,
@@ -20,11 +23,11 @@ export interface RefinedType<TType, TNominal> {
       TMediumTypes,
       __MediumTypeOf<TType, TMediumTypes> & TNominal
     >,
-  ): TypeOf<TType> & TNominal;
+  ): __RefinedMediumType<TType, TNominal, XValue.Types>;
 
   encode<TMediumTypes extends object>(
     medium: Medium<TMediumTypes>,
-    value: TypeOf<TType> & TNominal,
+    value: __RefinedMediumType<TType, TNominal, XValue.Types>,
   ): __MediumTypesPackedType<
     TMediumTypes,
     __MediumTypeOf<TType, TMediumTypes> & TNominal
@@ -42,7 +45,9 @@ export interface RefinedType<TType, TNominal> {
     __MediumTypeOf<TType, TToMediumTypes> & TNominal
   >;
 
-  is(value: unknown): value is TypeOf<TType> & TNominal;
+  is(
+    value: unknown,
+  ): value is __RefinedMediumType<TType, TNominal, XValue.Types>;
 }
 
 export class RefinedType<TType extends Type, TNominal> extends Type<'refined'> {

@@ -1,6 +1,6 @@
 import * as x from '../library';
 
-it('literal type should work', () => {
+test('literal type should work', () => {
   const Foo = x.literal('foo');
   const One = x.literal(1);
   const True = x.literal(true);
@@ -13,7 +13,7 @@ it('literal type should work', () => {
   expect(True.is(false)).toBe(false);
 });
 
-it('literal type should throw on unsupported values', () => {
+test('literal type should throw on unsupported values', () => {
   expect(() => x.literal({} as any)).toThrow(TypeError);
 });
 
@@ -41,7 +41,7 @@ test('equal should work', () => {
   `);
 });
 
-it('UnknownRecord type should work', () => {
+test('UnknownRecord type should work', () => {
   expect(x.UnknownRecord.is({})).toBe(true);
   expect(x.UnknownRecord.is({key: 'value'})).toBe(true);
   expect(x.UnknownRecord.is([])).toBe(true);

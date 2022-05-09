@@ -1,5 +1,6 @@
 import type {__MediumTypeOf} from '../@utils';
 import type {Medium} from '../medium';
+import type {Nominal} from '../utils';
 
 /* eslint-disable @mufan/import-groups */
 
@@ -8,7 +9,7 @@ export abstract class Type<TCategory extends string = string> {
 
   refine(
     constraints: TypeConstraint | TypeConstraint[],
-  ): RefinedType<Type, unknown> {
+  ): RefinedType<Type, Nominal<unknown>> {
     return refined(this, constraints);
   }
 

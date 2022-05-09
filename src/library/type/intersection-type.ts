@@ -2,11 +2,11 @@ import type {
   __ElementOrArray,
   __MediumTypeOf,
   __MediumTypesPackedType,
-  __Nominal,
   __UnionToIntersection,
 } from '../@utils';
 import {merge} from '../@utils';
 import type {Medium} from '../medium';
+import type {Nominal} from '../utils';
 
 import type {RefinedType} from './refined-type';
 import type {TypeConstraint, TypeIssue, TypeOf, TypePath} from './type';
@@ -17,7 +17,7 @@ export interface IntersectionType<TTypeTuple> {
     constraints: __ElementOrArray<
       TypeConstraint<__UnionToIntersection<TypeOf<TTypeTuple[number]>>>
     >,
-  ): RefinedType<this, __Nominal<TNominal>>;
+  ): RefinedType<this, Nominal<TNominal>>;
 
   decode<TMediumTypes extends object>(
     medium: Medium<TMediumTypes>,

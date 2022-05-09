@@ -1,11 +1,11 @@
 import type {
   __ElementOrArray,
   __MediumTypesPackedType,
-  __Nominal,
   __ObjectTypeDefinitionToMediumType,
 } from '../@utils';
 import {toString} from '../@utils';
 import type {Medium} from '../medium';
+import type {Nominal} from '../utils';
 
 import type {RefinedType} from './refined-type';
 import type {TypeConstraint, TypeIssue, TypePath} from './type';
@@ -18,7 +18,7 @@ export interface ObjectType<TTypeDefinition> {
         __ObjectTypeDefinitionToMediumType<TTypeDefinition, XValue.Types>
       >
     >,
-  ): RefinedType<this, __Nominal<TNominal>>;
+  ): RefinedType<this, Nominal<TNominal>>;
 
   decode<TMediumTypes extends object>(
     medium: Medium<TMediumTypes>,

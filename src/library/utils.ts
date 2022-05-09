@@ -16,13 +16,34 @@ import {
  * Exported to avoid TS4023 error:
  * https://github.com/Microsoft/TypeScript/issues/5711
  */
-export declare const nominal: unique symbol;
+export declare const __nominal: unique symbol;
 
-export type Nominal<TKey extends string | symbol, TType = unknown> = TType & {
-  [TNominalSymbol in typeof nominal]: {
-    [TNominalKey in TKey]: true;
-  };
-};
+/**
+ * DECLARATION ONLY.
+ *
+ * Exported to avoid TS4023 error:
+ * https://github.com/Microsoft/TypeScript/issues/5711
+ */
+export declare const __nominalType: unique symbol;
+
+export type Nominal<TNominal, T = unknown> = T &
+  (unknown extends TNominal
+    ? unknown
+    : {
+        [TNominalTypeSymbol in typeof __nominalType]: T;
+      } & ([TNominal] extends [string | symbol]
+        ? {
+            [TNominalSymbol in typeof __nominal]: {
+              [TNominalKey in TNominal]: true;
+            };
+          }
+        : TNominal));
+
+export type Denominalize<T> = T extends {
+  [TNominalTypeSymbol in typeof __nominalType]: infer TDenominalized;
+}
+  ? TDenominalized
+  : T;
 
 export const UnknownRecord = record(string, unknown);
 

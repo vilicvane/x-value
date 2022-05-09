@@ -1,7 +1,7 @@
 import type {AssertTrue, IsEqual} from 'tslang';
 
 import * as x from '../library';
-import type {MediumTypeOf, Nominal, TypeOf} from '../library';
+import type {Denominalize, MediumTypeOf, Nominal, TypeOf} from '../library';
 
 import type {MediumATypes, MediumBTypes} from './@usage';
 import {Identifier} from './@usage';
@@ -62,8 +62,11 @@ test('atomic refinement should work', () => {
 
   type _ =
     | AssertTrue<IsEqual<Email, Nominal<'email', string>>>
+    | AssertTrue<IsEqual<Denominalize<Email>, string>>
     | AssertTrue<IsEqual<EmailInJSONValue, Nominal<'email', string>>>
+    | AssertTrue<IsEqual<Denominalize<EmailInJSONValue>, string>>
     | AssertTrue<IsEqual<LiveEmail, Nominal<'email' | 'live-email', string>>>
+    | AssertTrue<IsEqual<Denominalize<LiveEmail>, string>>
     | AssertTrue<
         IsEqual<LiveEmailInJSONValue, Nominal<'email' | 'live-email', string>>
       >
@@ -89,8 +92,8 @@ test('array refinement should work', () => {
   }
 
   type _ =
-    | AssertTrue<IsEqual<Triple, string[] & {length: 3}>>
-    | AssertTrue<IsEqual<TripleInJSONValue, string[] & {length: 3}>>;
+    | AssertTrue<IsEqual<Triple, Nominal<{length: 3}, string[]>>>
+    | AssertTrue<IsEqual<TripleInJSONValue, Nominal<{length: 3}, string[]>>>;
 });
 
 test('object refinement should work', () => {
@@ -110,7 +113,9 @@ test('object refinement should work', () => {
     type _ = AssertTrue<IsEqual<typeof unknownValue, O>>;
   }
 
-  type _ = AssertTrue<IsEqual<O, {foo: 'abc'; bar: number}>>;
+  type _ = AssertTrue<
+    IsEqual<O, Nominal<{foo: 'abc'}, {foo: string; bar: number}>>
+  >;
 });
 
 test('optional refinement should work', () => {
