@@ -12,7 +12,7 @@
     "build": "rimraf ./bld && tsc --build",
     "lint": "run-in-every eslint-project --parallel --echo -- eslint --config {configFileName} .",
     "lint-prettier": "prettier --check .",
-    "test": "yarn lint-prettier && yarn build && yarn lint && jest",
+    "test": "yarn lint-prettier && yarn build && yarn lint && jest --coverage",
     "prepublishOnly": "yarn test"
   },
   "dependencies": {

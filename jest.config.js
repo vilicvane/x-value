@@ -9,7 +9,6 @@ module.exports = {
   },
   roots: ['<rootDir>/src/test'],
   clearMocks: true,
-  collectCoverage: true,
   coverageDirectory: 'coverage',
   coverageProvider: 'v8',
   coveragePathIgnorePatterns: ['/node_modules/', '<rootDir>/src/test/'],
