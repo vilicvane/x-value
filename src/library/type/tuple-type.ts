@@ -11,11 +11,11 @@ import type {TypeConstraint, TypeIssue, TypePath} from './type';
 import {Type} from './type';
 
 export interface TupleType<TElements> {
-  refine<TNominalOrRefined, TNominal = unknown>(
+  refine<TNominalOrRefinement, TNominal = unknown>(
     constraints: __ElementOrArray<
       TypeConstraint<__TupleMediumType<TElements, XValue.Types>>
     >,
-  ): __RefinedType<this, TNominalOrRefined, TNominal>;
+  ): __RefinedType<this, TNominalOrRefinement, TNominal>;
 
   decode<TMediumTypes extends object>(
     medium: Medium<TMediumTypes>,

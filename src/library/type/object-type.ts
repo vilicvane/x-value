@@ -11,13 +11,13 @@ import type {TypeConstraint, TypeIssue, TypePath} from './type';
 import {Type} from './type';
 
 export interface ObjectType<TTypeDefinition> {
-  refine<TNominalOrRefined, TNominal = unknown>(
+  refine<TNominalOrRefinement, TNominal = unknown>(
     constraints: __ElementOrArray<
       TypeConstraint<
         __ObjectTypeDefinitionToMediumType<TTypeDefinition, XValue.Types>
       >
     >,
-  ): __RefinedType<this, TNominalOrRefined, TNominal>;
+  ): __RefinedType<this, TNominalOrRefinement, TNominal>;
 
   decode<TMediumTypes extends object>(
     medium: Medium<TMediumTypes>,

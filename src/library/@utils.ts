@@ -29,8 +29,8 @@ export type __MediumTypeOf<TType, TMediumTypes> = TType extends ObjectType<
   ? __MediumTypeOf<TElementType, TMediumTypes>[]
   : TType extends TupleType<infer TTuple>
   ? __TupleMediumType<TTuple, TMediumTypes>
-  : TType extends RefinedType<infer TType, infer TRefined, infer TNominal>
-  ? __RefinedMediumType<TType, TRefined, TNominal, TMediumTypes>
+  : TType extends RefinedType<infer TType, infer TRefinement, infer TNominal>
+  ? __RefinedMediumType<TType, TRefinement, TNominal, TMediumTypes>
   : TType extends AtomicType<infer TTypeSymbol>
   ? __AtomicMediumType<TTypeSymbol, TMediumTypes>
   : TType extends UnionType<infer TTypeTuple>
@@ -70,8 +70,8 @@ export type __TupleMediumType<TElements, TMediumTypes> = {
   [TIndex in keyof TElements]: __MediumTypeOf<TElements[TIndex], TMediumTypes>;
 };
 
-export type __RefinedMediumType<TType, TRefined, TNominal, TMediumTypes> =
-  __MediumTypeOf<TType, TMediumTypes> & TRefined extends infer T
+export type __RefinedMediumType<TType, TRefinement, TNominal, TMediumTypes> =
+  __MediumTypeOf<TType, TMediumTypes> & TRefinement extends infer T
     ? unknown extends TNominal
       ? T
       : T &
@@ -124,12 +124,16 @@ export type __ElementOrArray<T> = T | T[];
 
 export type __RefinedType<
   TType extends Type,
-  TNominalOrRefined,
+  TNominalOrRefinement,
   TNominal,
 > = RefinedType<
   TType,
-  TNominalOrRefined extends __NominalPartial ? unknown : TNominalOrRefined,
-  TNominalOrRefined extends __NominalPartial ? TNominalOrRefined : TNominal
+  TNominalOrRefinement extends __NominalPartial
+    ? unknown
+    : TNominalOrRefinement,
+  TNominalOrRefinement extends __NominalPartial
+    ? TNominalOrRefinement
+    : TNominal
 >;
 
 export type __NominalPartial = {

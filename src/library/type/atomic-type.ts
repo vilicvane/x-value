@@ -19,11 +19,11 @@ export type AtomicTypeType<
   : TType;
 
 export interface AtomicType<TSymbol> {
-  refine<TNominalOrRefined, TNominal = unknown>(
+  refine<TNominalOrRefinement, TNominal = unknown>(
     constraints: __ElementOrArray<
       TypeConstraint<__AtomicMediumType<TSymbol, XValue.Types>>
     >,
-  ): __RefinedType<this, TNominalOrRefined, TNominal>;
+  ): __RefinedType<this, TNominalOrRefinement, TNominal>;
 
   decode<TMediumTypes extends object>(
     medium: Medium<TMediumTypes>,

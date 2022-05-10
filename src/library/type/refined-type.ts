@@ -11,14 +11,14 @@ import type {__nominalType} from '../utils';
 import type {TypeConstraint, TypeIssue, TypePath} from './type';
 import {Type} from './type';
 
-export interface RefinedType<TType, TRefined, TNominal> {
-  refine<TNominalOrRefined, TNominal = unknown>(
+export interface RefinedType<TType, TRefinement, TNominal> {
+  refine<TNominalOrRefinement, TNominal = unknown>(
     constraints: __ElementOrArray<
       TypeConstraint<
-        __RefinedMediumType<TType, TNominalOrRefined, TNominal, XValue.Types>
+        __RefinedMediumType<TType, TNominalOrRefinement, TNominal, XValue.Types>
       >
     >,
-  ): __RefinedType<this, TNominalOrRefined, TNominal>;
+  ): __RefinedType<this, TNominalOrRefinement, TNominal>;
 
   decode<TMediumTypes extends object>(
     medium: Medium<TMediumTypes>,
@@ -26,11 +26,11 @@ export interface RefinedType<TType, TRefined, TNominal> {
       TMediumTypes,
       __MediumTypeOf<TType, TMediumTypes> & TNominal
     >,
-  ): __RefinedMediumType<TType, TRefined, TNominal, XValue.Types>;
+  ): __RefinedMediumType<TType, TRefinement, TNominal, XValue.Types>;
 
   encode<TMediumTypes extends object>(
     medium: Medium<TMediumTypes>,
-    value: __RefinedMediumType<TType, TRefined, TNominal, XValue.Types>,
+    value: __RefinedMediumType<TType, TRefinement, TNominal, XValue.Types>,
   ): __MediumTypesPackedType<
     TMediumTypes,
     __MediumTypeOf<TType, TMediumTypes> & TNominal
@@ -50,15 +50,15 @@ export interface RefinedType<TType, TRefined, TNominal> {
 
   is(
     value: unknown,
-  ): value is __RefinedMediumType<TType, TRefined, TNominal, XValue.Types>;
+  ): value is __RefinedMediumType<TType, TRefinement, TNominal, XValue.Types>;
 }
 
 export class RefinedType<
   TType extends Type,
-  TRefined,
+  TRefinement,
   TNominal,
 > extends Type<'refined'> {
-  protected __static_type_refined!: TRefined;
+  protected __static_type_refinement!: TRefinement;
   protected __static_type_nominal!: TNominal;
 
   constructor(readonly Type: TType, readonly constraints: TypeConstraint[]) {

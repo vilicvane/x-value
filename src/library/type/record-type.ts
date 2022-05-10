@@ -13,11 +13,11 @@ import type {TypeConstraint, TypeIssue, TypeOf, TypePath} from './type';
 import {Type} from './type';
 
 export interface RecordType<TKey, TValue> {
-  refine<TNominalOrRefined, TNominal = unknown>(
+  refine<TNominalOrRefinement, TNominal = unknown>(
     constraints: __ElementOrArray<
       TypeConstraint<Record<__TypeOfRecordKeyType<TKey>, TypeOf<TValue>>>
     >,
-  ): __RefinedType<this, TNominalOrRefined, TNominal>;
+  ): __RefinedType<this, TNominalOrRefinement, TNominal>;
 
   decode<TMediumTypes extends object>(
     medium: Medium<TMediumTypes>,
