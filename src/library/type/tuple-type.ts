@@ -1,22 +1,21 @@
 import type {
   __ElementOrArray,
   __MediumTypesPackedType,
+  __RefinedType,
   __TupleMediumType,
 } from '../@utils';
 import {__MediumTypeOf, toString} from '../@utils';
 import type {Medium} from '../medium';
-import type {Nominal} from '../utils';
 
-import type {RefinedType} from './refined-type';
 import type {TypeConstraint, TypeIssue, TypePath} from './type';
 import {Type} from './type';
 
 export interface TupleType<TElements> {
-  refine<TNominal>(
+  refine<TNominalOrRefined, TNominal = unknown>(
     constraints: __ElementOrArray<
       TypeConstraint<__TupleMediumType<TElements, XValue.Types>>
     >,
-  ): RefinedType<this, Nominal<TNominal>>;
+  ): __RefinedType<this, TNominalOrRefined, TNominal>;
 
   decode<TMediumTypes extends object>(
     medium: Medium<TMediumTypes>,

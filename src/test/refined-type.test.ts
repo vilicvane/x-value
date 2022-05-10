@@ -13,6 +13,8 @@ test('atomic refinement should work', () => {
     value.length > 0 ? true : 'Empty',
   );
 
+  type NonEmptyString = TypeOf<typeof NonEmptyString>;
+
   expect(NonEmptyString.encode(x.jsonValue, 'abc')).toBe('abc');
   expect(NonEmptyString.decode(x.jsonValue, 'abc')).toBe('abc');
   expect(() => NonEmptyString.encode(x.jsonValue, ''))
@@ -26,7 +28,7 @@ test('atomic refinement should work', () => {
       Expected string, getting [object Array]."
   `);
 
-  const Email = x.string.refine<'email'>(value => value.includes('@'));
+  const Email = x.string.refine<Nominal<'email'>>(value => value.includes('@'));
 
   type Email = TypeOf<typeof Email>;
   type EmailInJSONValue = MediumTypeOf<typeof Email, x.JSONValueTypes>;
@@ -38,7 +40,7 @@ test('atomic refinement should work', () => {
     type _ = AssertTrue<IsEqual<typeof unknownValue, Email>>;
   }
 
-  const LiveEmail = Email.refine<'live-email'>([
+  const LiveEmail = Email.refine<Nominal<'live-email'>>([
     value => value.endsWith('@live'),
   ]);
 
@@ -53,7 +55,7 @@ test('atomic refinement should work', () => {
     type _ = AssertTrue<IsEqual<typeof unknownValue, LiveEmail>>;
   }
 
-  const UserId = Identifier.refine<'user'>(() => true);
+  const UserId = Identifier.refine<Nominal<'user'>>(() => true);
 
   type UserId = TypeOf<typeof UserId>;
 
@@ -61,6 +63,7 @@ test('atomic refinement should work', () => {
   type UserIdInMediumB = MediumTypeOf<typeof UserId, MediumBTypes>;
 
   type _ =
+    | AssertTrue<IsEqual<NonEmptyString, string>>
     | AssertTrue<IsEqual<Email, Nominal<'email', string>>>
     | AssertTrue<IsEqual<Denominalize<Email>, string>>
     | AssertTrue<IsEqual<EmailInJSONValue, Nominal<'email', string>>>
@@ -92,8 +95,8 @@ test('array refinement should work', () => {
   }
 
   type _ =
-    | AssertTrue<IsEqual<Triple, Nominal<{length: 3}, string[]>>>
-    | AssertTrue<IsEqual<TripleInJSONValue, Nominal<{length: 3}, string[]>>>;
+    | AssertTrue<IsEqual<Triple, string[] & {length: 3}>>
+    | AssertTrue<IsEqual<TripleInJSONValue, string[] & {length: 3}>>;
 });
 
 test('object refinement should work', () => {
@@ -113,15 +116,15 @@ test('object refinement should work', () => {
     type _ = AssertTrue<IsEqual<typeof unknownValue, O>>;
   }
 
-  type _ = AssertTrue<
-    IsEqual<O, Nominal<{foo: 'abc'}, {foo: string; bar: number}>>
-  >;
+  type _ = AssertTrue<IsEqual<O, {foo: 'abc'; bar: number}>>;
 });
 
 test('optional refinement should work', () => {
   const O = x
     .optional(x.string)
-    .refine<'includes #'>(value => value === undefined || value.includes('#'));
+    .refine<Nominal<'includes #'>>(
+      value => value === undefined || value.includes('#'),
+    );
 
   type O = TypeOf<typeof O>;
 
@@ -141,7 +144,7 @@ test('optional refinement should work', () => {
 test('record refinement should work', () => {
   const O = x
     .record(x.string, x.number)
-    .refine<'not empty'>(value => Object.keys(value).length > 0);
+    .refine<Nominal<'not empty'>>(value => Object.keys(value).length > 0);
 
   type O = TypeOf<typeof O>;
 
@@ -160,7 +163,7 @@ test('record refinement should work', () => {
 test('tuple refinement should work', () => {
   const O = x
     .tuple(x.string, x.number)
-    .refine<'string is abc and number is 123'>(
+    .refine<Nominal<'string is abc and number is 123'>>(
       ([a, b]) => a === 'abc' && b === 123,
     );
 
@@ -185,7 +188,7 @@ test('tuple refinement should work', () => {
 test('intersection refinement should work', () => {
   const O = x
     .intersection(x.object({foo: x.string}), x.object({bar: x.number}))
-    .refine<'foo is abc'>(value => value.foo === 'abc');
+    .refine<Nominal<'foo is abc'>>(value => value.foo === 'abc');
 
   type O = TypeOf<typeof O>;
 
@@ -206,7 +209,7 @@ test('intersection refinement should work', () => {
 test('union refinement should work', () => {
   const O = x
     .union(x.object({foo: x.string}), x.object({bar: x.number}))
-    .refine<'foo is abc or bar is 123'>(
+    .refine<Nominal<'foo is abc or bar is 123'>>(
       value =>
         ('foo' in value && value.foo === 'abc') ||
         ('bar' in value && value.bar === 123),

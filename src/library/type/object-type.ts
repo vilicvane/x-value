@@ -2,23 +2,22 @@ import type {
   __ElementOrArray,
   __MediumTypesPackedType,
   __ObjectTypeDefinitionToMediumType,
+  __RefinedType,
 } from '../@utils';
 import {toString} from '../@utils';
 import type {Medium} from '../medium';
-import type {Nominal} from '../utils';
 
-import type {RefinedType} from './refined-type';
 import type {TypeConstraint, TypeIssue, TypePath} from './type';
 import {Type} from './type';
 
 export interface ObjectType<TTypeDefinition> {
-  refine<TNominal>(
+  refine<TNominalOrRefined, TNominal = unknown>(
     constraints: __ElementOrArray<
       TypeConstraint<
         __ObjectTypeDefinitionToMediumType<TTypeDefinition, XValue.Types>
       >
     >,
-  ): RefinedType<this, Nominal<TNominal>>;
+  ): __RefinedType<this, TNominalOrRefined, TNominal>;
 
   decode<TMediumTypes extends object>(
     medium: Medium<TMediumTypes>,

@@ -9,8 +9,11 @@ export abstract class Type<TCategory extends string = string> {
 
   refine(
     constraints: TypeConstraint | TypeConstraint[],
-  ): RefinedType<Type, Nominal<unknown>> {
-    return refined(this, constraints);
+  ): RefinedType<Type, unknown, Nominal<unknown>> {
+    return new RefinedType(
+      this,
+      Array.isArray(constraints) ? constraints : [constraints],
+    );
   }
 
   decode(medium: Medium, packed: unknown): unknown {
@@ -139,5 +142,4 @@ export type TypeOf<TType extends Type> = __MediumTypeOf<TType, XValue.Types>;
 /* eslint-enable @mufan/import-groups */
 
 // Make sure code in refined-type.ts accessing type.ts after exports ready.
-import type {RefinedType} from './refined-type';
-import {refined} from './refined-type';
+import {RefinedType} from './refined-type';

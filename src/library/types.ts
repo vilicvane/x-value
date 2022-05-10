@@ -6,6 +6,7 @@ declare global {
     interface Types {
       [unknownTypeSymbol]: unknown;
       [undefinedTypeSymbol]: undefined;
+      [voidTypeSymbol]: void;
       [nullTypeSymbol]: null;
       [stringTypeSymbol]: string;
       [numberTypeSymbol]: number;

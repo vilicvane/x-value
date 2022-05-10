@@ -1,4 +1,7 @@
+import type {AssertTrue, IsEqual} from 'tslang';
+
 import * as x from '../library';
+import type {TypeOf} from '../library';
 
 test('literal type should work', () => {
   const Foo = x.literal('foo');
@@ -11,6 +14,11 @@ test('literal type should work', () => {
   expect(One.is(2)).toBe(false);
   expect(True.is(true)).toBe(true);
   expect(True.is(false)).toBe(false);
+
+  type _ =
+    | AssertTrue<IsEqual<TypeOf<typeof Foo>, 'foo'>>
+    | AssertTrue<IsEqual<TypeOf<typeof One>, 1>>
+    | AssertTrue<IsEqual<TypeOf<typeof True>, true>>;
 });
 
 test('literal type should throw on unsupported values', () => {
@@ -30,7 +38,7 @@ test('equal should work', () => {
   expect(O.encode(x.json, o)).toBe(JSON.stringify(o));
   expect(O.decode(x.json, JSON.stringify(o))).toEqual(o);
 
-  expect(() => O.encode(x.json, {})).toThrowErrorMatchingInlineSnapshot(`
+  expect(() => O.encode(x.json, {} as any)).toThrowErrorMatchingInlineSnapshot(`
     "Failed to encode to medium:
       Unexpected value."
   `);

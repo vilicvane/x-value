@@ -29,8 +29,8 @@ export type __MediumTypeOf<TType, TMediumTypes> = TType extends ObjectType<
   ? __MediumTypeOf<TElementType, TMediumTypes>[]
   : TType extends TupleType<infer TTuple>
   ? __TupleMediumType<TTuple, TMediumTypes>
-  : TType extends RefinedType<infer TType, infer TNominal>
-  ? __RefinedMediumType<TType, TNominal, TMediumTypes>
+  : TType extends RefinedType<infer TType, infer TRefined, infer TNominal>
+  ? __RefinedMediumType<TType, TRefined, TNominal, TMediumTypes>
   : TType extends AtomicType<infer TTypeSymbol>
   ? __AtomicMediumType<TTypeSymbol, TMediumTypes>
   : TType extends UnionType<infer TTypeTuple>
@@ -70,17 +70,15 @@ export type __TupleMediumType<TElements, TMediumTypes> = {
   [TIndex in keyof TElements]: __MediumTypeOf<TElements[TIndex], TMediumTypes>;
 };
 
-export type __RefinedMediumType<TType, TNominal, TMediumTypes> = __MediumTypeOf<
-  TType,
-  TMediumTypes
-> extends infer T
-  ? unknown extends TNominal
-    ? T
-    : T &
-        TNominal & {
-          [TNominalTypeSymbol in typeof __nominalType]: Denominalize<T>;
-        }
-  : never;
+export type __RefinedMediumType<TType, TRefined, TNominal, TMediumTypes> =
+  __MediumTypeOf<TType, TMediumTypes> & TRefined extends infer T
+    ? unknown extends TNominal
+      ? T
+      : T &
+          TNominal & {
+            [TNominalTypeSymbol in typeof __nominalType]: Denominalize<T>;
+          }
+    : never;
 
 export type __AtomicMediumType<
   TSymbol extends symbol,
@@ -123,6 +121,20 @@ export type __MediumTypesPackedType<
   : TFallback;
 
 export type __ElementOrArray<T> = T | T[];
+
+export type __RefinedType<
+  TType extends Type,
+  TNominalOrRefined,
+  TNominal,
+> = RefinedType<
+  TType,
+  TNominalOrRefined extends __NominalPartial ? unknown : TNominalOrRefined,
+  TNominalOrRefined extends __NominalPartial ? TNominalOrRefined : TNominal
+>;
+
+export type __NominalPartial = {
+  [TNominalTypeSymbol in typeof __nominalType]: unknown;
+};
 
 export function merge(partials: unknown[]): unknown {
   let pendingMergeKeyToValues: Map<string | number, unknown[]> | undefined;

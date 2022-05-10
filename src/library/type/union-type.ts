@@ -2,18 +2,17 @@ import type {
   __ElementOrArray,
   __MediumTypeOf,
   __MediumTypesPackedType,
+  __RefinedType,
 } from '../@utils';
 import type {Medium} from '../medium';
-import type {Nominal} from '../utils';
 
-import type {RefinedType} from './refined-type';
 import type {TypeConstraint, TypeIssue, TypeOf, TypePath} from './type';
 import {Type} from './type';
 
 export interface UnionType<TTypeTuple> {
-  refine<TNominal>(
+  refine<TNominalOrRefined, TNominal = unknown>(
     constraints: __ElementOrArray<TypeConstraint<TypeOf<TTypeTuple[number]>>>,
-  ): RefinedType<this, Nominal<TNominal>>;
+  ): __RefinedType<this, TNominalOrRefined, TNominal>;
 
   decode<TMediumTypes extends object>(
     medium: Medium<TMediumTypes>,

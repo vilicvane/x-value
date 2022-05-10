@@ -1,14 +1,8 @@
 import isEqual from 'lodash.isequal';
 
 import type {Type, TypeOf} from './type';
-import {AtomicType, RefinedType, record} from './type';
-import {
-  booleanTypeSymbol,
-  numberTypeSymbol,
-  string,
-  stringTypeSymbol,
-  unknown,
-} from './types';
+import {RefinedType, record} from './type';
+import {boolean, number, string, unknown} from './types';
 
 /**
  * DECLARATION ONLY.
@@ -26,18 +20,15 @@ export declare const __nominal: unique symbol;
  */
 export declare const __nominalType: unique symbol;
 
-export type Nominal<TNominal, T = unknown> = T &
-  (unknown extends TNominal
-    ? unknown
-    : {
-        [TNominalTypeSymbol in typeof __nominalType]: T;
-      } & ([TNominal] extends [string | symbol]
-        ? {
-            [TNominalSymbol in typeof __nominal]: {
-              [TNominalKey in TNominal]: true;
-            };
-          }
-        : TNominal));
+export type Nominal<TNominal, T = unknown> = T & {
+  [TNominalTypeSymbol in typeof __nominalType]: T;
+} & ([TNominal] extends [string | symbol]
+    ? {
+        [TNominalSymbol in typeof __nominal]: {
+          [TNominalKey in TNominal]: true;
+        };
+      }
+    : TNominal);
 
 export type Denominalize<T> = T extends {
   [TNominalTypeSymbol in typeof __nominalType]: infer TDenominalized;
@@ -49,43 +40,36 @@ export const UnknownRecord = record(string, unknown);
 
 export function literal<T extends string>(
   literal: T,
-): AtomicType<typeof stringTypeSymbol>;
+): RefinedType<typeof string, T, unknown>;
 export function literal<T extends number>(
   literal: T,
-): AtomicType<typeof numberTypeSymbol>;
+): RefinedType<typeof number, T, unknown>;
 export function literal<T extends boolean>(
   literal: T,
-): AtomicType<typeof booleanTypeSymbol>;
-export function literal(literal: unknown): AtomicType<any> {
-  let symbol: symbol;
-
+): RefinedType<typeof boolean, T, unknown>;
+export function literal(literal: unknown): RefinedType<Type, unknown, unknown> {
   switch (typeof literal) {
     case 'string':
-      symbol = stringTypeSymbol;
-      break;
+      return string.refine(value => value === literal);
     case 'number':
-      symbol = numberTypeSymbol;
-      break;
+      return number.refine(value => value === literal);
     case 'boolean':
-      symbol = booleanTypeSymbol;
-      break;
+      return boolean.refine(value => value === literal);
     default:
       throw new TypeError('Unsupported literal value');
   }
-
-  return new AtomicType(symbol, [value => value === literal]);
 }
 
-export function equal(
-  comparison: unknown,
-): RefinedType<typeof unknown, unknown>;
-export function equal<TType extends Type>(
-  comparison: TypeOf<TType>,
+export function equal<T>(
+  comparison: T,
+): RefinedType<typeof unknown, T, unknown>;
+export function equal<T extends TypeOf<TType>, TType extends Type>(
+  comparison: T,
   Type: TType,
-): RefinedType<TType, unknown>;
+): RefinedType<TType, T, unknown>;
 export function equal(
   comparison: unknown,
   Type = unknown,
-): RefinedType<Type, unknown> {
+): RefinedType<Type, unknown, unknown> {
   return new RefinedType(Type, [value => isEqual(value, comparison)]);
 }

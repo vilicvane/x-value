@@ -2,11 +2,10 @@ import type {
   __AtomicMediumType,
   __ElementOrArray,
   __MediumTypesPackedType,
+  __RefinedType,
 } from '../@utils';
 import type {Medium} from '../medium';
-import type {Nominal} from '../utils';
 
-import type {RefinedType} from './refined-type';
 import type {TypeConstraint, TypeIssue, TypePath} from './type';
 import {Type} from './type';
 
@@ -20,11 +19,11 @@ export type AtomicTypeType<
   : TType;
 
 export interface AtomicType<TSymbol> {
-  refine<TNominal>(
+  refine<TNominalOrRefined, TNominal = unknown>(
     constraints: __ElementOrArray<
       TypeConstraint<__AtomicMediumType<TSymbol, XValue.Types>>
     >,
-  ): RefinedType<this, Nominal<TNominal>>;
+  ): __RefinedType<this, TNominalOrRefined, TNominal>;
 
   decode<TMediumTypes extends object>(
     medium: Medium<TMediumTypes>,

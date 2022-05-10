@@ -4,6 +4,7 @@ import type {
   dateTypeSymbol,
   nullTypeSymbol,
   numberTypeSymbol,
+  regexpTypeSymbol,
   stringTypeSymbol,
   undefinedTypeSymbol,
   unknownTypeSymbol,
@@ -19,6 +20,7 @@ export interface ECMAScriptTypes {
   [numberTypeSymbol]: number;
   [booleanTypeSymbol]: boolean;
   [dateTypeSymbol]: Date;
+  [regexpTypeSymbol]: RegExp;
 }
 
 export const ecmascript = medium<ECMAScriptTypes>('ECMAScript', {

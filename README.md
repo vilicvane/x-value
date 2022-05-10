@@ -57,8 +57,11 @@ Refine type:
 ```ts
 const Email = x.string.refine(value => value.includes('@'));
 
-// Or with nominal type.
-const Email = x.string.refine<'email'>(value => value.includes('@'));
+// Or with refined or nominal type.
+const Email = x.string.refine<`${string}@${string}`>(value =>
+  value.includes('@'),
+);
+const Email = x.string.refine<Nominal<'email'>>(value => value.includes('@'));
 ```
 
 Decode from medium:

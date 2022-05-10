@@ -3,19 +3,22 @@ import type {
   __MediumTypeOf,
   __MediumTypesPackedType,
   __RefinedMediumType,
+  __RefinedType,
 } from '../@utils';
 import type {Medium} from '../medium';
-import type {Nominal} from '../utils';
+import type {__nominalType} from '../utils';
 
 import type {TypeConstraint, TypeIssue, TypePath} from './type';
 import {Type} from './type';
 
-export interface RefinedType<TType, TNominal> {
-  refine<TNominal>(
+export interface RefinedType<TType, TRefined, TNominal> {
+  refine<TNominalOrRefined, TNominal = unknown>(
     constraints: __ElementOrArray<
-      TypeConstraint<__RefinedMediumType<TType, TNominal, XValue.Types>>
+      TypeConstraint<
+        __RefinedMediumType<TType, TNominalOrRefined, TNominal, XValue.Types>
+      >
     >,
-  ): RefinedType<this, Nominal<TNominal>>;
+  ): __RefinedType<this, TNominalOrRefined, TNominal>;
 
   decode<TMediumTypes extends object>(
     medium: Medium<TMediumTypes>,
@@ -23,11 +26,11 @@ export interface RefinedType<TType, TNominal> {
       TMediumTypes,
       __MediumTypeOf<TType, TMediumTypes> & TNominal
     >,
-  ): __RefinedMediumType<TType, TNominal, XValue.Types>;
+  ): __RefinedMediumType<TType, TRefined, TNominal, XValue.Types>;
 
   encode<TMediumTypes extends object>(
     medium: Medium<TMediumTypes>,
-    value: __RefinedMediumType<TType, TNominal, XValue.Types>,
+    value: __RefinedMediumType<TType, TRefined, TNominal, XValue.Types>,
   ): __MediumTypesPackedType<
     TMediumTypes,
     __MediumTypeOf<TType, TMediumTypes> & TNominal
@@ -47,10 +50,15 @@ export interface RefinedType<TType, TNominal> {
 
   is(
     value: unknown,
-  ): value is __RefinedMediumType<TType, TNominal, XValue.Types>;
+  ): value is __RefinedMediumType<TType, TRefined, TNominal, XValue.Types>;
 }
 
-export class RefinedType<TType extends Type, TNominal> extends Type<'refined'> {
+export class RefinedType<
+  TType extends Type,
+  TRefined,
+  TNominal,
+> extends Type<'refined'> {
+  protected __static_type_refined!: TRefined;
   protected __static_type_nominal!: TNominal;
 
   constructor(readonly Type: TType, readonly constraints: TypeConstraint[]) {
@@ -137,14 +145,4 @@ export class RefinedType<TType extends Type, TNominal> extends Type<'refined'> {
 
     return issues;
   }
-}
-
-export function refined<TType extends Type, TNominal>(
-  Type: TType,
-  constraints: TypeConstraint | TypeConstraint[],
-): RefinedType<TType, TNominal> {
-  return new RefinedType(
-    Type,
-    Array.isArray(constraints) ? constraints : [constraints],
-  );
 }

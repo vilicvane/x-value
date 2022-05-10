@@ -3,22 +3,21 @@ import type {
   __MediumTypeOf,
   __MediumTypeOfRecordKeyType,
   __MediumTypesPackedType,
+  __RefinedType,
   __TypeOfRecordKeyType,
 } from '../@utils';
 import {__ObjectTypeDefinitionToMediumType, toString} from '../@utils';
 import type {Medium} from '../medium';
-import type {Nominal} from '../utils';
 
-import type {RefinedType} from './refined-type';
 import type {TypeConstraint, TypeIssue, TypeOf, TypePath} from './type';
 import {Type} from './type';
 
 export interface RecordType<TKey, TValue> {
-  refine<TNominal>(
+  refine<TNominalOrRefined, TNominal = unknown>(
     constraints: __ElementOrArray<
       TypeConstraint<Record<__TypeOfRecordKeyType<TKey>, TypeOf<TValue>>>
     >,
-  ): RefinedType<this, Nominal<TNominal>>;
+  ): __RefinedType<this, TNominalOrRefined, TNominal>;
 
   decode<TMediumTypes extends object>(
     medium: Medium<TMediumTypes>,
