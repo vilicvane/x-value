@@ -10,6 +10,7 @@ declare global {
       [nullTypeSymbol]: null;
       [stringTypeSymbol]: string;
       [numberTypeSymbol]: number;
+      [bigintTypeSymbol]: bigint;
       [booleanTypeSymbol]: boolean;
       [dateTypeSymbol]: Date;
       [regexpTypeSymbol]: RegExp;
@@ -51,6 +52,13 @@ export const number = atomic(numberTypeSymbol, value =>
   typeof value === 'number'
     ? true
     : `Expected number, getting ${toString.call(value)}.`,
+);
+
+export const bigintTypeSymbol = Symbol();
+export const bigint = atomic(bigintTypeSymbol, value =>
+  typeof value === 'bigint'
+    ? true
+    : `Expected bigint, getting ${toString.call(value)}.`,
 );
 
 export const booleanTypeSymbol = Symbol();

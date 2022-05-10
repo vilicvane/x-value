@@ -1,15 +1,30 @@
 import {toString} from '../@utils';
 import type {MediumAtomicCodecs} from '../medium';
-import {dateTypeSymbol, regexpTypeSymbol} from '../types';
+import {bigintTypeSymbol, dateTypeSymbol, regexpTypeSymbol} from '../types';
 
 const REGEXP_LITERAL_REGEX = /^\/(.*)\/([^/]*)$/;
 
 export interface ExtendedTypes {
+  [bigintTypeSymbol]: string;
   [dateTypeSymbol]: string;
   [regexpTypeSymbol]: string;
 }
 
 export const EXTENDED_CODECS: MediumAtomicCodecs<ExtendedTypes> = {
+  [bigintTypeSymbol]: {
+    encode(bigint) {
+      return bigint.toString();
+    },
+    decode(value) {
+      if (typeof value !== 'string') {
+        throw new TypeError(
+          `Expected bigint string, getting ${toString.call(value)}`,
+        );
+      }
+
+      return BigInt(value);
+    },
+  },
   [dateTypeSymbol]: {
     encode(date) {
       return date.toISOString();

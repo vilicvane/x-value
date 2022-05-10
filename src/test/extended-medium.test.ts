@@ -1,5 +1,50 @@
 import * as x from '../library';
 
+test('bigint type should work', () => {
+  const bigint = BigInt('12345678901234567890');
+  const bigintString = bigint.toString();
+
+  expect(x.bigint.is(bigint)).toBe(true);
+  expect(x.bigint.is(bigintString)).toBe(false);
+  expect(x.bigint.decode(x.extendedJSONValue, bigintString)).toEqual(bigint);
+  expect(x.bigint.encode(x.extendedJSONValue, bigint)).toBe(bigintString);
+  expect(x.bigint.encode(x.ecmascript, bigint)).toEqual(bigint);
+
+  expect(
+    x.object({value: x.bigint}).transform(
+      x.extendedJSON,
+      x.extendedQueryString,
+      JSON.stringify({
+        value: bigintString,
+      }),
+    ),
+  ).toBe(
+    new URLSearchParams({
+      value: bigintString,
+    }).toString(),
+  );
+
+  expect(
+    x.object({value: x.bigint}).transform(
+      x.extendedQueryString,
+      x.extendedJSON,
+      new URLSearchParams({
+        value: bigintString,
+      }).toString(),
+    ),
+  ).toBe(
+    JSON.stringify({
+      value: bigintString,
+    }),
+  );
+
+  expect(() =>
+    x.bigint.decode(x.extendedJSONValue, 123 as any),
+  ).toThrowErrorMatchingInlineSnapshot(
+    `"Expected bigint string, getting [object Number]"`,
+  );
+});
+
 test('Date type should work', () => {
   const date = new Date();
   const dateString = date.toISOString();

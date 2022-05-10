@@ -1,5 +1,6 @@
 import {atomicTypeSymbol, medium} from '../medium';
 import type {
+  bigintTypeSymbol,
   booleanTypeSymbol,
   dateTypeSymbol,
   nullTypeSymbol,
@@ -18,6 +19,7 @@ export interface ECMAScriptTypes {
   [nullTypeSymbol]: null;
   [stringTypeSymbol]: string;
   [numberTypeSymbol]: number;
+  [bigintTypeSymbol]: bigint;
   [booleanTypeSymbol]: boolean;
   [dateTypeSymbol]: Date;
   [regexpTypeSymbol]: RegExp;
