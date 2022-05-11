@@ -7,6 +7,7 @@ import type {
 import {toString} from '../@utils';
 import type {Medium} from '../medium';
 
+import {OptionalType} from './optional-type';
 import type {TypeConstraint, TypeIssue, TypePath} from './type';
 import {Type} from './type';
 
@@ -57,6 +58,44 @@ export class ObjectType<
 > extends Type<'object'> {
   constructor(readonly definition: TTypeDefinition) {
     super();
+  }
+
+  partial(): ObjectType<__Partial<TTypeDefinition>>;
+  partial(): ObjectType<Record<string, OptionalType<Type>>> {
+    let definition = Object.fromEntries(
+      Object.entries(this.definition).map(([key, Type]) => [
+        key,
+        Type instanceof OptionalType ? Type : new OptionalType(Type),
+      ]),
+    );
+
+    return new ObjectType(definition);
+  }
+
+  pick<TKeys extends string[]>(
+    ...keys: TKeys
+  ): ObjectType<Pick<TTypeDefinition, TKeys[number]>>;
+  pick(...keys: string[]): ObjectType<Record<string, Type>> {
+    let keySet = new Set(keys);
+
+    let definition = Object.fromEntries(
+      Object.entries(this.definition).filter(([key]) => keySet.has(key)),
+    );
+
+    return new ObjectType(definition);
+  }
+
+  omit<TKeys extends string[]>(
+    ...keys: TKeys
+  ): ObjectType<Omit<TTypeDefinition, TKeys[number]>>;
+  omit(...keys: string[]): ObjectType<Record<string, Type>> {
+    let keySet = new Set(keys);
+
+    let definition = Object.fromEntries(
+      Object.entries(this.definition).filter(([key]) => !keySet.has(key)),
+    );
+
+    return new ObjectType(definition);
   }
 
   /** @internal */
@@ -208,3 +247,9 @@ export function object<TTypeDefinition extends Record<string, Type>>(
 ): ObjectType<TTypeDefinition> {
   return new ObjectType(definition);
 }
+
+export type __Partial<TTypeDefinition extends Record<string, Type>> = {
+  [TKey in keyof TTypeDefinition]: TTypeDefinition[TKey] extends OptionalType<Type>
+    ? TTypeDefinition[TKey]
+    : OptionalType<TTypeDefinition[TKey]>;
+};

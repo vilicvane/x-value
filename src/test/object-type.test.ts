@@ -1,3 +1,5 @@
+import type {AssertTrue, IsEqual} from 'tslang';
+
 import * as x from '../library';
 import type {TypeOf} from '../library';
 import {TypeConstraintError} from '../library';
@@ -252,4 +254,99 @@ it('object type with intersection type property should work with json medium', (
   expect(Type.is(value1)).toBe(true);
   expect(Type.is(value2)).toBe(true);
   expect(Type.is(value3)).toBe(false);
+});
+
+test('partial() should work', () => {
+  const O = x.object({
+    foo: x.string,
+    bar: x.optional(x.number),
+  });
+
+  const PartialO = O.partial();
+
+  type PartialO = TypeOf<typeof PartialO>;
+
+  expect(PartialO.is({foo: 'abc', bar: 123})).toBe(true);
+  expect(PartialO.is({bar: 123})).toBe(true);
+  expect(PartialO.is({foo: 'abc'})).toBe(true);
+  expect(PartialO.is({})).toBe(true);
+  expect(PartialO.is(123)).toBe(false);
+
+  expect(PartialO.encode(x.jsonValue, {bar: 123})).toEqual({bar: 123});
+  expect(PartialO.encode(x.jsonValue, {foo: 'abc'})).toEqual({foo: 'abc'});
+  expect(
+    PartialO.encode(x.jsonValue, {foo: 'abc', extra: true} as any),
+  ).toEqual({foo: 'abc'});
+
+  expect(PartialO.decode(x.jsonValue, {bar: 123})).toEqual({bar: 123});
+  expect(PartialO.decode(x.jsonValue, {foo: 'abc'})).toEqual({foo: 'abc'});
+  expect(
+    PartialO.decode(x.jsonValue, {foo: 'abc', extra: true} as any),
+  ).toEqual({foo: 'abc'});
+
+  type _ = AssertTrue<IsEqual<PartialO, {foo?: string; bar?: number}>>;
+});
+
+test('pick() should work', () => {
+  const O = x.object({
+    foo: x.string,
+    bar: x.optional(x.number),
+    extra: x.boolean,
+  });
+
+  const PickedO = O.pick('foo', 'bar');
+
+  type PickedO = TypeOf<typeof PickedO>;
+
+  expect(PickedO.is({foo: 'abc', bar: 123})).toBe(true);
+  expect(PickedO.is({bar: 123})).toBe(false);
+  expect(PickedO.is({foo: 'abc'})).toBe(true);
+  expect(PickedO.is({})).toBe(false);
+  expect(PickedO.is(123)).toBe(false);
+
+  expect(PickedO.encode(x.jsonValue, {foo: 'abc'})).toEqual({foo: 'abc'});
+  expect(PickedO.encode(x.jsonValue, {foo: 'abc', extra: true} as any)).toEqual(
+    {foo: 'abc'},
+  );
+
+  expect(PickedO.decode(x.jsonValue, {foo: 'abc'})).toEqual({foo: 'abc'});
+  expect(PickedO.decode(x.jsonValue, {foo: 'abc', extra: true} as any)).toEqual(
+    {foo: 'abc'},
+  );
+
+  type _ = AssertTrue<
+    IsEqual<TypeOf<typeof PickedO>, {foo: string; bar?: number}>
+  >;
+});
+
+test('omit() should work', () => {
+  const O = x.object({
+    foo: x.string,
+    bar: x.optional(x.number),
+    extra: x.boolean,
+  });
+
+  const OmittedO = O.omit('extra');
+
+  type OmittedO = TypeOf<typeof OmittedO>;
+
+  expect(OmittedO.is({foo: 'abc', bar: 123})).toBe(true);
+  expect(OmittedO.is({bar: 123})).toBe(false);
+  expect(OmittedO.is({foo: 'abc'})).toBe(true);
+  expect(OmittedO.is({})).toBe(false);
+  expect(OmittedO.is(123)).toBe(false);
+
+  expect(OmittedO.encode(x.jsonValue, {foo: 'abc'})).toEqual({foo: 'abc'});
+  expect(
+    OmittedO.encode(x.jsonValue, {foo: 'abc', extra: true} as any),
+  ).toEqual({foo: 'abc'});
+
+  expect(OmittedO.decode(x.jsonValue, {foo: 'abc'})).toEqual({foo: 'abc'});
+  expect(
+    OmittedO.decode(x.jsonValue, {foo: 'abc', extra: true} as any),
+  ).toEqual({foo: 'abc'});
+
+  type _ = AssertTrue<
+    IsEqual<TypeOf<typeof OmittedO>, {foo: string; bar?: number}>
+  >;
 });

@@ -3561,10 +3561,15 @@ tsconfig-paths@^3.12.0:
     minimist "^1.2.6"
     strip-bom "^3.0.0"
 
-tslang@^0.1.22, tslang@^0.1.25, tslang@^0.1.26:
+tslang@^0.1.22, tslang@^0.1.25:
   version "0.1.26"
   resolved "https://registry.yarnpkg.com/tslang/-/tslang-0.1.26.tgz#0f1c6c1456853fdab57e6c452a9f4c32ef42bfe8"
   integrity sha512-hZXxLsJ22njkcyLI2XQDcAOBI9eVbwYJPtUhAwjzJSl7x0266LrPbaRuSJmnKIA3kWJiVBqZwVTXCIMZ6yM0MA==
+
+tslang@^0.1.27:
+  version "0.1.27"
+  resolved "https://registry.yarnpkg.com/tslang/-/tslang-0.1.27.tgz#3fabd7d0f306e17db82ebd1523d3cb20ba60a190"
+  integrity sha512-/ni514EDCLP61/ULWh77VN47OGQ6tW14BqsebgipOhjf9ufhPEbNZTyc9q2y9mNnSai/ApWobKjAOfxhhOK2PA==
 
 tslib@^1.8.0, tslib@^1.8.1:
   version "1.14.1"
