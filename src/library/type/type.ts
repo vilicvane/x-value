@@ -9,7 +9,7 @@ export abstract class Type<TCategory extends string = string> {
 
   refine(
     constraints: TypeConstraint | TypeConstraint[],
-  ): RefinedType<Type, unknown, Nominal<unknown>> {
+  ): RefinedType<Type, unknown, Nominal<string | symbol>> {
     return new RefinedType(
       this,
       Array.isArray(constraints) ? constraints : [constraints],

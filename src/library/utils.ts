@@ -20,15 +20,13 @@ export declare const __nominal: unique symbol;
  */
 export declare const __nominalType: unique symbol;
 
-export type Nominal<TNominal, T = unknown> = T & {
+export type Nominal<TNominal extends string | symbol, T = unknown> = T & {
   [TNominalTypeSymbol in typeof __nominalType]: T;
-} & ([TNominal] extends [string | symbol]
-    ? {
-        [TNominalSymbol in typeof __nominal]: {
-          [TNominalKey in TNominal]: true;
-        };
-      }
-    : TNominal);
+} & {
+  [TNominalSymbol in typeof __nominal]: {
+    [TNominalKey in TNominal]: true;
+  };
+};
 
 export type Denominalize<T> = T extends {
   [TNominalTypeSymbol in typeof __nominalType]: infer TDenominalized;
