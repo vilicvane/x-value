@@ -2,7 +2,6 @@
 
 import type {__MediumTypeOf} from '../@utils';
 import type {Medium} from '../medium';
-import type {Nominal} from '../utils';
 
 export abstract class Type<TCategory extends string = string> {
   protected __static_type_category!: TCategory;
@@ -146,4 +145,5 @@ export type TypeOf<TType extends Type> = __MediumTypeOf<TType, XValue.Types>;
 // Make sure code circularly referenced accessing type.ts after exports ready.
 
 import {OptionalType} from './optional-type';
+import type {Nominal} from './refined-type';
 import {RefinedType} from './refined-type';

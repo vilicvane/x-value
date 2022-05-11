@@ -1,6 +1,7 @@
 import type {
   ArrayType,
   AtomicType,
+  Denominalize,
   IntersectionType,
   ObjectType,
   OptionalType,
@@ -9,8 +10,8 @@ import type {
   TupleType,
   Type,
   UnionType,
+  __nominalType,
 } from './type';
-import type {Denominalize, __nominalType} from './utils';
 
 export const hasOwnProperty = Object.prototype.hasOwnProperty;
 

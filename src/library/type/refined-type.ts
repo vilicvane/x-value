@@ -6,7 +6,6 @@ import type {
   __RefinedType,
 } from '../@utils';
 import type {Medium} from '../medium';
-import type {__nominalType} from '../utils';
 
 import type {TypeConstraint, TypeIssue, TypePath} from './type';
 import {Type} from './type';
@@ -146,3 +145,33 @@ export class RefinedType<
     return issues;
   }
 }
+
+/**
+ * DECLARATION ONLY.
+ *
+ * Exported to avoid TS4023 error:
+ * https://github.com/Microsoft/TypeScript/issues/5711
+ */
+export declare const __nominal: unique symbol;
+
+/**
+ * DECLARATION ONLY.
+ *
+ * Exported to avoid TS4023 error:
+ * https://github.com/Microsoft/TypeScript/issues/5711
+ */
+export declare const __nominalType: unique symbol;
+
+export type Nominal<TNominal extends string | symbol, T = unknown> = T & {
+  [TNominalTypeSymbol in typeof __nominalType]: T;
+} & {
+  [TNominalSymbol in typeof __nominal]: {
+    [TNominalKey in TNominal]: true;
+  };
+};
+
+export type Denominalize<T> = T extends {
+  [TNominalTypeSymbol in typeof __nominalType]: infer TDenominalized;
+}
+  ? TDenominalized
+  : T;
