@@ -2,7 +2,7 @@ import * as x from '../library';
 import type {TypeOf} from '../library';
 import {TypeConstraintError} from '../library';
 
-it('simple array type should work with json medium', () => {
+test('simple array type should work with json medium', () => {
   const Type = x.array(x.string);
 
   const value1: TypeOf<typeof Type> = ['abc', 'def'];
@@ -27,7 +27,7 @@ it('simple array type should work with json medium', () => {
   expect(() => Type.encode(x.json, value4 as any)).toThrow(TypeConstraintError);
 });
 
-it('simple array type should work with extended json medium', () => {
+test('simple array type should work with extended json medium', () => {
   const Type = x.array(x.Date);
 
   const value1: TypeOf<typeof Type> = [
@@ -59,7 +59,7 @@ it('simple array type should work with extended json medium', () => {
   );
 });
 
-it('simple array type should work with extended json value medium', () => {
+test('simple array type should work with extended json value medium', () => {
   const Type = x.array(x.Date);
 
   const value1: TypeOf<typeof Type> = [
@@ -103,7 +103,7 @@ it('simple array type should work with extended json value medium', () => {
   );
 });
 
-it('object array type should work with json medium', () => {
+test('object array type should work with json medium', () => {
   const Type = x.array(
     x.object({
       foo: x.string,

@@ -4,7 +4,7 @@ import type {MediumTypeOf, TypeOf} from '../library';
 import type {MediumATypes, MediumBTypes} from './@usage';
 import {Identifier, mediumA, mediumB} from './@usage';
 
-it('transform medium A to medium B and back', () => {
+test('transform medium A to medium B and back', () => {
   const Type = x.object({
     id: Identifier,
     name: x.string,
@@ -94,7 +94,7 @@ it('transform medium A to medium B and back', () => {
   expect(Type.encode(mediumB, value)).toEqual(b);
 });
 
-it('transform should work with refined type', () => {
+test('transform should work with refined type', () => {
   const O = x
     .object({
       foo: x.string,

@@ -1,6 +1,6 @@
 import * as x from '../library';
 
-it('query string medium should work', () => {
+test('query string medium should work', () => {
   const Type = x.object({
     foo: x.string,
     bar: x.number,

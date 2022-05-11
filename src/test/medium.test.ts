@@ -1,6 +1,6 @@
 import {Medium} from '../library';
 
-it('medium requireCodec should throw on unknown symbol', () => {
+test('medium requireCodec should throw on unknown symbol', () => {
   let medium = new Medium('Random', {
     codecs: {},
   });

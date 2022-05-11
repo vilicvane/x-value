@@ -4,7 +4,7 @@ import {TypeConstraintError, atomic, stringTypeSymbol} from '../library';
 
 const Sunday = x.Date.refine<'sunday'>(date => date.getDay() === 0);
 
-it('pre-defined atomic types should decode/encode ecmascript medium', () => {
+test('pre-defined atomic types should decode/encode ecmascript medium', () => {
   expect(x.unknown.decode(x.ecmascript, true)).toBe(true);
   expect(x.unknown.decode(x.ecmascript, 123)).toBe(123);
   expect(x.undefined.decode(x.ecmascript, undefined)).toBe(undefined);
@@ -22,7 +22,7 @@ it('pre-defined atomic types should decode/encode ecmascript medium', () => {
   expect(x.boolean.encode(x.ecmascript, true)).toBe(true);
 });
 
-it('pre-defined atomic types should error decode/encode ecmascript medium with wrong packed value', () => {
+test('pre-defined atomic types should error decode/encode ecmascript medium with wrong packed value', () => {
   expect(() => x.undefined.decode(x.ecmascript, true as any))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to decode from medium:
@@ -81,7 +81,7 @@ it('pre-defined atomic types should error decode/encode ecmascript medium with w
   `);
 });
 
-it('pre-defined atomic types should decode/encode json medium', () => {
+test('pre-defined atomic types should decode/encode json medium', () => {
   expect(x.nullType.decode(x.json, 'null')).toBe(null);
   expect(x.string.decode(x.json, '"text"')).toBe('text');
   expect(x.number.decode(x.json, '123')).toBe(123);
@@ -93,7 +93,7 @@ it('pre-defined atomic types should decode/encode json medium', () => {
   expect(x.boolean.encode(x.json, true)).toBe('true');
 });
 
-it('pre-defined atomic types should error decode/encode json medium with wrong packed value', () => {
+test('pre-defined atomic types should error decode/encode json medium with wrong packed value', () => {
   expect(() => x.nullType.decode(x.json, '"text"'))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to decode from medium:
@@ -117,7 +117,7 @@ it('pre-defined atomic types should error decode/encode json medium with wrong p
   );
 });
 
-it('date atomic type should error decoding json medium', () => {
+test('date atomic type should error decoding json medium', () => {
   expect(() => x.Date.decode(x.json, JSON.stringify(new Date().toISOString())))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to decode from medium:
@@ -129,7 +129,7 @@ it('date atomic type should error decoding json medium', () => {
   // expect(() => x.Date.encode(x.json, new Date())).toThrow(TypeConstraintError);
 });
 
-it('date atomic type should work with extended json medium', () => {
+test('date atomic type should work with extended json medium', () => {
   let date = new Date();
 
   expect(x.Date.decode(x.extendedJSON, JSON.stringify(date)).getTime()).toBe(
@@ -143,7 +143,7 @@ it('date atomic type should work with extended json medium', () => {
   ).toThrowErrorMatchingInlineSnapshot(`"Invalid date value"`);
 });
 
-it('date atomic refinement sunday should work with extended json medium', () => {
+test('date atomic refinement sunday should work with extended json medium', () => {
   let sunday = new Date('2022-3-27');
   let monday = new Date('2022-3-28');
 
@@ -177,7 +177,7 @@ it('date atomic refinement sunday should work with extended json medium', () => 
   expect(() => Sunday.satisfies(monday)).toThrow(TypeConstraintError);
 });
 
-it('date atomic refinement sunday should work with extended json value medium', () => {
+test('date atomic refinement sunday should work with extended json value medium', () => {
   let sunday = new Date('2022-3-27') as TypeOf<typeof Sunday>;
   let monday = new Date('2022-3-28');
 
@@ -202,7 +202,7 @@ it('date atomic refinement sunday should work with extended json value medium', 
   );
 });
 
-it('atomic with constraints array should work', () => {
+test('atomic with constraints array should work', () => {
   const Type = atomic(stringTypeSymbol, [value => typeof value === 'string']);
 
   expect(Type.diagnose('')).toEqual([]);

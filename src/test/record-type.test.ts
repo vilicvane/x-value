@@ -1,7 +1,7 @@
 import * as x from '../library';
 import type {TypeOf} from '../library';
 
-it('record type with string key should work', () => {
+test('record type with string key should work', () => {
   const Type = x.record(x.string, x.number);
 
   const value1: TypeOf<typeof Type> = {
@@ -66,7 +66,7 @@ it('record type with string key should work', () => {
   expect(Type.is(null)).toBe(false);
 });
 
-it('record type with number key should work', () => {
+test('record type with number key should work', () => {
   const Type = x.record(x.number, x.string);
 
   const value1: TypeOf<typeof Type> = ['abc', 'def'];
@@ -128,7 +128,7 @@ it('record type with number key should work', () => {
   expect(Type.is(null)).toBe(false);
 });
 
-it('record type with nominal string key should work', () => {
+test('record type with nominal string key should work', () => {
   const Email = x.string.refine<string & {_nominal: 'email'}>(value =>
     value.includes('@') ? true : 'Expected an email address.',
   );
@@ -167,7 +167,7 @@ it('record type with nominal string key should work', () => {
   `);
 });
 
-it('record type with union string key should work', () => {
+test('record type with union string key should work', () => {
   const Email = x.string.refine<string & {_nominal: 'email'}>(value =>
     value.includes('@') ? true : 'Expected an email address.',
   );

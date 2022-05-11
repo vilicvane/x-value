@@ -2,7 +2,7 @@ import * as x from '../library';
 import type {TypeOf} from '../library';
 import {TypeConstraintError} from '../library';
 
-it('union type of atomic types should work with json medium', () => {
+test('union type of atomic types should work with json medium', () => {
   const Type = x.union(x.string, x.number);
 
   let value1: TypeOf<typeof Type> = 'abc';
@@ -31,7 +31,7 @@ it('union type of atomic types should work with json medium', () => {
   expect(Type.is(true)).toBe(false);
 });
 
-it('union type of mixed types should work with json medium', () => {
+test('union type of mixed types should work with json medium', () => {
   const Type = x.union(
     x.object({
       type: x.literal('text'),
@@ -79,7 +79,7 @@ it('union type of mixed types should work with json medium', () => {
   expect(Type.is(value4)).toBe(false);
 });
 
-it('union type of mixed types should work with json value medium', () => {
+test('union type of mixed types should work with json value medium', () => {
   const Type = x.union(
     x.object({
       type: x.literal('text'),

@@ -1,7 +1,7 @@
 // eslint-disable-next-line @mufan/import-path-shallowest,@mufan/scoped-modules
 import {merge} from '../library/@utils';
 
-it('merge for object-type should work', () => {
+test('merge for object-type should work', () => {
   expect(
     merge([
       {
@@ -77,7 +77,7 @@ it('merge for object-type should work', () => {
   });
 });
 
-it('merge for object-type should error for unexpected cases', () => {
+test('merge for object-type should error for unexpected cases', () => {
   expect(() => merge([null, 123])).toThrow(TypeError);
   expect(() => merge([{}, 123])).toThrow(TypeError);
 });
