@@ -9,15 +9,6 @@ import type {Medium} from '../medium';
 import type {TypeConstraint, TypeIssue, TypePath} from './type';
 import {Type} from './type';
 
-export type AtomicTypeType<
-  TType,
-  TSymbol extends symbol,
-> = unknown extends TType
-  ? XValue.Types extends {[TKey in TSymbol]: infer T}
-    ? T
-    : never
-  : TType;
-
 export interface AtomicType<TSymbol> {
   refine<TNominalOrRefinement, TNominal = unknown>(
     constraints: __ElementOrArray<
