@@ -80,7 +80,7 @@ test('object type with optional property should work with json medium', () => {
     id: x.string,
     profile: x.object({
       name: x.string,
-      age: x.optional(x.number),
+      age: x.number.optional(),
     }),
   });
 
@@ -146,12 +146,12 @@ test('object type with union type property should work with json medium', () => 
       x.object({
         version: x.literal(1),
         name: x.string,
-        age: x.optional(x.number),
+        age: x.number.optional(),
       }),
       x.object({
         version: x.literal(2),
         displayName: x.string,
-        age: x.optional(x.number),
+        age: x.number.optional(),
       }),
     ),
   });

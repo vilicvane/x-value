@@ -1,8 +1,8 @@
+/* eslint-disable @mufan/import-groups */
+
 import type {__MediumTypeOf} from '../@utils';
 import type {Medium} from '../medium';
 import type {Nominal} from '../utils';
-
-/* eslint-disable @mufan/import-groups */
 
 export abstract class Type<TCategory extends string = string> {
   protected __static_type_category!: TCategory;
@@ -14,6 +14,10 @@ export abstract class Type<TCategory extends string = string> {
       this,
       Array.isArray(constraints) ? constraints : [constraints],
     );
+  }
+
+  optional(): OptionalType<this> {
+    return new OptionalType(this);
   }
 
   decode(medium: Medium, packed: unknown): unknown {
@@ -139,7 +143,7 @@ ${this.issues
 
 export type TypeOf<TType extends Type> = __MediumTypeOf<TType, XValue.Types>;
 
-/* eslint-enable @mufan/import-groups */
+// Make sure code circularly referenced accessing type.ts after exports ready.
 
-// Make sure code in refined-type.ts accessing type.ts after exports ready.
+import {OptionalType} from './optional-type';
 import {RefinedType} from './refined-type';
