@@ -23,7 +23,7 @@ export interface RefinedType<TType, TRefinement, TNominal> {
     medium: Medium<TMediumTypes>,
     value: __MediumTypesPackedType<
       TMediumTypes,
-      __MediumTypeOf<TType, TMediumTypes> & TNominal
+      __RefinedMediumType<TType, TRefinement, TNominal, TMediumTypes>
     >,
   ): __RefinedMediumType<TType, TRefinement, TNominal, XValue.Types>;
 
@@ -32,7 +32,7 @@ export interface RefinedType<TType, TRefinement, TNominal> {
     value: __RefinedMediumType<TType, TRefinement, TNominal, XValue.Types>,
   ): __MediumTypesPackedType<
     TMediumTypes,
-    __MediumTypeOf<TType, TMediumTypes> & TNominal
+    __RefinedMediumType<TType, TRefinement, TNominal, TMediumTypes>
   >;
 
   transform<TFromMediumTypes extends object, TToMediumTypes extends object>(
@@ -40,11 +40,11 @@ export interface RefinedType<TType, TRefinement, TNominal> {
     to: Medium<TToMediumTypes>,
     value: __MediumTypesPackedType<
       TFromMediumTypes,
-      __MediumTypeOf<TType, TFromMediumTypes> & TNominal
+      __RefinedMediumType<TType, TRefinement, TNominal, TFromMediumTypes>
     >,
   ): __MediumTypesPackedType<
     TToMediumTypes,
-    __MediumTypeOf<TType, TToMediumTypes> & TNominal
+    __RefinedMediumType<TType, TRefinement, TNominal, TToMediumTypes>
   >;
 
   is(

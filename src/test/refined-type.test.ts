@@ -40,6 +40,13 @@ test('atomic refinement should work', () => {
     type _ = AssertTrue<IsEqual<typeof unknownValue, Email>>;
   }
 
+  const encodedEmailInJSONValue = Email.encode(
+    x.jsonValue,
+    'user@domain' as Email,
+  );
+
+  type EncodedEmailInJSONValue = typeof encodedEmailInJSONValue;
+
   const LiveEmail = Email.refine<Nominal<'live-email'>>([
     value => value.endsWith('@live'),
   ]);
@@ -68,6 +75,7 @@ test('atomic refinement should work', () => {
     | AssertTrue<IsEqual<Denominalize<Email>, string>>
     | AssertTrue<IsEqual<EmailInJSONValue, Nominal<'email', string>>>
     | AssertTrue<IsEqual<Denominalize<EmailInJSONValue>, string>>
+    | AssertTrue<IsEqual<EmailInJSONValue, EncodedEmailInJSONValue>>
     | AssertTrue<IsEqual<LiveEmail, Nominal<'email' | 'live-email', string>>>
     | AssertTrue<IsEqual<Denominalize<LiveEmail>, string>>
     | AssertTrue<
