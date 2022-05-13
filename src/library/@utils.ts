@@ -10,7 +10,8 @@ import type {
   TupleType,
   Type,
   UnionType,
-  __nominalType,
+  __nominal,
+  __type,
 } from './type';
 
 export const hasOwnProperty = Object.prototype.hasOwnProperty;
@@ -77,7 +78,7 @@ export type __RefinedMediumType<TType, TRefinement, TNominal, TMediumTypes> =
       ? T
       : T &
           TNominal & {
-            [TNominalTypeSymbol in typeof __nominalType]: Denominalize<T>;
+            [TNominalTypeSymbol in typeof __type]: Denominalize<T>;
           }
     : never;
 
@@ -138,7 +139,7 @@ export type __RefinedType<
 >;
 
 export type __NominalPartial = {
-  [TNominalTypeSymbol in typeof __nominalType]: unknown;
+  [TNominalSymbol in typeof __nominal]: unknown;
 };
 
 export function merge(partials: unknown[]): unknown {

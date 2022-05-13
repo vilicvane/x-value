@@ -160,18 +160,21 @@ export declare const __nominal: unique symbol;
  * Exported to avoid TS4023 error:
  * https://github.com/Microsoft/TypeScript/issues/5711
  */
-export declare const __nominalType: unique symbol;
+export declare const __type: unique symbol;
 
-export type Nominal<TNominal extends string | symbol, T = unknown> = T & {
-  [TNominalTypeSymbol in typeof __nominalType]: T;
-} & {
-  [TNominalSymbol in typeof __nominal]: {
-    [TNominalKey in TNominal]: true;
+export type Nominal<TNominal extends string | symbol, T = unknown> = T &
+  (unknown extends T
+    ? unknown
+    : {
+        [TNominalTypeSymbol in typeof __type]: T;
+      }) & {
+    [TNominalSymbol in typeof __nominal]: {
+      [TNominalKey in TNominal]: true;
+    };
   };
-};
 
 export type Denominalize<T> = T extends {
-  [TNominalTypeSymbol in typeof __nominalType]: infer TDenominalized;
+  [TNominalTypeSymbol in typeof __type]: infer TDenominalized;
 }
   ? TDenominalized
   : T;
