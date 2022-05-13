@@ -1,6 +1,7 @@
 import isEqual from 'lodash.isequal';
 
-import type {Type, TypeOf} from './type';
+import type {__NominalPartial} from './@utils';
+import type {Type, TypeOf, __nominal, __type} from './type';
 import {RefinedType, record} from './type';
 import {boolean, number, string, unknown} from './types';
 
@@ -41,3 +42,11 @@ export function equal(
 ): RefinedType<Type, unknown, unknown> {
   return new RefinedType(Type, [value => isEqual(value, comparison)]);
 }
+
+export type TransformNominal<TFrom, T> = TFrom extends __NominalPartial
+  ? T & {
+      [TTypeSymbol in typeof __type]: T;
+    } & {
+      [TNominalSymbol in typeof __nominal]: TFrom[TNominalSymbol];
+    }
+  : T;

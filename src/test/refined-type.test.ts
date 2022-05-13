@@ -1,7 +1,13 @@
 import type {AssertTrue, IsEqual} from 'tslang';
 
 import * as x from '../library';
-import type {Denominalize, MediumTypeOf, Nominal, TypeOf} from '../library';
+import type {
+  Denominalize,
+  MediumTypeOf,
+  Nominal,
+  TransformNominal,
+  TypeOf,
+} from '../library';
 
 import type {MediumATypes, MediumBTypes} from './@usage';
 import {Identifier} from './@usage';
@@ -62,7 +68,7 @@ test('atomic refinement should work', () => {
     type _ = AssertTrue<IsEqual<typeof unknownValue, LiveEmail>>;
   }
 
-  const UserId = Identifier.refine<Nominal<'user'>>(() => true);
+  const UserId = Identifier.nominal<'user'>();
 
   type UserId = TypeOf<typeof UserId>;
 
@@ -83,7 +89,8 @@ test('atomic refinement should work', () => {
       >
     | AssertTrue<IsEqual<UserId, Nominal<'user', string>>>
     | AssertTrue<IsEqual<UserIdInMediumA, Nominal<'user', Buffer>>>
-    | AssertTrue<IsEqual<UserIdInMediumB, Nominal<'user', number>>>;
+    | AssertTrue<IsEqual<UserIdInMediumB, Nominal<'user', number>>>
+    | AssertTrue<IsEqual<TransformNominal<UserId, number>, UserIdInMediumB>>;
 });
 
 test('array refinement should work', () => {

@@ -1,6 +1,6 @@
 /* eslint-disable @mufan/import-groups */
 
-import type {__MediumTypeOf} from '../@utils';
+import type {__MediumTypeOf, __NominalPartial} from '../@utils';
 import type {Medium} from '../medium';
 
 export abstract class Type<TCategory extends string = string> {
@@ -13,6 +13,14 @@ export abstract class Type<TCategory extends string = string> {
       this,
       Array.isArray(constraints) ? constraints : [constraints],
     );
+  }
+
+  nominal<TNominalKey extends string | symbol>(): RefinedType<
+    this,
+    unknown,
+    Nominal<TNominalKey>
+  > {
+    return new RefinedType(this, []);
   }
 
   optional(): OptionalType<this> {

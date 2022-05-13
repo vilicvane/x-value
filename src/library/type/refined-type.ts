@@ -163,14 +163,14 @@ export declare const __nominal: unique symbol;
  */
 export declare const __type: unique symbol;
 
-export type Nominal<TNominal extends string | symbol, T = unknown> = T &
+export type Nominal<TNominalKey extends string | symbol, T = unknown> = T &
   (unknown extends T
     ? unknown
     : {
-        [TNominalTypeSymbol in typeof __type]: T;
+        [TTypeSymbol in typeof __type]: T;
       }) & {
     [TNominalSymbol in typeof __nominal]: {
-      [TNominalKey in TNominal]: true;
+      [TKey in TNominalKey]: true;
     };
   };
 
@@ -178,12 +178,4 @@ export type Denominalize<T> = T extends {
   [TNominalTypeSymbol in typeof __type]: infer TDenominalized;
 }
   ? TDenominalized
-  : T;
-
-export type TransformNominal<TFrom, T> = TFrom extends __NominalPartial
-  ? T & {
-      [TTypeSymbol in typeof __type]: T;
-    } & {
-      [TNominalSymbol in typeof __nominal]: TFrom[typeof __nominal];
-    }
   : T;
