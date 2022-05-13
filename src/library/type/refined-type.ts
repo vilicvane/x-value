@@ -2,6 +2,7 @@ import type {
   __ElementOrArray,
   __MediumTypeOf,
   __MediumTypesPackedType,
+  __NominalPartial,
   __RefinedMediumType,
   __RefinedType,
 } from '../@utils';
@@ -177,4 +178,12 @@ export type Denominalize<T> = T extends {
   [TNominalTypeSymbol in typeof __type]: infer TDenominalized;
 }
   ? TDenominalized
+  : T;
+
+export type TransformNominal<TFrom, T> = TFrom extends __NominalPartial
+  ? T & {
+      [TTypeSymbol in typeof __type]: T;
+    } & {
+      [TNominalSymbol in typeof __nominal]: TFrom[typeof __nominal];
+    }
   : T;
