@@ -10,7 +10,7 @@ import type {
 } from '../library';
 
 import type {MediumATypes, MediumBTypes} from './@usage';
-import {Identifier} from './@usage';
+import {Identifier, mediumA} from './@usage';
 
 let unknownValue: unknown;
 
@@ -75,6 +75,12 @@ test('atomic refinement should work', () => {
   type UserIdInMediumA = MediumTypeOf<typeof UserId, MediumATypes>;
   type UserIdInMediumB = MediumTypeOf<typeof UserId, MediumBTypes>;
 
+  const encodedUserIdInMediumA = UserId.encode(mediumA, 'ffff' as UserId);
+
+  const userId = encodedUserIdInMediumA.toString('hex');
+
+  expect(userId).toBe('ffff');
+
   type _ =
     | AssertTrue<IsEqual<NonEmptyString, string>>
     | AssertTrue<IsEqual<Email, Nominal<'email', string>>>
@@ -90,6 +96,8 @@ test('atomic refinement should work', () => {
     | AssertTrue<IsEqual<UserId, Nominal<'user', string>>>
     | AssertTrue<IsEqual<UserIdInMediumA, Nominal<'user', Buffer>>>
     | AssertTrue<IsEqual<UserIdInMediumB, Nominal<'user', number>>>
+    | AssertTrue<IsEqual<typeof encodedUserIdInMediumA, UserIdInMediumA>>
+    | AssertTrue<IsEqual<typeof userId, UserId>>
     | AssertTrue<IsEqual<TransformNominal<UserId, number>, UserIdInMediumB>>;
 });
 

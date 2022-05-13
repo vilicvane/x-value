@@ -1,5 +1,9 @@
 import * as x from '../library';
-import type {ECMAScriptTypes, JSONValueTypes} from '../library';
+import type {
+  ECMAScriptTypes,
+  JSONValueTypes,
+  TransformNominal,
+} from '../library';
 
 declare global {
   namespace XValue {
@@ -16,8 +20,12 @@ export const Identifier = x.atomic(
   value => typeof value === 'string',
 );
 
+export interface IdentifierInMediumA extends Buffer {
+  toString(encoding: 'hex'): TransformNominal<this, string>;
+}
+
 export interface MediumATypes extends ECMAScriptTypes {
-  [identifierTypeSymbol]: Buffer;
+  [identifierTypeSymbol]: IdentifierInMediumA;
 }
 
 export interface MediumBTypes extends JSONValueTypes {
