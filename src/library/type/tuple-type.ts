@@ -3,8 +3,8 @@ import type {
   __MediumTypesPackedType,
   __RefinedType,
   __TupleMediumType,
-} from '../@utils';
-import {__MediumTypeOf, toString} from '../@utils';
+} from '../@internal';
+import {__MediumTypeOf, toString} from '../@internal';
 import type {Medium} from '../medium';
 
 import type {TypeConstraint, TypeIssue, TypePath} from './type';

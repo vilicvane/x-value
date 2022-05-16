@@ -3,7 +3,7 @@ import type {
   __MediumTypeOf,
   __MediumTypesPackedType,
   __RefinedType,
-} from '../@utils';
+} from '../@internal';
 import type {Medium} from '../medium';
 
 import type {TypeConstraint, TypeIssue, TypeOf, TypePath} from './type';

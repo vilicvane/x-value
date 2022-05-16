@@ -5,17 +5,19 @@ import type {
   __MediumTypesPackedType,
   __RefinedType,
   __TypeOfRecordKeyType,
-} from '../@utils';
-import {__ObjectTypeDefinitionToMediumType, toString} from '../@utils';
+} from '../@internal';
+import {__ObjectTypeDefinitionToMediumType, toString} from '../@internal';
 import type {Medium} from '../medium';
 
 import type {TypeConstraint, TypeIssue, TypeOf, TypePath} from './type';
 import {Type} from './type';
 
-export interface RecordType<TKey, TValue> {
+export interface RecordType<TKeyType, TValueType> {
   refine<TNominalOrRefinement, TNominal = unknown>(
     constraints: __ElementOrArray<
-      TypeConstraint<Record<__TypeOfRecordKeyType<TKey>, TypeOf<TValue>>>
+      TypeConstraint<
+        Record<__TypeOfRecordKeyType<TKeyType>, TypeOf<TValueType>>
+      >
     >,
   ): __RefinedType<this, TNominalOrRefinement, TNominal>;
 
@@ -24,20 +26,20 @@ export interface RecordType<TKey, TValue> {
     packed: __MediumTypesPackedType<
       TMediumTypes,
       Record<
-        __MediumTypeOfRecordKeyType<TKey, TMediumTypes>,
-        __MediumTypeOf<TValue, TMediumTypes>
+        __MediumTypeOfRecordKeyType<TKeyType, TMediumTypes>,
+        __MediumTypeOf<TValueType, TMediumTypes>
       >
     >,
-  ): Record<__TypeOfRecordKeyType<TKey>, TypeOf<TValue>>;
+  ): Record<__TypeOfRecordKeyType<TKeyType>, TypeOf<TValueType>>;
 
   encode<TMediumTypes extends object>(
     medium: Medium<TMediumTypes>,
-    value: Record<__TypeOfRecordKeyType<TKey>, TypeOf<TValue>>,
+    value: Record<__TypeOfRecordKeyType<TKeyType>, TypeOf<TValueType>>,
   ): __MediumTypesPackedType<
     TMediumTypes,
     Record<
-      __MediumTypeOfRecordKeyType<TKey, TMediumTypes>,
-      __MediumTypeOf<TValue, TMediumTypes>
+      __MediumTypeOfRecordKeyType<TKeyType, TMediumTypes>,
+      __MediumTypeOf<TValueType, TMediumTypes>
     >
   >;
 
@@ -47,29 +49,29 @@ export interface RecordType<TKey, TValue> {
     packed: __MediumTypesPackedType<
       TFromMediumTypes,
       Record<
-        __MediumTypeOfRecordKeyType<TKey, TFromMediumTypes>,
-        __MediumTypeOf<TValue, TFromMediumTypes>
+        __MediumTypeOfRecordKeyType<TKeyType, TFromMediumTypes>,
+        __MediumTypeOf<TValueType, TFromMediumTypes>
       >
     >,
   ): __MediumTypesPackedType<
     TToMediumTypes,
     Record<
-      __MediumTypeOfRecordKeyType<TKey, TToMediumTypes>,
-      __MediumTypeOf<TValue, TToMediumTypes>
+      __MediumTypeOfRecordKeyType<TKeyType, TToMediumTypes>,
+      __MediumTypeOf<TValueType, TToMediumTypes>
     >
   >;
 
   is(
     value: unknown,
-  ): value is Record<__TypeOfRecordKeyType<TKey>, TypeOf<TValue>>;
+  ): value is Record<__TypeOfRecordKeyType<TKeyType>, TypeOf<TValueType>>;
 }
 
 export class RecordType<
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  TKey extends Type,
-  TValue extends Type,
+  TKeyType extends Type,
+  TValueType extends Type,
 > extends Type<'record'> {
-  constructor(readonly Key: TKey, readonly Value: TValue) {
+  constructor(readonly Key: TKeyType, readonly Value: TValueType) {
     super();
   }
 

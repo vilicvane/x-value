@@ -1,5 +1,5 @@
 // eslint-disable-next-line @mufan/import-path-shallowest,@mufan/scoped-modules
-import {merge} from '../library/@utils';
+import {merge} from '../library/@internal';
 
 test('merge for object-type should work', () => {
   expect(

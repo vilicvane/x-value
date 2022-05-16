@@ -1,4 +1,4 @@
-import {toString} from './@utils';
+import {toString} from './@internal';
 import {atomic} from './type';
 
 declare global {

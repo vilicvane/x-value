@@ -1,4 +1,4 @@
-import {toString} from '../@utils';
+import {toString} from '../@internal';
 import type {MediumAtomicCodecs} from '../medium';
 import {bigintTypeSymbol, dateTypeSymbol, regexpTypeSymbol} from '../types';
 

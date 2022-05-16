@@ -1,4 +1,4 @@
-import {toString} from '../@utils';
+import {toString} from '../@internal';
 import {atomicTypeSymbol, medium} from '../medium';
 import {booleanTypeSymbol, numberTypeSymbol} from '../types';
 

@@ -3,8 +3,8 @@ import type {
   __MediumTypesPackedType,
   __ObjectTypeDefinitionToMediumType,
   __RefinedType,
-} from '../@utils';
-import {toString} from '../@utils';
+} from '../@internal';
+import {toString} from '../@internal';
 import type {Medium} from '../medium';
 
 import {OptionalType} from './optional-type';

@@ -5,7 +5,7 @@ import type {
   __NominalPartial,
   __RefinedMediumType,
   __RefinedType,
-} from '../@utils';
+} from '../@internal';
 import type {Medium} from '../medium';
 
 import type {TypeConstraint, TypeIssue, TypePath} from './type';

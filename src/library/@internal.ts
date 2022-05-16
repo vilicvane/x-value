@@ -6,6 +6,7 @@ import type {
   ObjectType,
   OptionalType,
   RecordType,
+  RecursiveType,
   RefinedType,
   TupleType,
   Type,
@@ -41,7 +42,9 @@ export type __MediumTypeOf<TType, TMediumTypes> = TType extends ObjectType<
   ? __UnionToIntersection<__MediumTypeOf<TTypeTuple[number], TMediumTypes>>
   : TType extends OptionalType<infer TType>
   ? __MediumTypeOf<TType, TMediumTypes> | undefined
-  : never;
+  : TType extends RecursiveType<infer TType>
+  ? __MediumTypeOf<TType, TMediumTypes>
+  : unknown;
 
 export type __ObjectTypeDefinitionToMediumType<TDefinition, TMediumTypes> = {
   [TKey in __KeyOfOptional<TDefinition>]?: TDefinition[TKey] extends OptionalType<
@@ -54,7 +57,11 @@ export type __ObjectTypeDefinitionToMediumType<TDefinition, TMediumTypes> = {
     TDefinition[TKey],
     TMediumTypes
   >;
-};
+} extends infer TObject
+  ? {
+      [TKey in keyof TObject]: TObject[TKey];
+    }
+  : never;
 
 export type __TypeOfRecordKeyType<TType> = __MediumTypeOfRecordKeyType<
   TType,
@@ -68,8 +75,11 @@ export type __MediumTypeOfRecordKeyType<TType, TMediumTypes> = __MediumTypeOf<
   ? Extract<TKey, string | symbol>
   : never;
 
-export type __TupleMediumType<TElements, TMediumTypes> = {
-  [TIndex in keyof TElements]: __MediumTypeOf<TElements[TIndex], TMediumTypes>;
+export type __TupleMediumType<TElementTypes, TMediumTypes> = {
+  [TIndex in keyof TElementTypes]: __MediumTypeOf<
+    TElementTypes[TIndex],
+    TMediumTypes
+  >;
 };
 
 export type __RefinedMediumType<TType, TRefinement, TNominal, TMediumTypes> =
@@ -77,9 +87,11 @@ export type __RefinedMediumType<TType, TRefinement, TNominal, TMediumTypes> =
     ? unknown extends TNominal
       ? T
       : T &
-          TNominal & {
+          (TNominal & {
             [TNominalTypeSymbol in typeof __type]: Denominalize<T>;
-          }
+          } extends infer TNominalPart
+            ? {[TKey in keyof TNominalPart]: TNominalPart[TKey]}
+            : never)
     : never;
 
 export type __AtomicMediumType<
@@ -140,6 +152,10 @@ export type __RefinedType<
 
 export type __NominalPartial = {
   [TNominalSymbol in typeof __nominal]: unknown;
+};
+
+export type __CleanUpType<T> = {
+  [TKey in keyof T]: T[TKey];
 };
 
 export function merge(partials: unknown[]): unknown {

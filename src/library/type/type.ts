@@ -1,6 +1,6 @@
 /* eslint-disable @mufan/import-groups */
 
-import type {__MediumTypeOf, __NominalPartial} from '../@utils';
+import type {__MediumTypeOf, __NominalPartial} from '../@internal';
 import type {Medium} from '../medium';
 
 export abstract class Type<TCategory extends string = string> {
