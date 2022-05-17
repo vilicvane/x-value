@@ -44,9 +44,5 @@ export function equal(
 }
 
 export type TransformNominal<TFrom, T> = TFrom extends __NominalPartial
-  ? T & {
-      [TTypeSymbol in typeof __type]: T;
-    } & {
-      [TNominalSymbol in typeof __nominal]: TFrom[TNominalSymbol];
-    }
+  ? T & Record<__type, T> & Record<__nominal, TFrom[__nominal]>
   : T;

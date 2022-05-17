@@ -155,6 +155,8 @@ export class RefinedType<
  */
 export declare const __nominal: unique symbol;
 
+export type __nominal = typeof __nominal;
+
 /**
  * DECLARATION ONLY.
  *
@@ -163,19 +165,17 @@ export declare const __nominal: unique symbol;
  */
 export declare const __type: unique symbol;
 
-export type Nominal<TNominalKey extends string | symbol, T = unknown> = T &
-  (unknown extends T
-    ? unknown
-    : {
-        [TTypeSymbol in typeof __type]: T;
-      }) & {
-    [TNominalSymbol in typeof __nominal]: {
-      [TKey in TNominalKey]: true;
-    };
-  };
+export type __type = typeof __type;
 
-export type Denominalize<T> = T extends {
-  [TNominalTypeSymbol in typeof __type]: infer TDenominalized;
-}
+export type Nominal<TNominalKey extends string | symbol, T = unknown> = T &
+  (unknown extends T ? unknown : Record<__type, T>) &
+  Record<
+    __nominal,
+    {
+      [TKey in TNominalKey]: true;
+    }
+  >;
+
+export type Denominalize<T> = T extends Record<__type, infer TDenominalized>
   ? TDenominalized
   : T;

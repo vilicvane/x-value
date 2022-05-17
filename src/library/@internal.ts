@@ -57,11 +57,7 @@ export type __ObjectTypeDefinitionToMediumType<TDefinition, TMediumTypes> = {
     TDefinition[TKey],
     TMediumTypes
   >;
-} extends infer TObject
-  ? {
-      [TKey in keyof TObject]: TObject[TKey];
-    }
-  : never;
+};
 
 export type __TypeOfRecordKeyType<TType> = __MediumTypeOfRecordKeyType<
   TType,
@@ -83,16 +79,15 @@ export type __TupleMediumType<TElementTypes, TMediumTypes> = {
 };
 
 export type __RefinedMediumType<TType, TRefinement, TNominal, TMediumTypes> =
-  __MediumTypeOf<TType, TMediumTypes> & TRefinement extends infer T
-    ? unknown extends TNominal
-      ? T
-      : T &
-          (TNominal & {
-            [TNominalTypeSymbol in typeof __type]: Denominalize<T>;
-          } extends infer TNominalPart
-            ? {[TKey in keyof TNominalPart]: TNominalPart[TKey]}
-            : never)
-    : never;
+  unknown extends TNominal
+    ? __MediumTypeOf<TType, TMediumTypes> & TRefinement
+    : __RefinedNominalType<
+        __MediumTypeOf<TType, TMediumTypes> & TRefinement,
+        TNominal
+      >;
+
+export type __RefinedNominalType<T, TNominal> = T &
+  (TNominal & Record<__type, Denominalize<T>>);
 
 export type __AtomicMediumType<
   TSymbol extends symbol,
@@ -156,9 +151,7 @@ export type __RecursiveMediumType<T, TMediumTypes> = T extends Type
       [TKey in keyof T]: __RecursiveMediumType<T[TKey], TMediumTypes>;
     };
 
-export type __NominalPartial = {
-  [TNominalSymbol in typeof __nominal]: unknown;
-};
+export type __NominalPartial = Record<__nominal, unknown>;
 
 export function merge(partials: unknown[]): unknown {
   let pendingMergeKeyToValues: Map<string | number, unknown[]> | undefined;
