@@ -40,10 +40,10 @@ export type __MediumTypeOf<TType, TMediumTypes> = TType extends ObjectType<
   ? __MediumTypeOf<TTypeTuple[number], TMediumTypes>
   : TType extends IntersectionType<infer TTypeTuple>
   ? __UnionToIntersection<__MediumTypeOf<TTypeTuple[number], TMediumTypes>>
+  : TType extends RecursiveType<infer T>
+  ? __RecursiveMediumType<T, TMediumTypes>
   : TType extends OptionalType<infer TType>
   ? __MediumTypeOf<TType, TMediumTypes> | undefined
-  : TType extends RecursiveType<infer TType>
-  ? __MediumTypeOf<TType, TMediumTypes>
   : unknown;
 
 export type __ObjectTypeDefinitionToMediumType<TDefinition, TMediumTypes> = {
@@ -150,12 +150,14 @@ export type __RefinedType<
     : TNominal
 >;
 
+export type __RecursiveMediumType<T, TMediumTypes> = T extends Type
+  ? __MediumTypeOf<T, TMediumTypes>
+  : {
+      [TKey in keyof T]: __RecursiveMediumType<T[TKey], TMediumTypes>;
+    };
+
 export type __NominalPartial = {
   [TNominalSymbol in typeof __nominal]: unknown;
-};
-
-export type __CleanUpType<T> = {
-  [TKey in keyof T]: T[TKey];
 };
 
 export function merge(partials: unknown[]): unknown {

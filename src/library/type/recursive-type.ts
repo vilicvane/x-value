@@ -2,50 +2,56 @@ import type {
   __ElementOrArray,
   __MediumTypeOf,
   __MediumTypesPackedType,
+  __RecursiveMediumType,
   __RefinedType,
 } from '../@internal';
 import type {Medium} from '../medium';
 
-import type {TypeConstraint, TypeIssue, TypeOf, TypePath} from './type';
+import type {TypeConstraint, TypeIssue, TypePath} from './type';
 import {Type} from './type';
 
-export interface RecursiveType<TType> {
+export interface RecursiveType<T> {
   refine<TNominalOrRefinement, TNominal = unknown>(
-    constraints: __ElementOrArray<TypeConstraint<TypeOf<TType>>>,
+    constraints: __ElementOrArray<
+      TypeConstraint<__RecursiveMediumType<T, XValue.Types>>
+    >,
   ): __RefinedType<this, TNominalOrRefinement, TNominal>;
 
   decode<TMediumTypes extends object>(
     medium: Medium<TMediumTypes>,
     value: __MediumTypesPackedType<
       TMediumTypes,
-      __MediumTypeOf<TType, TMediumTypes>
+      __RecursiveMediumType<T, TMediumTypes>
     >,
-  ): TypeOf<TType>;
+  ): __RecursiveMediumType<T, XValue.Types>;
 
   encode<TMediumTypes extends object>(
     medium: Medium<TMediumTypes>,
-    value: TypeOf<TType>,
-  ): __MediumTypesPackedType<TMediumTypes, __MediumTypeOf<TType, TMediumTypes>>;
+    value: __RecursiveMediumType<T, XValue.Types>,
+  ): __MediumTypesPackedType<
+    TMediumTypes,
+    __RecursiveMediumType<T, TMediumTypes>
+  >;
 
   transform<TFromMediumTypes extends object, TToMediumTypes extends object>(
     from: Medium<TFromMediumTypes>,
     to: Medium<TToMediumTypes>,
     value: __MediumTypesPackedType<
       TFromMediumTypes,
-      __MediumTypeOf<TType, TFromMediumTypes>
+      __RecursiveMediumType<T, TFromMediumTypes>
     >,
   ): __MediumTypesPackedType<
     TToMediumTypes,
-    __MediumTypeOf<TType, TToMediumTypes>
+    __RecursiveMediumType<T, TToMediumTypes>
   >;
 
-  is(value: unknown): value is TypeOf<TType>;
+  is(value: unknown): value is __RecursiveMediumType<T, XValue.Types>;
 }
 
-export class RecursiveType<TType extends Type> extends Type<'recursive'> {
-  readonly Type: TType;
+export class RecursiveType<T> extends Type<'recursive'> {
+  readonly Type: Type;
 
-  constructor(recursion: (Type: RecursiveType<TType>) => TType) {
+  constructor(recursion: (Type: RecursiveType<T>) => Type) {
     super();
 
     this.Type = recursion(this);
@@ -94,8 +100,8 @@ export class RecursiveType<TType extends Type> extends Type<'recursive'> {
   }
 }
 
-export function recursive(
-  recursion: (Type: RecursiveType<Type>) => Type,
-): RecursiveType<Type> {
+export function recursive<T>(
+  recursion: (Type: RecursiveType<T>) => Type,
+): RecursiveType<T> {
   return new RecursiveType(recursion);
 }
