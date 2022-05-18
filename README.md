@@ -26,7 +26,7 @@ import * as x from 'x-value';
 
 const Oops = x.object({
   foo: x.string,
-  bar: x.optional(x.number),
+  bar: x.number.optional(),
 });
 
 const Rock = x.record(x.string, x.number);
@@ -69,11 +69,14 @@ Refine type:
 ```ts
 const Email = x.string.refine(value => value.includes('@'));
 
-// Or with refined or nominal type.
+// Or with refined or nominal type:
 const Email = x.string.refine<`${string}@${string}`>(value =>
   value.includes('@'),
 );
 const Email = x.string.refine<Nominal<'email'>>(value => value.includes('@'));
+
+// Or just nominal type without extra constraints:
+const Email = x.string.nominal<'email'>();
 ```
 
 Decode from medium:
