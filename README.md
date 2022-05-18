@@ -43,6 +43,18 @@ const I = x.intersection(
     yoha: x.boolean,
   }),
 );
+
+interface R {
+  type: 'recursive';
+  child: R;
+}
+
+const R = x.recursive<R>(R =>
+  x.object({
+    type: x.literal('recursive'),
+    child: R,
+  }),
+);
 ```
 
 Get static type of type object:
