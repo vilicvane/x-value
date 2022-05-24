@@ -60,8 +60,14 @@ const R = x.recursive<R>(R =>
 Get static type of type object:
 
 ```ts
+declare global {
+  namespace XValue {
+    interface Using extends x.UsingJSONMedium {}
+  }
+}
+
 type Oops = x.TypeOf<typeof Oops>;
-type JSONOops = x.MediumTypeOf<typeof Oops, x.JSONTypes>;
+type JSONOops = x.MediumTypeOf<typeof Oops, 'json'>;
 ```
 
 Refine type:
@@ -82,18 +88,36 @@ const Email = x.string.nominal<'email'>();
 Decode from medium:
 
 ```ts
+declare global {
+  namespace XValue {
+    interface Using extends x.UsingJSONMedium {}
+  }
+}
+
 let value = Oops.decode(x.json, '{"foo":"abc","bar":123}');
 ```
 
 Encode to medium:
 
 ```ts
+declare global {
+  namespace XValue {
+    interface Using extends x.UsingJSONMedium {}
+  }
+}
+
 let json = Oops.encode(x.json, {foo: 'abc', bar: 123});
 ```
 
 Transform from medium to medium:
 
 ```ts
+declare global {
+  namespace XValue {
+    interface Using extends x.UsingJSONMedium, x.UsingQueryStringMedium {}
+  }
+}
+
 let json = Oops.transform(x.queryString, x.json, 'foo=abc&bar=123');
 ```
 
@@ -194,13 +218,15 @@ After creating the new atomic type, we need to create/extend a new medium that s
 
 ```ts
 interface SuperJSONTypes extends x.JSONTypes {
-  // 1. Define the unpacked type for decode/encode operation.
   [newAtomicTypeSymbol]: string;
 }
 
-const superJSON = x.json.extend<SuperJSONTypes>('Super JSON', {
+interface UsingSuperJSONMedium {
+  'super-json': SuperJSONTypes;
+}
+
+const superJSON = x.json.extend<UsingSuperJSONMedium>('super-json', {
   codecs: {
-    // 2. Define the codec.
     [newAtomicTypeSymbol]: {
       decode(value) {
         if (typeof value !== 'string') {
@@ -219,6 +245,16 @@ const superJSON = x.json.extend<SuperJSONTypes>('Super JSON', {
     },
   },
 });
+```
+
+To use this medium:
+
+```ts
+declare global {
+  namespace XValue {
+    interface Using extends x.UsingSuperJSONMedium {}
+  }
+}
 ```
 
 ## Medium Packing
