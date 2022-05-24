@@ -59,7 +59,13 @@ export class AtomicType<TSymbol extends symbol> extends Type<'atomic'> {
     unpacked: unknown,
     path: TypePath,
   ): [unknown, TypeIssue[]] {
-    let value = medium.requireCodec(this.symbol).decode(unpacked);
+    let value: unknown;
+
+    try {
+      value = medium.requireCodec(this.symbol).decode(unpacked);
+    } catch (error: any) {
+      return buildCodecErrorResult(error, path);
+    }
 
     let issues = this._diagnose(value, path);
 
@@ -81,9 +87,11 @@ export class AtomicType<TSymbol extends symbol> extends Type<'atomic'> {
       }
     }
 
-    let unpacked = medium.requireCodec(this.symbol).encode(value);
-
-    return [unpacked, []];
+    try {
+      return [medium.requireCodec(this.symbol).encode(value), []];
+    } catch (error: any) {
+      return buildCodecErrorResult(error, path);
+    }
   }
 
   /** @internal */
@@ -95,7 +103,13 @@ export class AtomicType<TSymbol extends symbol> extends Type<'atomic'> {
   ): [unknown, TypeIssue[]] {
     let symbol = this.symbol;
 
-    let value = from.requireCodec(symbol).decode(unpacked);
+    let value: unknown;
+
+    try {
+      value = from.requireCodec(symbol).decode(unpacked);
+    } catch (error: any) {
+      return buildCodecErrorResult(error, path);
+    }
 
     let issues = this._diagnose(value, path);
 
@@ -103,9 +117,11 @@ export class AtomicType<TSymbol extends symbol> extends Type<'atomic'> {
       return [undefined, issues];
     }
 
-    let transformedUnpacked = to.requireCodec(symbol).encode(value);
-
-    return [transformedUnpacked, issues];
+    try {
+      return [to.requireCodec(symbol).encode(value), issues];
+    } catch (error: any) {
+      return buildCodecErrorResult(error, path);
+    }
   }
 
   /** @internal */
@@ -137,4 +153,19 @@ export function atomic<TSymbol extends symbol>(
     symbol,
     Array.isArray(constraints) ? constraints : [constraints],
   );
+}
+
+function buildCodecErrorResult(
+  error: string | Error,
+  path: TypePath,
+): [undefined, TypeIssue[]] {
+  return [
+    undefined,
+    [
+      {
+        path,
+        message: typeof error === 'string' ? error : error.message,
+      },
+    ],
+  ];
 }

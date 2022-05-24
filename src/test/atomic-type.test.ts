@@ -138,9 +138,11 @@ test('date atomic type should work with extended json medium', () => {
 
   expect(x.Date.encode(x.extendedJSON, date)).toBe(JSON.stringify(date));
 
-  expect(() =>
-    x.Date.decode(x.extendedJSON, '"invalid date"'),
-  ).toThrowErrorMatchingInlineSnapshot(`"Invalid date value"`);
+  expect(() => x.Date.decode(x.extendedJSON, '"invalid date"'))
+    .toThrowErrorMatchingInlineSnapshot(`
+    "Failed to decode from medium:
+      Invalid date value"
+  `);
 });
 
 test('date atomic refinement sunday should work with extended json medium', () => {

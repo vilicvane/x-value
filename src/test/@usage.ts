@@ -36,6 +36,10 @@ export const mediumA = x.ecmascript.extend<MediumATypes>('Medium A', {
   codecs: {
     [identifierTypeSymbol]: {
       encode(value) {
+        if (value.length === 0) {
+          throw new TypeError('Value cannot be empty string');
+        }
+
         return Buffer.from(value, 'hex');
       },
       decode(value) {
@@ -53,6 +57,11 @@ export const mediumB = x.jsonValue.extend<MediumBTypes>('Medium B', {
   codecs: {
     [identifierTypeSymbol]: {
       encode(value) {
+        if (value.length === 0) {
+          // eslint-disable-next-line no-throw-literal
+          throw 'Value cannot be empty string';
+        }
+
         return Buffer.from(value, 'hex').readUint16BE();
       },
       decode(value) {

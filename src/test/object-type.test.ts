@@ -350,3 +350,13 @@ test('omit() should work', () => {
     IsEqual<TypeOf<typeof OmittedO>, {foo: string; bar?: number}>
   >;
 });
+
+test('undefined with json should work as expected', () => {
+  const O = x.object({
+    foo: x.union(x.string, x.undefined),
+  });
+
+  expect(O.is({foo: undefined})).toBe(true);
+  expect(O.encode(x.json, {foo: undefined})).toBe('{}');
+  expect(O.decode(x.json, '{}')).toStrictEqual({foo: undefined});
+});

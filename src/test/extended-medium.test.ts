@@ -38,11 +38,11 @@ test('bigint type should work', () => {
     }),
   );
 
-  expect(() =>
-    x.bigint.decode(x.extendedJSONValue, 123 as any),
-  ).toThrowErrorMatchingInlineSnapshot(
-    `"Expected bigint string, getting [object Number]"`,
-  );
+  expect(() => x.bigint.decode(x.extendedJSONValue, 123 as any))
+    .toThrowErrorMatchingInlineSnapshot(`
+    "Failed to decode from medium:
+      Expected bigint string, getting [object Number]"
+  `);
 });
 
 test('Date type should work', () => {
@@ -108,13 +108,15 @@ test('RegExp type should work', () => {
     }).toString(),
   );
 
-  expect(() =>
-    x.RegExp.decode(x.extendedJSONValue, 123 as any),
-  ).toThrowErrorMatchingInlineSnapshot(
-    `"Expected regular expression literal, getting [object Number]"`,
-  );
+  expect(() => x.RegExp.decode(x.extendedJSONValue, 123 as any))
+    .toThrowErrorMatchingInlineSnapshot(`
+    "Failed to decode from medium:
+      Expected regular expression literal, getting [object Number]"
+  `);
 
-  expect(() =>
-    x.RegExp.decode(x.extendedJSONValue, ''),
-  ).toThrowErrorMatchingInlineSnapshot(`"Invalid regular expression literal"`);
+  expect(() => x.RegExp.decode(x.extendedJSONValue, ''))
+    .toThrowErrorMatchingInlineSnapshot(`
+    "Failed to decode from medium:
+      Invalid regular expression literal"
+  `);
 });

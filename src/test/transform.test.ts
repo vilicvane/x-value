@@ -92,6 +92,18 @@ test('transform medium A to medium B and back', () => {
 
   expect(Type.encode(mediumA, value)).toEqual(a);
   expect(Type.encode(mediumB, value)).toEqual(b);
+
+  expect(() => Identifier.encode(mediumA, ''))
+    .toThrowErrorMatchingInlineSnapshot(`
+    "Failed to encode to medium:
+      Value cannot be empty string"
+  `);
+
+  expect(() => Identifier.transform(mediumA, mediumB, Buffer.from([])))
+    .toThrowErrorMatchingInlineSnapshot(`
+    "Failed to transform medium:
+      Value cannot be empty string"
+  `);
 });
 
 test('transform should work with refined type', () => {
