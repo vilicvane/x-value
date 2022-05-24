@@ -1,65 +1,15 @@
-import type {
-  __ElementOrArray,
-  __MediumTypeOf,
-  __MediumTypesPackedType,
-  __NominalPartial,
-  __RefinedMediumType,
-  __RefinedType,
-} from '../@internal';
+import type {__RefinedMediumType} from '../@internal';
 import type {Medium} from '../medium';
 
 import type {TypeConstraint, TypeIssue, TypePath} from './type';
 import {Type} from './type';
 
-export interface RefinedType<TType, TRefinement, TNominal> {
-  refine<TNominalOrRefinement, TNominal = unknown>(
-    constraints: __ElementOrArray<
-      TypeConstraint<
-        __RefinedMediumType<TType, TNominalOrRefinement, TNominal, XValue.Types>
-      >
-    >,
-  ): __RefinedType<this, TNominalOrRefinement, TNominal>;
-
-  decode<TMediumTypes extends object>(
-    medium: Medium<TMediumTypes>,
-    value: __MediumTypesPackedType<
-      TMediumTypes,
-      __RefinedMediumType<TType, TRefinement, TNominal, TMediumTypes>
-    >,
-  ): __RefinedMediumType<TType, TRefinement, TNominal, XValue.Types>;
-
-  encode<TMediumTypes extends object>(
-    medium: Medium<TMediumTypes>,
-    value: __RefinedMediumType<TType, TRefinement, TNominal, XValue.Types>,
-  ): __MediumTypesPackedType<
-    TMediumTypes,
-    __RefinedMediumType<TType, TRefinement, TNominal, TMediumTypes>
-  >;
-
-  transform<TFromMediumTypes extends object, TToMediumTypes extends object>(
-    from: Medium<TFromMediumTypes>,
-    to: Medium<TToMediumTypes>,
-    value: __MediumTypesPackedType<
-      TFromMediumTypes,
-      __RefinedMediumType<TType, TRefinement, TNominal, TFromMediumTypes>
-    >,
-  ): __MediumTypesPackedType<
-    TToMediumTypes,
-    __RefinedMediumType<TType, TRefinement, TNominal, TToMediumTypes>
-  >;
-
-  is(
-    value: unknown,
-  ): value is __RefinedMediumType<TType, TRefinement, TNominal, XValue.Types>;
-}
-
 export class RefinedType<
   TType extends Type,
   TRefinement,
   TNominal,
-> extends Type<'refined'> {
-  protected __static_type_refinement!: TRefinement;
-  protected __static_type_nominal!: TNominal;
+> extends Type<__RefinedInMediums<TType, TRefinement, TNominal>> {
+  protected __type!: 'refined';
 
   constructor(readonly Type: TType, readonly constraints: TypeConstraint[]) {
     super();
@@ -179,3 +129,17 @@ export type Nominal<TNominalKey extends string | symbol, T = unknown> = T &
 export type Denominalize<T> = T extends Record<__type, infer TDenominalized>
   ? TDenominalized
   : T;
+
+type __RefinedInMediums<
+  TType extends Type,
+  TRefinement,
+  TNominal,
+> = TType extends Type<infer TInMediums>
+  ? {
+      [TMediumName in keyof XValue.Using]: __RefinedMediumType<
+        TInMediums[TMediumName],
+        TRefinement,
+        TNominal
+      >;
+    }
+  : never;

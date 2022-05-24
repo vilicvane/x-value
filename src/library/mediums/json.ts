@@ -7,7 +7,11 @@ export interface JSONTypes {
   packed: string;
 }
 
-export const json = medium<JSONTypes>('JSON', {
+export interface UsingJSONMedium {
+  json: JSONTypes;
+}
+
+export const json = medium<UsingJSONMedium>('json', {
   packing: {
     pack(data) {
       return JSON.stringify(data);
@@ -30,6 +34,13 @@ export const json = medium<JSONTypes>('JSON', {
 
 export interface ExtendedJSONTypes extends JSONTypes, ExtendedTypes {}
 
-export const extendedJSON = json.extend<ExtendedJSONTypes>('Extended JSON', {
-  codecs: EXTENDED_CODECS,
-});
+export interface UsingExtendedJSONMedium {
+  'extended-json': ExtendedJSONTypes;
+}
+
+export const extendedJSON = json.extend<UsingExtendedJSONMedium>(
+  'extended-json',
+  {
+    codecs: EXTENDED_CODECS,
+  },
+);

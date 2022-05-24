@@ -1,51 +1,13 @@
-import type {
-  __ElementOrArray,
-  __MediumTypeOf,
-  __MediumTypesPackedType,
-  __RefinedType,
-} from '../@internal';
 import type {Medium} from '../medium';
 
-import type {TypeConstraint, TypeIssue, TypeOf, TypePath} from './type';
+import type {TypeIssue, TypePath} from './type';
 import {Type} from './type';
 
-export interface OptionalType<TType> {
-  refine<TNominalOrRefinement, TNominal = unknown>(
-    constraints: __ElementOrArray<TypeConstraint<TypeOf<TType> | undefined>>,
-  ): __RefinedType<this, TNominalOrRefinement, TNominal>;
+export class OptionalType<TType extends Type> extends Type<
+  __OptionalInMediums<TType>
+> {
+  protected __type!: 'optional';
 
-  decode<TMediumTypes extends object>(
-    medium: Medium<TMediumTypes>,
-    value: __MediumTypesPackedType<
-      TMediumTypes,
-      __MediumTypeOf<TType, TMediumTypes> | undefined
-    >,
-  ): TypeOf<TType> | undefined;
-
-  encode<TMediumTypes extends object>(
-    medium: Medium<TMediumTypes>,
-    value: TypeOf<TType> | undefined,
-  ): __MediumTypesPackedType<
-    TMediumTypes,
-    __MediumTypeOf<TType, TMediumTypes> | undefined
-  >;
-
-  transform<TFromMediumTypes extends object, TToMediumTypes extends object>(
-    from: Medium<TFromMediumTypes>,
-    to: Medium<TToMediumTypes>,
-    value: __MediumTypesPackedType<
-      TFromMediumTypes,
-      __MediumTypeOf<TType, TFromMediumTypes> | undefined
-    >,
-  ): __MediumTypesPackedType<
-    TToMediumTypes,
-    __MediumTypeOf<TType, TToMediumTypes> | undefined
-  >;
-
-  is(value: unknown): value is TypeOf<TType> | undefined;
-}
-
-export class OptionalType<TType extends Type> extends Type<'optional'> {
   constructor(readonly Type: TType) {
     super();
   }
@@ -108,3 +70,11 @@ export class OptionalType<TType extends Type> extends Type<'optional'> {
 export function optional<TType extends Type>(Type: TType): OptionalType<TType> {
   return new OptionalType(Type);
 }
+
+type __OptionalInMediums<TType extends Type> = TType extends Type<
+  infer TInMediums
+>
+  ? {
+      [TMediumName in keyof XValue.Using]: TInMediums[TMediumName] | undefined;
+    }
+  : never;

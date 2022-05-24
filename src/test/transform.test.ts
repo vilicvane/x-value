@@ -1,7 +1,6 @@
 import * as x from '../library';
 import type {MediumTypeOf, TypeOf} from '../library';
 
-import type {MediumATypes, MediumBTypes} from './@usage';
 import {Identifier, mediumA, mediumB} from './@usage';
 
 test('transform medium A to medium B and back', () => {
@@ -39,12 +38,12 @@ test('transform medium A to medium B and back', () => {
     ],
   };
 
-  let a: MediumTypeOf<typeof Type, MediumATypes> = {
+  let a: MediumTypeOf<typeof Type, 'medium-a'> = {
     id: idBuffer,
     ...common,
   };
 
-  let b: MediumTypeOf<typeof Type, MediumBTypes> = {
+  let b: MediumTypeOf<typeof Type, 'medium-b'> = {
     id: idBuffer.readUint16BE(),
     ...common,
   };

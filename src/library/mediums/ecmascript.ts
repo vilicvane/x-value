@@ -25,7 +25,11 @@ export interface ECMAScriptTypes {
   [regexpTypeSymbol]: RegExp;
 }
 
-export const ecmascript = medium<ECMAScriptTypes>('ECMAScript', {
+export interface UsingECMAScriptMedium {
+  ecmascript: ECMAScriptTypes;
+}
+
+export const ecmascript = medium<UsingECMAScriptMedium>('ecmascript', {
   codecs: {
     [atomicTypeSymbol]: {
       encode(value) {

@@ -1,66 +1,20 @@
-import type {
-  __ElementOrArray,
-  __MediumTypesPackedType,
-  __ObjectTypeDefinitionToMediumType,
-  __RefinedType,
-} from '../@internal';
 import {toString} from '../@internal';
 import type {Medium} from '../medium';
 
 import {OptionalType} from './optional-type';
-import type {TypeConstraint, TypeIssue, TypePath} from './type';
+import type {TypeIssue, TypePath} from './type';
 import {Type} from './type';
 
-export interface ObjectType<TTypeDefinition> {
-  refine<TNominalOrRefinement, TNominal = unknown>(
-    constraints: __ElementOrArray<
-      TypeConstraint<
-        __ObjectTypeDefinitionToMediumType<TTypeDefinition, XValue.Types>
-      >
-    >,
-  ): __RefinedType<this, TNominalOrRefinement, TNominal>;
+export class ObjectType<TDefinition extends Record<string, Type>> extends Type<
+  __ObjectInMediums<TDefinition>
+> {
+  protected __type!: 'object';
 
-  decode<TMediumTypes extends object>(
-    medium: Medium<TMediumTypes>,
-    packed: __MediumTypesPackedType<
-      TMediumTypes,
-      __ObjectTypeDefinitionToMediumType<TTypeDefinition, TMediumTypes>
-    >,
-  ): __ObjectTypeDefinitionToMediumType<TTypeDefinition, XValue.Types>;
-
-  encode<TMediumTypes extends object>(
-    medium: Medium<TMediumTypes>,
-    value: __ObjectTypeDefinitionToMediumType<TTypeDefinition, XValue.Types>,
-  ): __MediumTypesPackedType<
-    TMediumTypes,
-    __ObjectTypeDefinitionToMediumType<TTypeDefinition, TMediumTypes>
-  >;
-
-  transform<TFromMediumTypes extends object, TToMediumTypes extends object>(
-    from: Medium<TFromMediumTypes>,
-    to: Medium<TToMediumTypes>,
-    packed: __MediumTypesPackedType<
-      TFromMediumTypes,
-      __ObjectTypeDefinitionToMediumType<TTypeDefinition, TFromMediumTypes>
-    >,
-  ): __MediumTypesPackedType<
-    TToMediumTypes,
-    __ObjectTypeDefinitionToMediumType<TTypeDefinition, TToMediumTypes>
-  >;
-
-  is(
-    value: unknown,
-  ): value is __ObjectTypeDefinitionToMediumType<TTypeDefinition, XValue.Types>;
-}
-
-export class ObjectType<
-  TTypeDefinition extends Record<string, Type>,
-> extends Type<'object'> {
-  constructor(readonly definition: TTypeDefinition) {
+  constructor(readonly definition: TDefinition) {
     super();
   }
 
-  partial(): ObjectType<__Partial<TTypeDefinition>>;
+  partial(): ObjectType<__Partial<TDefinition>>;
   partial(): ObjectType<Record<string, OptionalType<Type>>> {
     let definition = Object.fromEntries(
       Object.entries(this.definition).map(([key, Type]) => [
@@ -74,7 +28,7 @@ export class ObjectType<
 
   pick<TKeys extends string[]>(
     ...keys: TKeys
-  ): ObjectType<Pick<TTypeDefinition, TKeys[number]>>;
+  ): ObjectType<Pick<TDefinition, TKeys[number]>>;
   pick(...keys: string[]): ObjectType<Record<string, Type>> {
     let keySet = new Set(keys);
 
@@ -87,7 +41,7 @@ export class ObjectType<
 
   omit<TKeys extends string[]>(
     ...keys: TKeys
-  ): ObjectType<Omit<TTypeDefinition, TKeys[number]>>;
+  ): ObjectType<Omit<TDefinition, TKeys[number]>>;
   omit(...keys: string[]): ObjectType<Record<string, Type>> {
     let keySet = new Set(keys);
 
@@ -248,8 +202,50 @@ export function object<TTypeDefinition extends Record<string, Type>>(
   return new ObjectType(definition);
 }
 
-export type __Partial<TTypeDefinition extends Record<string, Type>> = {
-  [TKey in keyof TTypeDefinition]: TTypeDefinition[TKey] extends OptionalType<Type>
-    ? TTypeDefinition[TKey]
-    : OptionalType<TTypeDefinition[TKey]>;
+type __ObjectInMediums<TDefinition extends Record<string, Type>> = {
+  [TMediumName in keyof XValue.Using]: __ObjectInMedium<
+    TDefinition,
+    TMediumName
+  >;
+};
+
+type __ObjectInMedium<
+  TDefinition extends Record<string, Type>,
+  TMediumName extends keyof XValue.Using,
+> = {
+  [TKey in __KeyOfOptional<TDefinition>]?: TDefinition[TKey] extends OptionalType<
+    Type<infer TInMediums>
+  >
+    ? TInMediums[TMediumName]
+    : never;
+} & {
+  [TKey in __KeyOfNonOptional<TDefinition>]: TDefinition[TKey] extends Type<
+    infer TInMediums
+  >
+    ? TInMediums[TMediumName]
+    : never;
+};
+
+type __KeyOfOptional<TType> = Extract<
+  {
+    [TKey in keyof TType]: TType[TKey] extends OptionalType<Type>
+      ? TKey
+      : never;
+  }[keyof TType],
+  string
+>;
+
+type __KeyOfNonOptional<TType> = Extract<
+  {
+    [TKey in keyof TType]: TType[TKey] extends OptionalType<Type>
+      ? never
+      : TKey;
+  }[keyof TType],
+  string
+>;
+
+type __Partial<TDefinition extends Record<string, Type>> = {
+  [TKey in keyof TDefinition]: TDefinition[TKey] extends OptionalType<Type>
+    ? TDefinition[TKey]
+    : OptionalType<TDefinition[TKey]>;
 };

@@ -1,53 +1,13 @@
-import type {
-  __AtomicMediumType,
-  __ElementOrArray,
-  __MediumTypesPackedType,
-  __RefinedType,
-} from '../@internal';
 import type {Medium} from '../medium';
 
 import type {TypeConstraint, TypeIssue, TypePath} from './type';
 import {Type} from './type';
 
-export interface AtomicType<TSymbol> {
-  refine<TNominalOrRefinement, TNominal = unknown>(
-    constraints: __ElementOrArray<
-      TypeConstraint<__AtomicMediumType<TSymbol, XValue.Types>>
-    >,
-  ): __RefinedType<this, TNominalOrRefinement, TNominal>;
+export class AtomicType<TSymbol extends symbol> extends Type<
+  __AtomicInMediums<TSymbol>
+> {
+  protected __type!: 'atomic';
 
-  decode<TMediumTypes extends object>(
-    medium: Medium<TMediumTypes>,
-    value: __MediumTypesPackedType<
-      TMediumTypes,
-      __AtomicMediumType<TSymbol, TMediumTypes>
-    >,
-  ): __AtomicMediumType<TSymbol, XValue.Types>;
-
-  encode<TMediumTypes extends object>(
-    medium: Medium<TMediumTypes>,
-    value: __AtomicMediumType<TSymbol, XValue.Types>,
-  ): __MediumTypesPackedType<
-    TMediumTypes,
-    __AtomicMediumType<TSymbol, TMediumTypes>
-  >;
-
-  transform<TFromMediumTypes extends object, TToMediumTypes extends object>(
-    from: Medium<TFromMediumTypes>,
-    to: Medium<TToMediumTypes>,
-    value: __MediumTypesPackedType<
-      TFromMediumTypes,
-      __AtomicMediumType<TSymbol, TFromMediumTypes>
-    >,
-  ): __MediumTypesPackedType<
-    TToMediumTypes,
-    __AtomicMediumType<TSymbol, TToMediumTypes>
-  >;
-
-  is(value: unknown): value is __AtomicMediumType<TSymbol, XValue.Types>;
-}
-
-export class AtomicType<TSymbol extends symbol> extends Type<'atomic'> {
   constructor(symbol: TSymbol, constraints: TypeConstraint[]);
   constructor(readonly symbol: symbol, readonly constraints: TypeConstraint[]) {
     super();
@@ -169,3 +129,15 @@ function buildCodecErrorResult(
     ],
   ];
 }
+
+type __AtomicInMediums<TSymbol extends symbol> = {
+  [TMediumName in keyof XValue.Using]: __AtomicInMedium<
+    TSymbol,
+    XValue.Using[TMediumName]
+  >;
+};
+
+type __AtomicInMedium<
+  TSymbol extends symbol,
+  TMediumTypes,
+> = TSymbol extends keyof TMediumTypes ? TMediumTypes[TSymbol] : never;

@@ -15,6 +15,10 @@ declare global {
       [dateTypeSymbol]: Date;
       [regexpTypeSymbol]: RegExp;
     }
+
+    interface Using {
+      value: Types;
+    }
   }
 }
 

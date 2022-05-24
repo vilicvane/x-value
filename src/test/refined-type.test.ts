@@ -9,7 +9,6 @@ import type {
   TypeOf,
 } from '../library';
 
-import type {MediumATypes, MediumBTypes} from './@usage';
 import {Identifier, mediumA} from './@usage';
 
 let unknownValue: unknown;
@@ -37,7 +36,7 @@ test('atomic refinement should work', () => {
   const Email = x.string.refine<Nominal<'email'>>(value => value.includes('@'));
 
   type Email = TypeOf<typeof Email>;
-  type EmailInJSONValue = MediumTypeOf<typeof Email, x.JSONValueTypes>;
+  type EmailInJSONValue = MediumTypeOf<typeof Email, 'json-value'>;
 
   expect(Email.is('user@domain')).toBe(true);
   expect(Email.is('user#domain')).toBe(false);
@@ -58,7 +57,7 @@ test('atomic refinement should work', () => {
   ]);
 
   type LiveEmail = TypeOf<typeof LiveEmail>;
-  type LiveEmailInJSONValue = MediumTypeOf<typeof LiveEmail, x.JSONValueTypes>;
+  type LiveEmailInJSONValue = MediumTypeOf<typeof LiveEmail, 'json-value'>;
 
   expect(LiveEmail.is('user@live')).toBe(true);
   expect(LiveEmail.is('user@domain')).toBe(false);
@@ -72,8 +71,8 @@ test('atomic refinement should work', () => {
 
   type UserId = TypeOf<typeof UserId>;
 
-  type UserIdInMediumA = MediumTypeOf<typeof UserId, MediumATypes>;
-  type UserIdInMediumB = MediumTypeOf<typeof UserId, MediumBTypes>;
+  type UserIdInMediumA = MediumTypeOf<typeof UserId, 'medium-a'>;
+  type UserIdInMediumB = MediumTypeOf<typeof UserId, 'medium-b'>;
 
   const encodedUserIdInMediumA = UserId.encode(mediumA, 'ffff' as UserId);
 
@@ -107,7 +106,7 @@ test('array refinement should work', () => {
     .refine<{length: 3}>(value => value.length === 3);
 
   type Triple = TypeOf<typeof Triple>;
-  type TripleInJSONValue = MediumTypeOf<typeof Triple, x.JSONValueTypes>;
+  type TripleInJSONValue = MediumTypeOf<typeof Triple, 'json-value'>;
 
   expect(Triple.is(['', '', ''])).toBe(true);
   expect(Triple.is([])).toBe(false);

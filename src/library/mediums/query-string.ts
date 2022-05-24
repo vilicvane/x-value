@@ -9,7 +9,11 @@ export interface QueryStringTypes {
   packed: string;
 }
 
-export const queryString = medium<QueryStringTypes>('Query String', {
+export interface UsingQueryStringMedium {
+  'query-string': QueryStringTypes;
+}
+
+export const queryString = medium<UsingQueryStringMedium>('query-string', {
   packing: {
     pack(data) {
       return stringify(data);
@@ -58,12 +62,14 @@ export interface ExtendedQueryStringTypes
   extends QueryStringTypes,
     ExtendedTypes {}
 
-export const extendedQueryString = queryString.extend<ExtendedQueryStringTypes>(
-  'Extended Query String',
-  {
+export interface UsingExtendedQueryStringMedium {
+  'extended-query-string': ExtendedQueryStringTypes;
+}
+
+export const extendedQueryString =
+  queryString.extend<UsingExtendedQueryStringMedium>('extended-query-string', {
     codecs: EXTENDED_CODECS,
-  },
-);
+  });
 
 function stringify(dict: unknown): string {
   if (typeof dict !== 'object' || dict === null) {

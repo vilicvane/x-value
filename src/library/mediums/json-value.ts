@@ -17,7 +17,11 @@ export interface JSONValueTypes {
   [booleanTypeSymbol]: boolean;
 }
 
-export const jsonValue = medium<JSONValueTypes>('JSON Value', {
+export interface UsingJSONValueMedium {
+  'json-value': JSONValueTypes;
+}
+
+export const jsonValue = medium<UsingJSONValueMedium>('json-value', {
   codecs: {
     [atomicTypeSymbol]: {
       encode(value) {
@@ -32,8 +36,12 @@ export const jsonValue = medium<JSONValueTypes>('JSON Value', {
 
 export interface ExtendedJSONValueTypes extends JSONValueTypes, ExtendedTypes {}
 
-export const extendedJSONValue = jsonValue.extend<ExtendedJSONValueTypes>(
-  'Extended JSON Value',
+export interface UsingExtendedJSONValueMedium {
+  'extended-json-value': ExtendedJSONValueTypes;
+}
+
+export const extendedJSONValue = jsonValue.extend<UsingExtendedJSONValueMedium>(
+  'extended-json-value',
   {
     codecs: EXTENDED_CODECS as MediumAtomicCodecs<ExtendedJSONValueTypes>,
   },

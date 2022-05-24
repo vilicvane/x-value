@@ -3,6 +3,13 @@ import type {
   ECMAScriptTypes,
   JSONValueTypes,
   TransformNominal,
+  UsingECMAScriptMedium,
+  UsingExtendedJSONMedium,
+  UsingExtendedJSONValueMedium,
+  UsingExtendedQueryStringMedium,
+  UsingJSONMedium,
+  UsingJSONValueMedium,
+  UsingQueryStringMedium,
 } from '../library';
 
 declare global {
@@ -10,6 +17,17 @@ declare global {
     interface Types {
       [identifierTypeSymbol]: string;
     }
+
+    interface Using
+      extends UsingJSONMedium,
+        UsingExtendedJSONMedium,
+        UsingJSONValueMedium,
+        UsingExtendedJSONValueMedium,
+        UsingQueryStringMedium,
+        UsingExtendedQueryStringMedium,
+        UsingECMAScriptMedium,
+        UsingMediumA,
+        UsingMediumB {}
   }
 }
 
@@ -28,11 +46,19 @@ export interface MediumATypes extends ECMAScriptTypes {
   [identifierTypeSymbol]: IdentifierInMediumA;
 }
 
+export interface UsingMediumA {
+  'medium-a': MediumATypes;
+}
+
 export interface MediumBTypes extends JSONValueTypes {
   [identifierTypeSymbol]: number;
 }
 
-export const mediumA = x.ecmascript.extend<MediumATypes>('Medium A', {
+export interface UsingMediumB {
+  'medium-b': MediumBTypes;
+}
+
+export const mediumA = x.ecmascript.extend<UsingMediumA>('medium-a', {
   codecs: {
     [identifierTypeSymbol]: {
       encode(value) {
@@ -53,7 +79,7 @@ export const mediumA = x.ecmascript.extend<MediumATypes>('Medium A', {
   },
 });
 
-export const mediumB = x.jsonValue.extend<MediumBTypes>('Medium B', {
+export const mediumB = x.jsonValue.extend<UsingMediumB>('medium-b', {
   codecs: {
     [identifierTypeSymbol]: {
       encode(value) {

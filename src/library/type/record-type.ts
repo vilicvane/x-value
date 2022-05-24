@@ -1,76 +1,15 @@
-import type {
-  __ElementOrArray,
-  __MediumTypeOf,
-  __MediumTypeOfRecordKeyType,
-  __MediumTypesPackedType,
-  __RefinedType,
-  __TypeOfRecordKeyType,
-} from '../@internal';
-import {__ObjectTypeDefinitionToMediumType, toString} from '../@internal';
+import {toString} from '../@internal';
 import type {Medium} from '../medium';
 
-import type {TypeConstraint, TypeIssue, TypeOf, TypePath} from './type';
+import type {TypeIssue, TypePath} from './type';
 import {Type} from './type';
 
-export interface RecordType<TKeyType, TValueType> {
-  refine<TNominalOrRefinement, TNominal = unknown>(
-    constraints: __ElementOrArray<
-      TypeConstraint<
-        Record<__TypeOfRecordKeyType<TKeyType>, TypeOf<TValueType>>
-      >
-    >,
-  ): __RefinedType<this, TNominalOrRefinement, TNominal>;
-
-  decode<TMediumTypes extends object>(
-    medium: Medium<TMediumTypes>,
-    packed: __MediumTypesPackedType<
-      TMediumTypes,
-      Record<
-        __MediumTypeOfRecordKeyType<TKeyType, TMediumTypes>,
-        __MediumTypeOf<TValueType, TMediumTypes>
-      >
-    >,
-  ): Record<__TypeOfRecordKeyType<TKeyType>, TypeOf<TValueType>>;
-
-  encode<TMediumTypes extends object>(
-    medium: Medium<TMediumTypes>,
-    value: Record<__TypeOfRecordKeyType<TKeyType>, TypeOf<TValueType>>,
-  ): __MediumTypesPackedType<
-    TMediumTypes,
-    Record<
-      __MediumTypeOfRecordKeyType<TKeyType, TMediumTypes>,
-      __MediumTypeOf<TValueType, TMediumTypes>
-    >
-  >;
-
-  transform<TFromMediumTypes extends object, TToMediumTypes extends object>(
-    from: Medium<TFromMediumTypes>,
-    to: Medium<TToMediumTypes>,
-    packed: __MediumTypesPackedType<
-      TFromMediumTypes,
-      Record<
-        __MediumTypeOfRecordKeyType<TKeyType, TFromMediumTypes>,
-        __MediumTypeOf<TValueType, TFromMediumTypes>
-      >
-    >,
-  ): __MediumTypesPackedType<
-    TToMediumTypes,
-    Record<
-      __MediumTypeOfRecordKeyType<TKeyType, TToMediumTypes>,
-      __MediumTypeOf<TValueType, TToMediumTypes>
-    >
-  >;
-
-  is(
-    value: unknown,
-  ): value is Record<__TypeOfRecordKeyType<TKeyType>, TypeOf<TValueType>>;
-}
-
 export class RecordType<
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   TKeyType extends Type,
   TValueType extends Type,
-> extends Type<'record'> {
+> extends Type<__RecordInMediums<TKeyType, TValueType>> {
+  protected __type!: 'record';
+
   constructor(readonly Key: TKeyType, readonly Value: TValueType) {
     super();
   }
@@ -232,12 +171,23 @@ export class RecordType<
   }
 }
 
-export function record<TKey extends Type, TValue extends Type>(
-  Key: TKey,
-  Value: TValue,
-): RecordType<TKey, TValue> {
+export function record<TKeyType extends Type, TValueType extends Type>(
+  Key: TKeyType,
+  Value: TValueType,
+): RecordType<TKeyType, TValueType> {
   return new RecordType(Key, Value);
 }
+
+type __RecordInMediums<TKeyType extends Type, TValueType extends Type> = {
+  [TMediumName in keyof XValue.Using]: Record<
+    TKeyType extends Type<infer TKeyInMediums>
+      ? Extract<TKeyInMediums[TMediumName], string | symbol>
+      : never,
+    TValueType extends Type<infer TValueInMediums>
+      ? TValueInMediums[TMediumName]
+      : never
+  >;
+};
 
 function getRecordEntries(value: object): [string | number, unknown][] {
   if (Array.isArray(value)) {

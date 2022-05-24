@@ -212,6 +212,12 @@ test('object type with intersection type property should work with json medium',
     ),
   });
 
+  type Type = TypeOf<typeof Type>;
+
+  type Gender = Type['profile']['gender'];
+
+  type _ = AssertTrue<IsEqual<Gender, 'male' | 'female'>>;
+
   const value1: TypeOf<typeof Type> = {
     id: 'abc',
     profile: {
@@ -359,4 +365,14 @@ test('undefined with json should work as expected', () => {
   expect(O.is({foo: undefined})).toBe(true);
   expect(O.encode(x.json, {foo: undefined})).toBe('{}');
   expect(O.decode(x.json, '{}')).toStrictEqual({foo: undefined});
+});
+
+test('literal property type should be correct', () => {
+  const O = x.object({
+    type: x.literal('foo'),
+  });
+
+  type O = TypeOf<typeof O>;
+
+  type _ = AssertTrue<IsEqual<O['type'], 'foo'>>;
 });

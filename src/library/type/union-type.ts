@@ -1,51 +1,14 @@
-import type {
-  __ElementOrArray,
-  __MediumTypeOf,
-  __MediumTypesPackedType,
-  __RefinedType,
-} from '../@internal';
+import type {__TupleInMedium} from '../@internal';
 import type {Medium} from '../medium';
 
-import type {TypeConstraint, TypeIssue, TypeOf, TypePath} from './type';
+import type {TypeIssue, TypePath} from './type';
 import {Type} from './type';
 
-export interface UnionType<TTypeTuple> {
-  refine<TNominalOrRefinement, TNominal = unknown>(
-    constraints: __ElementOrArray<TypeConstraint<TypeOf<TTypeTuple[number]>>>,
-  ): __RefinedType<this, TNominalOrRefinement, TNominal>;
+export class UnionType<TTypeTuple extends [Type, Type, ...Type[]]> extends Type<
+  __UnionInMediums<TTypeTuple>
+> {
+  protected __type!: 'union';
 
-  decode<TMediumTypes extends object>(
-    medium: Medium<TMediumTypes>,
-    packed: __MediumTypesPackedType<
-      TMediumTypes,
-      __MediumTypeOf<TTypeTuple[number], TMediumTypes>
-    >,
-  ): TypeOf<TTypeTuple[number]>;
-
-  encode<TMediumTypes extends object>(
-    medium: Medium<TMediumTypes>,
-    value: TypeOf<TTypeTuple[number]>,
-  ): __MediumTypesPackedType<
-    TMediumTypes,
-    __MediumTypeOf<TTypeTuple[number], TMediumTypes>
-  >;
-
-  transform<TFromMediumTypes extends object, TToMediumTypes extends object>(
-    from: Medium<TFromMediumTypes>,
-    to: Medium<TToMediumTypes>,
-    packed: __MediumTypesPackedType<
-      TFromMediumTypes,
-      __MediumTypeOf<TTypeTuple[number], TFromMediumTypes>
-    >,
-  ): __MediumTypesPackedType<
-    TToMediumTypes,
-    __MediumTypeOf<TTypeTuple[number], TToMediumTypes>
-  >;
-
-  is(value: unknown): value is TypeOf<TTypeTuple[number]>;
-}
-
-export class UnionType<TTypeTuple extends Type[]> extends Type<'union'> {
   constructor(readonly TypeTuple: TTypeTuple) {
     if (TypeTuple.length < 2) {
       throw new TypeError('Expecting at least 2 type for union type');
@@ -179,3 +142,7 @@ export function union<TTypeTuple extends [Type, Type, ...Type[]]>(
 ): UnionType<TTypeTuple> {
   return new UnionType(Types);
 }
+
+type __UnionInMediums<TTypeTuple extends Type[]> = {
+  [TKey in keyof XValue.Using]: __TupleInMedium<TTypeTuple, TKey>[number];
+};

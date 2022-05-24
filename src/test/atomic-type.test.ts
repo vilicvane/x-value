@@ -1,8 +1,10 @@
 import * as x from '../library';
-import type {ExtendedJSONValueTypes, MediumTypeOf, TypeOf} from '../library';
+import type {MediumTypeOf, Nominal, TypeOf} from '../library';
 import {TypeConstraintError, atomic, stringTypeSymbol} from '../library';
 
-const Sunday = x.Date.refine<'sunday'>(date => date.getDay() === 0);
+const Sunday = x.Date.refine<Nominal<'sunday'>>(date => date.getDay() === 0);
+
+type Sunday = TypeOf<typeof Sunday>;
 
 test('pre-defined atomic types should decode/encode ecmascript medium', () => {
   expect(x.unknown.decode(x.ecmascript, true)).toBe(true);
@@ -188,7 +190,7 @@ test('date atomic refinement sunday should work with extended json value medium'
       x.extendedJSONValue,
       sunday.toISOString() as MediumTypeOf<
         typeof Sunday,
-        ExtendedJSONValueTypes
+        'extended-json-value'
       >,
     ).getTime(),
   ).toBe(sunday.getTime());

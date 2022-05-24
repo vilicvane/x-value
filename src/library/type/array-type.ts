@@ -1,53 +1,15 @@
-import type {
-  __ElementOrArray,
-  __MediumTypeOf,
-  __MediumTypesPackedType,
-  __RefinedType,
-} from '../@internal';
 import {toString} from '../@internal';
 import type {Medium} from '../medium';
 
-import type {TypeConstraint, TypeIssue, TypeOf, TypePath} from './type';
+import type {TypeIssue, TypePath} from './type';
 import {Type} from './type';
 
-export interface ArrayType<TElement> {
-  refine<TNominalOrRefinement, TNominal = unknown>(
-    constraints: __ElementOrArray<TypeConstraint<TypeOf<TElement>[]>>,
-  ): __RefinedType<this, TNominalOrRefinement, TNominal>;
+export class ArrayType<TElementType extends Type> extends Type<
+  __ArrayInMediums<TElementType>
+> {
+  protected __type!: 'array';
 
-  decode<TMediumTypes extends object>(
-    medium: Medium<TMediumTypes>,
-    value: __MediumTypesPackedType<
-      TMediumTypes,
-      __MediumTypeOf<TElement, TMediumTypes>[]
-    >,
-  ): TypeOf<TElement>[];
-
-  encode<TMediumTypes extends object>(
-    medium: Medium<TMediumTypes>,
-    value: TypeOf<TElement>[],
-  ): __MediumTypesPackedType<
-    TMediumTypes,
-    __MediumTypeOf<TElement, TMediumTypes>[]
-  >;
-
-  transform<TFromMediumTypes extends object, TToMediumTypes extends object>(
-    from: Medium<TFromMediumTypes>,
-    to: Medium<TToMediumTypes>,
-    value: __MediumTypesPackedType<
-      TFromMediumTypes,
-      __MediumTypeOf<TElement, TFromMediumTypes>[]
-    >,
-  ): __MediumTypesPackedType<
-    TToMediumTypes,
-    __MediumTypeOf<TElement, TToMediumTypes>[]
-  >;
-
-  is(value: unknown): value is TypeOf<TElement>[];
-}
-
-export class ArrayType<TElement extends Type> extends Type<'array'> {
-  constructor(readonly Element: TElement) {
+  constructor(readonly ElementType: TElementType) {
     super();
   }
 
@@ -73,16 +35,17 @@ export class ArrayType<TElement extends Type> extends Type<'array'> {
       ];
     }
 
-    let Element = this.Element;
+    let ElementType = this.ElementType;
 
     let value: unknown[] = [];
     let issues: TypeIssue[] = [];
 
     for (let [index, unpackedElement] of unpacked.entries()) {
-      let [element, entryIssues] = Element._decode(medium, unpackedElement, [
-        ...path,
-        index,
-      ]);
+      let [element, entryIssues] = ElementType._decode(
+        medium,
+        unpackedElement,
+        [...path, index],
+      );
 
       value.push(element);
       issues.push(...entryIssues);
@@ -112,13 +75,13 @@ export class ArrayType<TElement extends Type> extends Type<'array'> {
       ];
     }
 
-    let Element = this.Element;
+    let ElementType = this.ElementType;
 
     let unpacked: unknown[] = [];
     let issues: TypeIssue[] = [];
 
     for (let [index, valueElement] of (value as unknown[]).entries()) {
-      let [unpackedElement, entryIssues] = Element._encode(
+      let [unpackedElement, entryIssues] = ElementType._encode(
         medium,
         valueElement,
         [...path, index],
@@ -155,13 +118,13 @@ export class ArrayType<TElement extends Type> extends Type<'array'> {
       ];
     }
 
-    let Element = this.Element;
+    let ElementType = this.ElementType;
 
     let value: unknown[] = [];
     let issues: TypeIssue[] = [];
 
     for (let [index, unpackedElement] of unpacked.entries()) {
-      let [element, entryIssues] = Element._transform(
+      let [element, entryIssues] = ElementType._transform(
         from,
         to,
         unpackedElement,
@@ -186,16 +149,22 @@ export class ArrayType<TElement extends Type> extends Type<'array'> {
       ];
     }
 
-    let Element = this.Element;
+    let ElementType = this.ElementType;
 
     return value.flatMap((element, index) =>
-      Element._diagnose(element, [...path, index]),
+      ElementType._diagnose(element, [...path, index]),
     );
   }
 }
 
-export function array<TElement extends Type>(
-  Element: TElement,
-): ArrayType<TElement> {
-  return new ArrayType(Element);
+export function array<TElementType extends Type>(
+  ElementType: TElementType,
+): ArrayType<TElementType> {
+  return new ArrayType(ElementType);
 }
+
+type __ArrayInMediums<TElementType extends Type> = TElementType extends Type<
+  infer TElementInMediums
+>
+  ? {[TKey in keyof XValue.Using]: TElementInMediums[TKey][]}
+  : never;

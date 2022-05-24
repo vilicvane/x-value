@@ -1,14 +1,20 @@
 /* eslint-disable @mufan/import-groups */
 
-import type {__MediumTypeOf, __NominalPartial} from '../@internal';
+import type {
+  __ElementOrArray,
+  __MediumTypesPackedType,
+  __NominalPartial,
+} from '../@internal';
 import type {Medium} from '../medium';
 
-export abstract class Type<TCategory extends string = string> {
-  protected __static_type_category!: TCategory;
+export type TypesInMediums = Record<keyof XValue.Using, unknown>;
 
-  refine(
-    constraints: TypeConstraint | TypeConstraint[],
-  ): RefinedType<Type, unknown, Nominal<string | symbol>> {
+export abstract class Type<TInMediums extends TypesInMediums = TypesInMediums> {
+  protected __static_type_in_mediums!: TInMediums;
+
+  refine<TNominalOrRefinement, TNominal = unknown>(
+    constraints: __ElementOrArray<TypeConstraint<TInMediums['value']>>,
+  ): __OverloadedRefinedType<this, TNominalOrRefinement, TNominal> {
     return new RefinedType(
       this,
       Array.isArray(constraints) ? constraints : [constraints],
@@ -27,6 +33,10 @@ export abstract class Type<TCategory extends string = string> {
     return new OptionalType(this);
   }
 
+  decode<TMediumName extends keyof XValue.Using, TMediumTypes extends object>(
+    medium: Medium<TMediumName, TMediumTypes>,
+    packed: __MediumTypesPackedType<TMediumTypes, TInMediums[TMediumName]>,
+  ): TInMediums['value'];
   decode(medium: Medium, packed: unknown): unknown {
     let unpacked = medium.unpack(packed);
     let [value, issues] = this._decode(medium, unpacked, []);
@@ -38,6 +48,10 @@ export abstract class Type<TCategory extends string = string> {
     return value;
   }
 
+  encode<TMediumName extends keyof XValue.Using, TMediumTypes extends object>(
+    medium: Medium<TMediumName, TMediumTypes>,
+    value: TInMediums['value'],
+  ): __MediumTypesPackedType<TMediumTypes, TInMediums[TMediumName]>;
   encode(medium: Medium, value: unknown): unknown {
     let [unpacked, issues] = this._encode(medium, value, [], true);
 
@@ -48,6 +62,19 @@ export abstract class Type<TCategory extends string = string> {
     return medium.pack(unpacked);
   }
 
+  transform<
+    TFromMediumName extends keyof XValue.Using,
+    TFromMediumTypes extends object,
+    TToMediumName extends keyof XValue.Using,
+    TToMediumTypes extends object,
+  >(
+    from: Medium<TFromMediumName, TFromMediumTypes>,
+    to: Medium<TToMediumName, TToMediumTypes>,
+    value: __MediumTypesPackedType<
+      TFromMediumTypes,
+      TInMediums[TFromMediumName]
+    >,
+  ): __MediumTypesPackedType<TToMediumTypes, TInMediums[TToMediumName]>;
   transform(from: Medium, to: Medium, packed: unknown): unknown {
     let unpacked = from.unpack(packed);
     let [transformedUnpacked, issues] = this._transform(from, to, unpacked, []);
@@ -69,6 +96,7 @@ export abstract class Type<TCategory extends string = string> {
     throw new TypeConstraintError('Value does not satisfy the type', issues);
   }
 
+  is(value: unknown): value is TInMediums['value'];
   is(value: unknown): boolean {
     return this.diagnose(value).length === 0;
   }
@@ -148,7 +176,23 @@ ${this.issues
   }
 }
 
-export type TypeOf<TType extends Type> = __MediumTypeOf<TType, XValue.Types>;
+export type TypeOf<TType extends Type> = TType extends Type<infer TInMediums>
+  ? TInMediums['value']
+  : never;
+
+type __OverloadedRefinedType<
+  TType extends Type,
+  TNominalOrRefinement,
+  TNominal,
+> = RefinedType<
+  TType,
+  TNominalOrRefinement extends __NominalPartial
+    ? unknown
+    : TNominalOrRefinement,
+  TNominalOrRefinement extends __NominalPartial
+    ? TNominalOrRefinement
+    : TNominal
+>;
 
 // Make sure code circularly referenced accessing type.ts after exports ready.
 

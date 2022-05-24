@@ -1,55 +1,16 @@
-import type {
-  __ElementOrArray,
-  __MediumTypesPackedType,
-  __RefinedType,
-  __TupleMediumType,
-} from '../@internal';
-import {__MediumTypeOf, toString} from '../@internal';
+import type {__TupleInMedium} from '../@internal';
+import {toString} from '../@internal';
 import type {Medium} from '../medium';
 
-import type {TypeConstraint, TypeIssue, TypePath} from './type';
+import type {TypeIssue, TypePath} from './type';
 import {Type} from './type';
 
-export interface TupleType<TElements> {
-  refine<TNominalOrRefinement, TNominal = unknown>(
-    constraints: __ElementOrArray<
-      TypeConstraint<__TupleMediumType<TElements, XValue.Types>>
-    >,
-  ): __RefinedType<this, TNominalOrRefinement, TNominal>;
+export class TupleType<TElementTypeTuple extends Type[]> extends Type<
+  __TupleInMediums<TElementTypeTuple>
+> {
+  protected __type!: 'tuple';
 
-  decode<TMediumTypes extends object>(
-    medium: Medium<TMediumTypes>,
-    value: __MediumTypesPackedType<
-      TMediumTypes,
-      __TupleMediumType<TElements, TMediumTypes>
-    >,
-  ): __TupleMediumType<TElements, XValue.Types>;
-
-  encode<TMediumTypes extends object>(
-    medium: Medium<TMediumTypes>,
-    value: __TupleMediumType<TElements, XValue.Types>,
-  ): __MediumTypesPackedType<
-    TMediumTypes,
-    __TupleMediumType<TElements, TMediumTypes>
-  >;
-
-  transform<TFromMediumTypes extends object, TToMediumTypes extends object>(
-    from: Medium<TFromMediumTypes>,
-    to: Medium<TToMediumTypes>,
-    value: __MediumTypesPackedType<
-      TFromMediumTypes,
-      __TupleMediumType<TElements, TFromMediumTypes>
-    >,
-  ): __MediumTypesPackedType<
-    TToMediumTypes,
-    __TupleMediumType<TElements, TToMediumTypes>
-  >;
-
-  is(value: unknown): value is __TupleMediumType<TElements, XValue.Types>;
-}
-
-export class TupleType<TElements extends Type[]> extends Type<'tuple'> {
-  constructor(readonly Elements: TElements) {
+  constructor(readonly ElementTypeTuple: TElementTypeTuple) {
     super();
   }
 
@@ -75,12 +36,12 @@ export class TupleType<TElements extends Type[]> extends Type<'tuple'> {
       ];
     }
 
-    let Elements = this.Elements;
+    let ElementTypeTuple = this.ElementTypeTuple;
 
     let value: unknown[] = [];
     let issues: TypeIssue[] = [];
 
-    for (let [index, Element] of Elements.entries()) {
+    for (let [index, Element] of ElementTypeTuple.entries()) {
       let [element, entryIssues] = Element._decode(medium, unpacked[index], [
         ...path,
         index,
@@ -114,12 +75,12 @@ export class TupleType<TElements extends Type[]> extends Type<'tuple'> {
       ];
     }
 
-    let Elements = this.Elements;
+    let ElementTypeTuple = this.ElementTypeTuple;
 
     let unpacked: unknown[] = [];
     let issues: TypeIssue[] = [];
 
-    for (let [index, Element] of Elements.entries()) {
+    for (let [index, Element] of ElementTypeTuple.entries()) {
       let [unpackedElement, entryIssues] = Element._encode(
         medium,
         (value as unknown[])[index],
@@ -157,12 +118,12 @@ export class TupleType<TElements extends Type[]> extends Type<'tuple'> {
       ];
     }
 
-    let Elements = this.Elements;
+    let ElementTypeTuple = this.ElementTypeTuple;
 
     let value: unknown[] = [];
     let issues: TypeIssue[] = [];
 
-    for (let [index, Element] of Elements.entries()) {
+    for (let [index, Element] of ElementTypeTuple.entries()) {
       let [element, entryIssues] = Element._transform(
         from,
         to,
@@ -188,14 +149,21 @@ export class TupleType<TElements extends Type[]> extends Type<'tuple'> {
       ];
     }
 
-    return this.Elements.flatMap((Element, index) =>
+    return this.ElementTypeTuple.flatMap((Element, index) =>
       Element._diagnose(value[index], [...path, index]),
     );
   }
 }
 
-export function tuple<TElements extends Type[]>(
-  ...Elements: TElements
-): TupleType<TElements> {
-  return new TupleType(Elements);
+export function tuple<TElementTypeTuple extends Type[]>(
+  ...ElementTypeTuple: TElementTypeTuple
+): TupleType<TElementTypeTuple> {
+  return new TupleType(ElementTypeTuple);
 }
+
+type __TupleInMediums<TElementTypeTuple extends Type[]> = {
+  [TMediumName in keyof XValue.Using]: __TupleInMedium<
+    TElementTypeTuple,
+    TMediumName
+  >;
+};

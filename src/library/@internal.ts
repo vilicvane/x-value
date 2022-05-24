@@ -1,118 +1,27 @@
-import type {
-  ArrayType,
-  AtomicType,
-  Denominalize,
-  IntersectionType,
-  ObjectType,
-  OptionalType,
-  RecordType,
-  RecursiveType,
-  RefinedType,
-  TupleType,
-  Type,
-  UnionType,
-  __nominal,
-  __type,
-} from './type';
+import type {Denominalize, Type, __nominal, __type} from './type';
 
 export const hasOwnProperty = Object.prototype.hasOwnProperty;
 
 export const toString = Object.prototype.toString;
 
-export type __MediumTypeOf<TType, TMediumTypes> = TType extends ObjectType<
-  infer TDefinition
->
-  ? __ObjectTypeDefinitionToMediumType<TDefinition, TMediumTypes>
-  : TType extends RecordType<infer TKey, infer TValue>
-  ? Record<
-      __MediumTypeOfRecordKeyType<TKey, TMediumTypes>,
-      __MediumTypeOf<TValue, TMediumTypes>
-    >
-  : TType extends ArrayType<infer TElementType>
-  ? __MediumTypeOf<TElementType, TMediumTypes>[]
-  : TType extends TupleType<infer TTuple>
-  ? __TupleMediumType<TTuple, TMediumTypes>
-  : TType extends RefinedType<infer TType, infer TRefinement, infer TNominal>
-  ? __RefinedMediumType<TType, TRefinement, TNominal, TMediumTypes>
-  : TType extends AtomicType<infer TTypeSymbol>
-  ? __AtomicMediumType<TTypeSymbol, TMediumTypes>
-  : TType extends UnionType<infer TTypeTuple>
-  ? __MediumTypeOf<TTypeTuple[number], TMediumTypes>
-  : TType extends IntersectionType<infer TTypeTuple>
-  ? __UnionToIntersection<__MediumTypeOf<TTypeTuple[number], TMediumTypes>>
-  : TType extends RecursiveType<infer T>
-  ? __RecursiveMediumType<T, TMediumTypes>
-  : TType extends OptionalType<infer TType>
-  ? __MediumTypeOf<TType, TMediumTypes> | undefined
-  : unknown;
-
-export type __ObjectTypeDefinitionToMediumType<TDefinition, TMediumTypes> = {
-  [TKey in __KeyOfOptional<TDefinition>]?: TDefinition[TKey] extends OptionalType<
-    infer TNestedType
-  >
-    ? __MediumTypeOf<TNestedType, TMediumTypes>
-    : never;
-} & {
-  [TKey in __KeyOfNonOptional<TDefinition>]: __MediumTypeOf<
-    TDefinition[TKey],
-    TMediumTypes
-  >;
-};
-
-export type __TypeOfRecordKeyType<TType> = __MediumTypeOfRecordKeyType<
-  TType,
-  XValue.Types
->;
-
-export type __MediumTypeOfRecordKeyType<TType, TMediumTypes> = __MediumTypeOf<
-  TType,
-  TMediumTypes
-> extends infer TKey
-  ? Extract<TKey, string | symbol>
-  : never;
-
-export type __TupleMediumType<TElementTypes, TMediumTypes> = {
-  [TIndex in keyof TElementTypes]: __MediumTypeOf<
-    TElementTypes[TIndex],
-    TMediumTypes
-  >;
-};
-
-export type __RefinedMediumType<TType, TRefinement, TNominal, TMediumTypes> =
+export type __RefinedMediumType<TInMedium, TRefinement, TNominal> =
   unknown extends TNominal
-    ? __MediumTypeOf<TType, TMediumTypes> & TRefinement
-    : __RefinedNominalType<
-        __MediumTypeOf<TType, TMediumTypes> & TRefinement,
-        TNominal
-      >;
+    ? TInMedium & TRefinement
+    : __RefinedNominalType<TInMedium & TRefinement, TNominal>;
 
 export type __RefinedNominalType<T, TNominal> = T &
   (TNominal & Record<__type, Denominalize<T>>);
 
-export type __AtomicMediumType<
-  TSymbol extends symbol,
-  TMediumTypes,
-> = TMediumTypes extends {[TKey in TSymbol]: infer TMediumType}
-  ? TMediumType
-  : never;
-
-export type __KeyOfOptional<TType> = Extract<
-  {
-    [TKey in keyof TType]: TType[TKey] extends OptionalType<Type>
-      ? TKey
-      : never;
-  }[keyof TType],
-  string
->;
-
-export type __KeyOfNonOptional<TType> = Extract<
-  {
-    [TKey in keyof TType]: TType[TKey] extends OptionalType<Type>
-      ? never
-      : TKey;
-  }[keyof TType],
-  string
->;
+export type __TupleInMedium<
+  TTypeTuple extends Type[],
+  TMediumName extends keyof XValue.Using,
+> = {
+  [TIndex in keyof TTypeTuple]: TTypeTuple[TIndex] extends Type<
+    infer TElementInMediums
+  >
+    ? TElementInMediums[TMediumName]
+    : never;
+};
 
 export type __UnionToIntersection<TUnion> = (
   TUnion extends unknown ? (_: TUnion) => unknown : never
@@ -130,26 +39,6 @@ export type __MediumTypesPackedType<
   : TFallback;
 
 export type __ElementOrArray<T> = T | T[];
-
-export type __RefinedType<
-  TType extends Type,
-  TNominalOrRefinement,
-  TNominal,
-> = RefinedType<
-  TType,
-  TNominalOrRefinement extends __NominalPartial
-    ? unknown
-    : TNominalOrRefinement,
-  TNominalOrRefinement extends __NominalPartial
-    ? TNominalOrRefinement
-    : TNominal
->;
-
-export type __RecursiveMediumType<T, TMediumTypes> = T extends Type
-  ? __MediumTypeOf<T, TMediumTypes>
-  : {
-      [TKey in keyof T]: __RecursiveMediumType<T[TKey], TMediumTypes>;
-    };
 
 export type __NominalPartial = Record<__nominal, unknown>;
 

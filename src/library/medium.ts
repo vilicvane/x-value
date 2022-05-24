@@ -1,4 +1,5 @@
-import type {__MediumTypeOf, __MediumTypesPackedType} from './@internal';
+import type {__MediumTypesPackedType} from './@internal';
+import type {Type} from './type';
 
 export const atomicTypeSymbol = Symbol();
 
@@ -10,6 +11,8 @@ export type GeneralMediumTypes =
       packed: unknown;
       [symbol: symbol]: unknown;
     };
+
+export type GeneralUsingMedium = Medium<keyof XValue.Using, object>;
 
 export type MediumAtomicCodecs<TMediumTypes extends object> = {
   [TSymbol in keyof XValue.Types]?: __MediumAtomicCodec<
@@ -32,29 +35,35 @@ export interface MediumOptions<
   codecs: MediumAtomicCodecs<TMediumTypes>;
 }
 
-export class Medium<TMediumTypes extends object = GeneralMediumTypes> {
-  private packing:
-    | MediumPacking<__MediumTypesPackedType<TMediumTypes>>
-    | undefined;
-  private codecs: MediumAtomicCodecs<TMediumTypes>;
+export class Medium<
+  TName extends string = string,
+  TTypes extends object = GeneralMediumTypes,
+> {
+  private packing: MediumPacking<__MediumTypesPackedType<TTypes>> | undefined;
+  private codecs: MediumAtomicCodecs<TTypes>;
 
-  constructor(
-    readonly name: string,
-    {packing, codecs}: MediumOptions<TMediumTypes>,
-  ) {
+  constructor(readonly name: TName, {packing, codecs}: MediumOptions<TTypes>) {
     this.packing = packing;
     this.codecs = codecs;
   }
 
-  extend<TExtendedMediumTypes extends TMediumTypes>(
-    description: string,
-    {packing, codecs}: MediumOptions<TExtendedMediumTypes>,
-  ): Medium<TExtendedMediumTypes>;
+  extend<TUsingExtendedMedium extends object>(
+    name: Extract<keyof TUsingExtendedMedium, string>,
+    {
+      packing,
+      codecs,
+    }: MediumOptions<
+      Extract<TUsingExtendedMedium[keyof TUsingExtendedMedium], object>
+    >,
+  ): Medium<
+    Extract<keyof TUsingExtendedMedium, string>,
+    Extract<TUsingExtendedMedium[keyof TUsingExtendedMedium], object>
+  >;
   extend(
-    description: string,
+    name: string,
     {packing = this.packing, codecs}: MediumOptions,
   ): Medium {
-    return new Medium(description, {
+    return new Medium(name, {
       packing,
       codecs: {
         ...this.codecs,
@@ -63,9 +72,9 @@ export class Medium<TMediumTypes extends object = GeneralMediumTypes> {
     });
   }
 
-  requireCodec<TSymbol extends keyof TMediumTypes>(
+  requireCodec<TSymbol extends keyof TTypes>(
     symbol: TSymbol,
-  ): MediumAtomicCodec<TMediumTypes, TSymbol>;
+  ): MediumAtomicCodec<TTypes, TSymbol>;
   requireCodec(symbol: symbol): __MediumAtomicCodec {
     let codecs = this.codecs;
 
@@ -80,11 +89,11 @@ export class Medium<TMediumTypes extends object = GeneralMediumTypes> {
     return codec;
   }
 
-  unpack(packed: __MediumTypesPackedType<TMediumTypes>): unknown {
+  unpack(packed: __MediumTypesPackedType<TTypes>): unknown {
     return this.packing ? this.packing.unpack(packed) : packed;
   }
 
-  pack(unpacked: unknown): __MediumTypesPackedType<TMediumTypes>;
+  pack(unpacked: unknown): __MediumTypesPackedType<TTypes>;
   pack(unpacked: unknown): unknown {
     return this.packing ? this.packing.pack(unpacked) : unpacked;
   }
@@ -104,14 +113,17 @@ interface __MediumAtomicCodec<TMediumAtomic = unknown, TValue = unknown> {
   decode(value: unknown): TValue;
 }
 
-export function medium<TMediumTypes extends object>(
-  description: string,
-  options: MediumOptions<TMediumTypes>,
-): Medium<TMediumTypes> {
-  return new Medium(description, options);
+export function medium<TUsingMedium extends object>(
+  name: Extract<keyof TUsingMedium, string>,
+  options: MediumOptions<Extract<TUsingMedium[keyof TUsingMedium], object>>,
+): Medium<
+  Extract<keyof TUsingMedium, string>,
+  Extract<TUsingMedium[keyof TUsingMedium], object>
+> {
+  return new Medium(name, options);
 }
 
-export type MediumTypeOf<TType, TMediumTypes> = __MediumTypesPackedType<
-  TMediumTypes,
-  __MediumTypeOf<TType, TMediumTypes>
->;
+export type MediumTypeOf<
+  TType extends Type,
+  TMediumName extends keyof XValue.Using,
+> = TType extends Type<infer TInMediums> ? TInMediums[TMediumName] : never;

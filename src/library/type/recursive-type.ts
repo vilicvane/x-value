@@ -1,57 +1,16 @@
-import type {
-  __ElementOrArray,
-  __MediumTypeOf,
-  __MediumTypesPackedType,
-  __RecursiveMediumType,
-  __RefinedType,
-} from '../@internal';
 import type {Medium} from '../medium';
 
-import type {TypeConstraint, TypeIssue, TypePath} from './type';
+import type {TypeIssue, TypePath} from './type';
 import {Type} from './type';
 
-export interface RecursiveType<T> {
-  refine<TNominalOrRefinement, TNominal = unknown>(
-    constraints: __ElementOrArray<
-      TypeConstraint<__RecursiveMediumType<T, XValue.Types>>
-    >,
-  ): __RefinedType<this, TNominalOrRefinement, TNominal>;
+export class RecursiveType<TRecursive> extends Type<
+  __RecursiveInMediums<TRecursive>
+> {
+  protected __type!: 'recursive';
 
-  decode<TMediumTypes extends object>(
-    medium: Medium<TMediumTypes>,
-    value: __MediumTypesPackedType<
-      TMediumTypes,
-      __RecursiveMediumType<T, TMediumTypes>
-    >,
-  ): __RecursiveMediumType<T, XValue.Types>;
-
-  encode<TMediumTypes extends object>(
-    medium: Medium<TMediumTypes>,
-    value: __RecursiveMediumType<T, XValue.Types>,
-  ): __MediumTypesPackedType<
-    TMediumTypes,
-    __RecursiveMediumType<T, TMediumTypes>
-  >;
-
-  transform<TFromMediumTypes extends object, TToMediumTypes extends object>(
-    from: Medium<TFromMediumTypes>,
-    to: Medium<TToMediumTypes>,
-    value: __MediumTypesPackedType<
-      TFromMediumTypes,
-      __RecursiveMediumType<T, TFromMediumTypes>
-    >,
-  ): __MediumTypesPackedType<
-    TToMediumTypes,
-    __RecursiveMediumType<T, TToMediumTypes>
-  >;
-
-  is(value: unknown): value is __RecursiveMediumType<T, XValue.Types>;
-}
-
-export class RecursiveType<T> extends Type<'recursive'> {
   readonly Type: Type;
 
-  constructor(recursion: (Type: RecursiveType<T>) => Type) {
+  constructor(recursion: (Type: RecursiveType<TRecursive>) => Type) {
     super();
 
     this.Type = recursion(this);
@@ -105,3 +64,22 @@ export function recursive<T>(
 ): RecursiveType<T> {
   return new RecursiveType(recursion);
 }
+
+type __RecursiveInMediums<TRecursive> = {
+  [TMediumName in keyof XValue.Using]: __RecursiveInMedium<
+    TRecursive,
+    TMediumName
+  >;
+};
+
+type __RecursiveInMedium<
+  TRecursive,
+  TMediumName extends keyof XValue.Using,
+> = TRecursive extends Type<infer TInMediums>
+  ? TInMediums[TMediumName]
+  : {
+      [TKey in keyof TRecursive]: __RecursiveInMedium<
+        TRecursive[TKey],
+        TMediumName
+      >;
+    };
