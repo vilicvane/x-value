@@ -1,5 +1,5 @@
-import type {__MediumTypesPackedType} from './@internal';
-import type {Type} from './type';
+import type {MediumTypesPackedType} from './@internal';
+import type {TypeInMediumsPartial, __type_in_mediums} from './type';
 
 export const atomicTypeSymbol = Symbol();
 
@@ -12,7 +12,7 @@ export type GeneralMediumTypes =
       [symbol: symbol]: unknown;
     };
 
-export type GeneralUsingMedium = Medium<keyof XValue.Using, object>;
+export type GeneralUsingMedium = Medium<XValue.UsingName, object>;
 
 export type MediumAtomicCodecs<TMediumTypes extends object> = {
   [TSymbol in keyof XValue.Types]?: __MediumAtomicCodec<
@@ -31,7 +31,7 @@ export interface MediumPacking<TPacked> {
 export interface MediumOptions<
   TMediumTypes extends object = GeneralMediumTypes,
 > {
-  packing?: MediumPacking<__MediumTypesPackedType<TMediumTypes>>;
+  packing?: MediumPacking<MediumTypesPackedType<TMediumTypes>>;
   codecs: MediumAtomicCodecs<TMediumTypes>;
 }
 
@@ -39,7 +39,7 @@ export class Medium<
   TName extends string = string,
   TTypes extends object = GeneralMediumTypes,
 > {
-  private packing: MediumPacking<__MediumTypesPackedType<TTypes>> | undefined;
+  private packing: MediumPacking<MediumTypesPackedType<TTypes>> | undefined;
   private codecs: MediumAtomicCodecs<TTypes>;
 
   constructor(readonly name: TName, {packing, codecs}: MediumOptions<TTypes>) {
@@ -89,11 +89,11 @@ export class Medium<
     return codec;
   }
 
-  unpack(packed: __MediumTypesPackedType<TTypes>): unknown {
+  unpack(packed: MediumTypesPackedType<TTypes>): unknown {
     return this.packing ? this.packing.unpack(packed) : packed;
   }
 
-  pack(unpacked: unknown): __MediumTypesPackedType<TTypes>;
+  pack(unpacked: unknown): MediumTypesPackedType<TTypes>;
   pack(unpacked: unknown): unknown {
     return this.packing ? this.packing.pack(unpacked) : unpacked;
   }
@@ -124,6 +124,6 @@ export function medium<TUsingMedium extends object>(
 }
 
 export type MediumTypeOf<
-  TType extends Type,
-  TMediumName extends keyof XValue.Using,
-> = TType extends Type<infer TInMediums> ? TInMediums[TMediumName] : never;
+  TType extends TypeInMediumsPartial,
+  TMediumName extends XValue.UsingName,
+> = TType[__type_in_mediums][TMediumName];

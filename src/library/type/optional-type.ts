@@ -1,14 +1,20 @@
 import type {Medium} from '../medium';
 
-import type {TypeIssue, TypePath} from './type';
-import {Type} from './type';
+import type {
+  TypeInMediumsPartial,
+  TypeIssue,
+  TypePath,
+  __type_in_mediums,
+} from './type';
+import {Type, __type_kind} from './type';
 
-export class OptionalType<TType extends Type> extends Type<
-  __OptionalInMediums<TType>
+export class OptionalType<TType extends TypeInMediumsPartial> extends Type<
+  OptionalInMediums<TType>
 > {
-  protected __type!: 'optional';
+  [__type_kind]!: 'optional';
 
-  constructor(readonly Type: TType) {
+  constructor(Type: TType);
+  constructor(readonly Type: Type) {
     super();
   }
 
@@ -67,14 +73,14 @@ export class OptionalType<TType extends Type> extends Type<
   }
 }
 
-export function optional<TType extends Type>(Type: TType): OptionalType<TType> {
+export function optional<TType extends TypeInMediumsPartial>(
+  Type: TType,
+): OptionalType<TType> {
   return new OptionalType(Type);
 }
 
-type __OptionalInMediums<TType extends Type> = TType extends Type<
-  infer TInMediums
->
-  ? {
-      [TMediumName in keyof XValue.Using]: TInMediums[TMediumName] | undefined;
-    }
-  : never;
+type OptionalInMediums<TType extends TypeInMediumsPartial> = {
+  [TMediumName in XValue.UsingName]:
+    | TType[__type_in_mediums][TMediumName]
+    | undefined;
+};

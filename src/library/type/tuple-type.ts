@@ -1,16 +1,17 @@
-import type {__TupleInMedium} from '../@internal';
+import type {TupleInMedium} from '../@internal';
 import {toString} from '../@internal';
 import type {Medium} from '../medium';
 
-import type {TypeIssue, TypePath} from './type';
-import {Type} from './type';
+import type {TypeInMediumsPartial, TypeIssue, TypePath} from './type';
+import {Type, __type_kind} from './type';
 
-export class TupleType<TElementTypeTuple extends Type[]> extends Type<
-  __TupleInMediums<TElementTypeTuple>
-> {
-  protected __type!: 'tuple';
+export class TupleType<
+  TElementTypeTuple extends TypeInMediumsPartial[],
+> extends Type<TupleInMediums<TElementTypeTuple>> {
+  [__type_kind]!: 'tuple';
 
-  constructor(readonly ElementTypeTuple: TElementTypeTuple) {
+  constructor(ElementTypeTuple: TElementTypeTuple);
+  constructor(readonly ElementTypeTuple: Type[]) {
     super();
   }
 
@@ -155,14 +156,14 @@ export class TupleType<TElementTypeTuple extends Type[]> extends Type<
   }
 }
 
-export function tuple<TElementTypeTuple extends Type[]>(
+export function tuple<TElementTypeTuple extends TypeInMediumsPartial[]>(
   ...ElementTypeTuple: TElementTypeTuple
 ): TupleType<TElementTypeTuple> {
   return new TupleType(ElementTypeTuple);
 }
 
-type __TupleInMediums<TElementTypeTuple extends Type[]> = {
-  [TMediumName in keyof XValue.Using]: __TupleInMedium<
+type TupleInMediums<TElementTypeTuple extends TypeInMediumsPartial[]> = {
+  [TMediumName in XValue.UsingName]: TupleInMedium<
     TElementTypeTuple,
     TMediumName
   >;

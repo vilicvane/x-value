@@ -19,6 +19,8 @@ declare global {
     interface Using {
       value: Types;
     }
+
+    type UsingName = keyof Using;
   }
 }
 

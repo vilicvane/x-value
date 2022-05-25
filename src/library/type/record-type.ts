@@ -1,16 +1,22 @@
 import {toString} from '../@internal';
 import type {Medium} from '../medium';
 
-import type {TypeIssue, TypePath} from './type';
-import {Type} from './type';
+import type {
+  TypeInMediumsPartial,
+  TypeIssue,
+  TypePath,
+  __type_in_mediums,
+} from './type';
+import {Type, __type_kind} from './type';
 
 export class RecordType<
-  TKeyType extends Type,
-  TValueType extends Type,
-> extends Type<__RecordInMediums<TKeyType, TValueType>> {
-  protected __type!: 'record';
+  TKeyType extends TypeInMediumsPartial,
+  TValueType extends TypeInMediumsPartial,
+> extends Type<RecordInMediums<TKeyType, TValueType>> {
+  [__type_kind]!: 'record';
 
-  constructor(readonly Key: TKeyType, readonly Value: TValueType) {
+  constructor(Key: TKeyType, Value: TValueType);
+  constructor(readonly Key: Type, readonly Value: Type) {
     super();
   }
 
@@ -171,21 +177,20 @@ export class RecordType<
   }
 }
 
-export function record<TKeyType extends Type, TValueType extends Type>(
-  Key: TKeyType,
-  Value: TValueType,
-): RecordType<TKeyType, TValueType> {
+export function record<
+  TKeyType extends TypeInMediumsPartial,
+  TValueType extends TypeInMediumsPartial,
+>(Key: TKeyType, Value: TValueType): RecordType<TKeyType, TValueType> {
   return new RecordType(Key, Value);
 }
 
-type __RecordInMediums<TKeyType extends Type, TValueType extends Type> = {
-  [TMediumName in keyof XValue.Using]: Record<
-    TKeyType extends Type<infer TKeyInMediums>
-      ? Extract<TKeyInMediums[TMediumName], string | symbol>
-      : never,
-    TValueType extends Type<infer TValueInMediums>
-      ? TValueInMediums[TMediumName]
-      : never
+type RecordInMediums<
+  TKeyType extends TypeInMediumsPartial,
+  TValueType extends TypeInMediumsPartial,
+> = {
+  [TMediumName in XValue.UsingName]: Record<
+    Extract<TKeyType[__type_in_mediums][TMediumName], string | symbol>,
+    TValueType[__type_in_mediums][TMediumName]
   >;
 };
 

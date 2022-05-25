@@ -1,15 +1,18 @@
 import type {Medium} from '../medium';
 
-import type {TypeIssue, TypePath} from './type';
-import {Type} from './type';
+import type {TypeInMediumsPartial, TypeIssue, TypePath} from './type';
+import {Type, __type_kind} from './type';
 
 export class RecursiveType<TRecursive> extends Type<
-  __RecursiveInMediums<TRecursive>
+  RecursiveInMediums<TRecursive>
 > {
-  protected __type!: 'recursive';
+  [__type_kind]!: 'recursive';
 
   readonly Type: Type;
 
+  constructor(
+    recursion: (Type: RecursiveType<TRecursive>) => TypeInMediumsPartial,
+  );
   constructor(recursion: (Type: RecursiveType<TRecursive>) => Type) {
     super();
 
@@ -60,25 +63,22 @@ export class RecursiveType<TRecursive> extends Type<
 }
 
 export function recursive<T>(
-  recursion: (Type: RecursiveType<T>) => Type,
+  recursion: (Type: RecursiveType<T>) => TypeInMediumsPartial,
 ): RecursiveType<T> {
   return new RecursiveType(recursion);
 }
 
-type __RecursiveInMediums<TRecursive> = {
-  [TMediumName in keyof XValue.Using]: __RecursiveInMedium<
-    TRecursive,
-    TMediumName
-  >;
+type RecursiveInMediums<TRecursive> = {
+  [TMediumName in XValue.UsingName]: RecursiveInMedium<TRecursive, TMediumName>;
 };
 
-type __RecursiveInMedium<
+type RecursiveInMedium<
   TRecursive,
-  TMediumName extends keyof XValue.Using,
-> = TRecursive extends Type<infer TInMediums>
+  TMediumName extends XValue.UsingName,
+> = TRecursive extends TypeInMediumsPartial<infer TInMediums>
   ? TInMediums[TMediumName]
   : {
-      [TKey in keyof TRecursive]: __RecursiveInMedium<
+      [TKey in keyof TRecursive]: RecursiveInMedium<
         TRecursive[TKey],
         TMediumName
       >;

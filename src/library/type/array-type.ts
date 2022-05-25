@@ -1,15 +1,21 @@
 import {toString} from '../@internal';
 import type {Medium} from '../medium';
 
-import type {TypeIssue, TypePath} from './type';
-import {Type} from './type';
+import type {
+  TypeInMediumsPartial,
+  TypeIssue,
+  TypePath,
+  __type_in_mediums,
+} from './type';
+import {Type, __type_kind} from './type';
 
-export class ArrayType<TElementType extends Type> extends Type<
-  __ArrayInMediums<TElementType>
+export class ArrayType<TElementType extends TypeInMediumsPartial> extends Type<
+  ArrayInMediums<TElementType>
 > {
-  protected __type!: 'array';
+  [__type_kind]!: 'array';
 
-  constructor(readonly ElementType: TElementType) {
+  constructor(ElementType: TElementType);
+  constructor(readonly ElementType: Type) {
     super();
   }
 
@@ -157,14 +163,12 @@ export class ArrayType<TElementType extends Type> extends Type<
   }
 }
 
-export function array<TElementType extends Type>(
+export function array<TElementType extends TypeInMediumsPartial>(
   ElementType: TElementType,
 ): ArrayType<TElementType> {
   return new ArrayType(ElementType);
 }
 
-type __ArrayInMediums<TElementType extends Type> = TElementType extends Type<
-  infer TElementInMediums
->
-  ? {[TKey in keyof XValue.Using]: TElementInMediums[TKey][]}
-  : never;
+type ArrayInMediums<TElementType extends TypeInMediumsPartial> = {
+  [TKey in XValue.UsingName]: TElementType[__type_in_mediums][TKey][];
+};

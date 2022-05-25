@@ -1,7 +1,7 @@
 import isEqual from 'lodash.isequal';
 
-import type {__NominalPartial} from './@internal';
-import type {Type, TypeOf, __nominal, __type} from './type';
+import type {NominalPartial} from './@internal';
+import type {TypeInMediumsPartial, TypeOf, __nominal, __type} from './type';
 import {RefinedType, record} from './type';
 import {boolean, number, string, unknown} from './types';
 
@@ -16,7 +16,9 @@ export function literal<T extends number>(
 export function literal<T extends boolean>(
   literal: T,
 ): RefinedType<typeof boolean, T, unknown>;
-export function literal(literal: unknown): RefinedType<Type, unknown, unknown> {
+export function literal(
+  literal: unknown,
+): RefinedType<TypeInMediumsPartial, unknown, unknown> {
   switch (typeof literal) {
     case 'string':
       return string.refine(value => value === literal);
@@ -32,17 +34,17 @@ export function literal(literal: unknown): RefinedType<Type, unknown, unknown> {
 export function equal<T>(
   comparison: T,
 ): RefinedType<typeof unknown, T, unknown>;
-export function equal<T extends TypeOf<TType>, TType extends Type>(
-  comparison: T,
-  Type: TType,
-): RefinedType<TType, T, unknown>;
+export function equal<
+  T extends TypeOf<TType>,
+  TType extends TypeInMediumsPartial,
+>(comparison: T, Type: TType): RefinedType<TType, T, unknown>;
 export function equal(
   comparison: unknown,
   Type = unknown,
-): RefinedType<Type, unknown, unknown> {
+): RefinedType<TypeInMediumsPartial, unknown, unknown> {
   return new RefinedType(Type, [value => isEqual(value, comparison)]);
 }
 
-export type TransformNominal<TFrom, T> = TFrom extends __NominalPartial
+export type TransformNominal<TFrom, T> = TFrom extends NominalPartial
   ? T & Record<__type, T> & Record<__nominal, TFrom[__nominal]>
   : T;

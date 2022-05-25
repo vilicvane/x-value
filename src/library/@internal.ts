@@ -1,35 +1,40 @@
-import type {Denominalize, Type, __nominal, __type} from './type';
+import type {
+  Denominalize,
+  TypeInMediumsPartial,
+  __nominal,
+  __type,
+} from './type';
 
 export const hasOwnProperty = Object.prototype.hasOwnProperty;
 
 export const toString = Object.prototype.toString;
 
-export type __RefinedMediumType<TInMedium, TRefinement, TNominal> =
+export type RefinedMediumType<TInMedium, TRefinement, TNominal> =
   unknown extends TNominal
     ? TInMedium & TRefinement
-    : __RefinedNominalType<TInMedium & TRefinement, TNominal>;
+    : RefinedNominalType<TInMedium & TRefinement, TNominal>;
 
-export type __RefinedNominalType<T, TNominal> = T &
+type RefinedNominalType<T, TNominal> = T &
   (TNominal & Record<__type, Denominalize<T>>);
 
-export type __TupleInMedium<
-  TTypeTuple extends Type[],
-  TMediumName extends keyof XValue.Using,
+export type TupleInMedium<
+  TTypeTuple extends TypeInMediumsPartial[],
+  TMediumName extends XValue.UsingName,
 > = {
-  [TIndex in keyof TTypeTuple]: TTypeTuple[TIndex] extends Type<
+  [TIndex in keyof TTypeTuple]: TTypeTuple[TIndex] extends TypeInMediumsPartial<
     infer TElementInMediums
   >
     ? TElementInMediums[TMediumName]
     : never;
 };
 
-export type __UnionToIntersection<TUnion> = (
+export type UnionToIntersection<TUnion> = (
   TUnion extends unknown ? (_: TUnion) => unknown : never
 ) extends (_: infer TIntersection) => unknown
   ? TIntersection
   : never;
 
-export type __MediumTypesPackedType<
+export type MediumTypesPackedType<
   TMediumTypes,
   TFallback = never,
 > = TMediumTypes extends {
@@ -38,9 +43,9 @@ export type __MediumTypesPackedType<
   ? TPacked
   : TFallback;
 
-export type __ElementOrArray<T> = T | T[];
+export type ElementOrArray<T> = T | T[];
 
-export type __NominalPartial = Record<__nominal, unknown>;
+export type NominalPartial = Record<__nominal, unknown>;
 
 export function merge(partials: unknown[]): unknown {
   let pendingMergeKeyToValues: Map<string | number, unknown[]> | undefined;

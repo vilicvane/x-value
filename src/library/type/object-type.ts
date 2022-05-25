@@ -2,20 +2,27 @@ import {toString} from '../@internal';
 import type {Medium} from '../medium';
 
 import {OptionalType} from './optional-type';
-import type {TypeIssue, TypePath} from './type';
-import {Type} from './type';
+import type {
+  TypeInMediumsPartial,
+  TypeIssue,
+  TypeKindPartial,
+  TypePath,
+  __type_in_mediums,
+} from './type';
+import {Type, __type_kind} from './type';
 
-export class ObjectType<TDefinition extends Record<string, Type>> extends Type<
-  __ObjectInMediums<TDefinition>
-> {
-  protected __type!: 'object';
+export class ObjectType<
+  TDefinition extends Record<string, TypeInMediumsPartial>,
+> extends Type<ObjectInMediums<TDefinition>> {
+  [__type_kind]!: 'object';
 
-  constructor(readonly definition: TDefinition) {
+  constructor(definition: TDefinition);
+  constructor(readonly definition: Record<string, Type>) {
     super();
   }
 
-  partial(): ObjectType<__Partial<TDefinition>>;
-  partial(): ObjectType<Record<string, OptionalType<Type>>> {
+  partial(): ObjectType<DefinitionPartial<TDefinition>>;
+  partial(): ObjectType<Record<string, any>> {
     let definition = Object.fromEntries(
       Object.entries(this.definition).map(([key, Type]) => [
         key,
@@ -29,7 +36,7 @@ export class ObjectType<TDefinition extends Record<string, Type>> extends Type<
   pick<TKeys extends string[]>(
     ...keys: TKeys
   ): ObjectType<Pick<TDefinition, TKeys[number]>>;
-  pick(...keys: string[]): ObjectType<Record<string, Type>> {
+  pick(...keys: string[]): ObjectType<Record<string, TypeInMediumsPartial>> {
     let keySet = new Set(keys);
 
     let definition = Object.fromEntries(
@@ -42,7 +49,7 @@ export class ObjectType<TDefinition extends Record<string, Type>> extends Type<
   omit<TKeys extends string[]>(
     ...keys: TKeys
   ): ObjectType<Omit<TDefinition, TKeys[number]>>;
-  omit(...keys: string[]): ObjectType<Record<string, Type>> {
+  omit(...keys: string[]): ObjectType<Record<string, TypeInMediumsPartial>> {
     let keySet = new Set(keys);
 
     let definition = Object.fromEntries(
@@ -196,56 +203,48 @@ export class ObjectType<TDefinition extends Record<string, Type>> extends Type<
   }
 }
 
-export function object<TTypeDefinition extends Record<string, Type>>(
-  definition: TTypeDefinition,
-): ObjectType<TTypeDefinition> {
+export function object<
+  TTypeDefinition extends Record<string, TypeInMediumsPartial>,
+>(definition: TTypeDefinition): ObjectType<TTypeDefinition> {
   return new ObjectType(definition);
 }
 
-type __ObjectInMediums<TDefinition extends Record<string, Type>> = {
-  [TMediumName in keyof XValue.Using]: __ObjectInMedium<
-    TDefinition,
-    TMediumName
-  >;
-};
-
-type __ObjectInMedium<
-  TDefinition extends Record<string, Type>,
-  TMediumName extends keyof XValue.Using,
-> = {
-  [TKey in __KeyOfOptional<TDefinition>]?: TDefinition[TKey] extends OptionalType<
-    Type<infer TInMediums>
-  >
-    ? TInMediums[TMediumName]
-    : never;
-} & {
-  [TKey in __KeyOfNonOptional<TDefinition>]: TDefinition[TKey] extends Type<
-    infer TInMediums
-  >
-    ? TInMediums[TMediumName]
-    : never;
-};
-
-type __KeyOfOptional<TType> = Extract<
+type ObjectInMediums<TDefinition extends Record<string, TypeInMediumsPartial>> =
   {
-    [TKey in keyof TType]: TType[TKey] extends OptionalType<Type>
+    [TMediumName in XValue.UsingName]: ObjectInMedium<TDefinition, TMediumName>;
+  };
+
+type ObjectInMedium<
+  TDefinition extends Record<string, TypeInMediumsPartial>,
+  TMediumName extends XValue.UsingName,
+> = {
+  [TKey in KeyOfOptional<TDefinition>]?: TDefinition[TKey][__type_in_mediums][TMediumName];
+} & {
+  [TKey in KeyOfNonOptional<TDefinition>]: TDefinition[TKey][__type_in_mediums][TMediumName];
+};
+
+type KeyOfOptional<TType> = Extract<
+  {
+    [TKey in keyof TType]: TType[TKey] extends TypeKindPartial<'optional'>
       ? TKey
       : never;
   }[keyof TType],
   string
 >;
 
-type __KeyOfNonOptional<TType> = Extract<
+type KeyOfNonOptional<TType> = Extract<
   {
-    [TKey in keyof TType]: TType[TKey] extends OptionalType<Type>
+    [TKey in keyof TType]: TType[TKey] extends TypeKindPartial<'optional'>
       ? never
       : TKey;
   }[keyof TType],
   string
 >;
 
-type __Partial<TDefinition extends Record<string, Type>> = {
-  [TKey in keyof TDefinition]: TDefinition[TKey] extends OptionalType<Type>
+type DefinitionPartial<
+  TDefinition extends Record<string, TypeInMediumsPartial>,
+> = {
+  [TKey in keyof TDefinition]: TDefinition[TKey] extends TypeKindPartial<'optional'>
     ? TDefinition[TKey]
     : OptionalType<TDefinition[TKey]>;
 };

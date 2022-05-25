@@ -1,12 +1,12 @@
 import type {Medium} from '../medium';
 
 import type {TypeConstraint, TypeIssue, TypePath} from './type';
-import {Type} from './type';
+import {Type, __type_kind} from './type';
 
 export class AtomicType<TSymbol extends symbol> extends Type<
-  __AtomicInMediums<TSymbol>
+  AtomicInMediums<TSymbol>
 > {
-  protected __type!: 'atomic';
+  [__type_kind]!: 'atomic';
 
   constructor(symbol: TSymbol, constraints: TypeConstraint[]);
   constructor(readonly symbol: symbol, readonly constraints: TypeConstraint[]) {
@@ -130,14 +130,14 @@ function buildCodecErrorResult(
   ];
 }
 
-type __AtomicInMediums<TSymbol extends symbol> = {
-  [TMediumName in keyof XValue.Using]: __AtomicInMedium<
+type AtomicInMediums<TSymbol extends symbol> = {
+  [TMediumName in XValue.UsingName]: AtomicInMedium<
     TSymbol,
     XValue.Using[TMediumName]
   >;
 };
 
-type __AtomicInMedium<
+type AtomicInMedium<
   TSymbol extends symbol,
   TMediumTypes,
 > = TSymbol extends keyof TMediumTypes ? TMediumTypes[TSymbol] : never;

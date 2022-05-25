@@ -1,17 +1,25 @@
-import type {__RefinedMediumType} from '../@internal';
+import type {RefinedMediumType} from '../@internal';
 import type {Medium} from '../medium';
 
-import type {TypeConstraint, TypeIssue, TypePath} from './type';
-import {Type} from './type';
+import type {
+  TypeConstraint,
+  TypeInMediumsPartial,
+  TypeIssue,
+  TypePath,
+  TypesInMediums,
+  __type_in_mediums,
+} from './type';
+import {Type, __type_kind} from './type';
 
 export class RefinedType<
-  TType extends Type,
+  TType extends TypeInMediumsPartial,
   TRefinement,
   TNominal,
-> extends Type<__RefinedInMediums<TType, TRefinement, TNominal>> {
-  protected __type!: 'refined';
+> extends Type<RefinedInMediums<TType, TRefinement, TNominal>> {
+  [__type_kind]!: 'refined';
 
-  constructor(readonly Type: TType, readonly constraints: TypeConstraint[]) {
+  constructor(Type: TType, constraints: TypeConstraint[]);
+  constructor(readonly Type: Type, readonly constraints: TypeConstraint[]) {
     super();
   }
 
@@ -119,27 +127,26 @@ export type __type = typeof __type;
 
 export type Nominal<TNominalKey extends string | symbol, T = unknown> = T &
   (unknown extends T ? unknown : Record<__type, T>) &
-  Record<
-    __nominal,
-    {
-      [TKey in TNominalKey]: true;
-    }
-  >;
+  Record<__nominal, {[TKey in TNominalKey]: true}>;
 
-export type Denominalize<T> = T extends Record<__type, infer TDenominalized>
+export type Denominalize<T> = T extends {[__type]: infer TDenominalized}
   ? TDenominalized
   : T;
 
-type __RefinedInMediums<
-  TType extends Type,
+type RefinedInMediums<
+  TType extends TypeInMediumsPartial,
   TRefinement,
   TNominal,
-> = TType extends Type<infer TInMediums>
-  ? {
-      [TMediumName in keyof XValue.Using]: __RefinedMediumType<
-        TInMediums[TMediumName],
-        TRefinement,
-        TNominal
-      >;
-    }
-  : never;
+> = __RefinedInMediums<TType[__type_in_mediums], TRefinement, TNominal>;
+
+type __RefinedInMediums<
+  TInMediums extends TypesInMediums,
+  TRefinement,
+  TNominal,
+> = {
+  [TMediumName in XValue.UsingName]: RefinedMediumType<
+    TInMediums[TMediumName],
+    TRefinement,
+    TNominal
+  >;
+};

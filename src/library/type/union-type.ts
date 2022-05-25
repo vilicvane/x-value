@@ -1,15 +1,20 @@
-import type {__TupleInMedium} from '../@internal';
+import type {TupleInMedium} from '../@internal';
 import type {Medium} from '../medium';
 
-import type {TypeIssue, TypePath} from './type';
-import {Type} from './type';
+import type {TypeInMediumsPartial, TypeIssue, TypePath} from './type';
+import {Type, __type_kind} from './type';
 
-export class UnionType<TTypeTuple extends [Type, Type, ...Type[]]> extends Type<
-  __UnionInMediums<TTypeTuple>
-> {
-  protected __type!: 'union';
+export class UnionType<
+  TTypeTuple extends [
+    TypeInMediumsPartial,
+    TypeInMediumsPartial,
+    ...TypeInMediumsPartial[],
+  ],
+> extends Type<UnionInMediums<TTypeTuple>> {
+  [__type_kind]!: 'union';
 
-  constructor(readonly TypeTuple: TTypeTuple) {
+  constructor(TypeTuple: TTypeTuple);
+  constructor(readonly TypeTuple: Type[]) {
     if (TypeTuple.length < 2) {
       throw new TypeError('Expecting at least 2 type for union type');
     }
@@ -137,12 +142,16 @@ export class UnionType<TTypeTuple extends [Type, Type, ...Type[]]> extends Type<
   }
 }
 
-export function union<TTypeTuple extends [Type, Type, ...Type[]]>(
-  ...Types: TTypeTuple
-): UnionType<TTypeTuple> {
+export function union<
+  TTypeTuple extends [
+    TypeInMediumsPartial,
+    TypeInMediumsPartial,
+    ...TypeInMediumsPartial[],
+  ],
+>(...Types: TTypeTuple): UnionType<TTypeTuple> {
   return new UnionType(Types);
 }
 
-type __UnionInMediums<TTypeTuple extends Type[]> = {
-  [TKey in keyof XValue.Using]: __TupleInMedium<TTypeTuple, TKey>[number];
+type UnionInMediums<TTypeTuple extends TypeInMediumsPartial[]> = {
+  [TKey in XValue.UsingName]: TupleInMedium<TTypeTuple, TKey>[number];
 };

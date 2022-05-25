@@ -1,16 +1,21 @@
-import type {__TupleInMedium, __UnionToIntersection} from '../@internal';
+import type {TupleInMedium, UnionToIntersection} from '../@internal';
 import {merge} from '../@internal';
 import type {Medium} from '../medium';
 
-import type {TypeIssue, TypePath} from './type';
-import {Type} from './type';
+import type {TypeInMediumsPartial, TypeIssue, TypePath} from './type';
+import {Type, __type_kind} from './type';
 
 export class IntersectionType<
-  TTypeTuple extends [Type, Type, ...Type[]],
-> extends Type<__IntersectionInMediums<TTypeTuple>> {
-  protected __type!: 'intersection';
+  TTypeTuple extends [
+    TypeInMediumsPartial,
+    TypeInMediumsPartial,
+    ...TypeInMediumsPartial[],
+  ],
+> extends Type<IntersectionInMediums<TTypeTuple>> {
+  [__type_kind]!: 'intersection';
 
-  constructor(readonly TypeTuple: TTypeTuple) {
+  constructor(TypeTuple: TTypeTuple);
+  constructor(readonly TypeTuple: Type[]) {
     if (TypeTuple.length < 2) {
       throw new TypeError('Expecting at least 2 types for intersection type');
     }
@@ -88,14 +93,18 @@ export class IntersectionType<
   }
 }
 
-export function intersection<TTypeTuple extends [Type, Type, ...Type[]]>(
-  ...Types: TTypeTuple
-): IntersectionType<TTypeTuple> {
+export function intersection<
+  TTypeTuple extends [
+    TypeInMediumsPartial,
+    TypeInMediumsPartial,
+    ...TypeInMediumsPartial[],
+  ],
+>(...Types: TTypeTuple): IntersectionType<TTypeTuple> {
   return new IntersectionType(Types);
 }
 
-type __IntersectionInMediums<TTypeTuple extends Type[]> = {
-  [TMediumName in keyof XValue.Using]: __UnionToIntersection<
-    __TupleInMedium<TTypeTuple, TMediumName>[number]
+type IntersectionInMediums<TTypeTuple extends TypeInMediumsPartial[]> = {
+  [TMediumName in XValue.UsingName]: UnionToIntersection<
+    TupleInMedium<TTypeTuple, TMediumName>[number]
   >;
 };

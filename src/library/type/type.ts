@@ -1,20 +1,54 @@
 /* eslint-disable @mufan/import-groups */
 
 import type {
-  __ElementOrArray,
-  __MediumTypesPackedType,
-  __NominalPartial,
+  ElementOrArray,
+  MediumTypesPackedType,
+  NominalPartial,
 } from '../@internal';
 import type {Medium} from '../medium';
 
-export type TypesInMediums = Record<keyof XValue.Using, unknown>;
+export type TypesInMediums = Record<XValue.UsingName, unknown>;
+
+/**
+ * DECLARATION ONLY.
+ */
+export declare const __type_in_mediums: unique symbol;
+
+export type __type_in_mediums = typeof __type_in_mediums;
+
+/**
+ * DECLARATION ONLY.
+ */
+export declare const __type_kind: unique symbol;
+
+export type __type_kind = typeof __type_kind;
+
+export interface TypeInMediumsPartial<
+  TInMediums extends TypesInMediums = TypesInMediums,
+> {
+  [__type_in_mediums]: TInMediums;
+}
+
+export interface TypeKindPartial<TKind extends string = string> {
+  [__type_kind]: TKind;
+}
 
 export abstract class Type<TInMediums extends TypesInMediums = TypesInMediums> {
-  protected __static_type_in_mediums!: TInMediums;
+  [__type_kind]!: string;
 
-  refine<TNominalOrRefinement, TNominal = unknown>(
-    constraints: __ElementOrArray<TypeConstraint<TInMediums['value']>>,
-  ): __OverloadedRefinedType<this, TNominalOrRefinement, TNominal> {
+  [__type_in_mediums]!: TInMediums;
+
+  refine<TRefinement, TNominal>(
+    constraints: ElementOrArray<TypeConstraint<TInMediums['value']>>,
+  ): RefinedType<this, TRefinement, TNominal>;
+  refine<TNominalOrRefinement>(
+    constraints: ElementOrArray<TypeConstraint<TInMediums['value']>>,
+  ): TNominalOrRefinement extends NominalPartial
+    ? RefinedType<this, unknown, TNominalOrRefinement>
+    : RefinedType<this, TNominalOrRefinement, unknown>;
+  refine(
+    constraints: ElementOrArray<TypeConstraint<TInMediums['value']>>,
+  ): RefinedType<TypeInMediumsPartial, unknown, unknown> {
     return new RefinedType(
       this,
       Array.isArray(constraints) ? constraints : [constraints],
@@ -33,9 +67,9 @@ export abstract class Type<TInMediums extends TypesInMediums = TypesInMediums> {
     return new OptionalType(this);
   }
 
-  decode<TMediumName extends keyof XValue.Using, TMediumTypes extends object>(
+  decode<TMediumName extends XValue.UsingName, TMediumTypes extends object>(
     medium: Medium<TMediumName, TMediumTypes>,
-    packed: __MediumTypesPackedType<TMediumTypes, TInMediums[TMediumName]>,
+    packed: MediumTypesPackedType<TMediumTypes, TInMediums[TMediumName]>,
   ): TInMediums['value'];
   decode(medium: Medium, packed: unknown): unknown {
     let unpacked = medium.unpack(packed);
@@ -48,10 +82,10 @@ export abstract class Type<TInMediums extends TypesInMediums = TypesInMediums> {
     return value;
   }
 
-  encode<TMediumName extends keyof XValue.Using, TMediumTypes extends object>(
+  encode<TMediumName extends XValue.UsingName, TMediumTypes extends object>(
     medium: Medium<TMediumName, TMediumTypes>,
     value: TInMediums['value'],
-  ): __MediumTypesPackedType<TMediumTypes, TInMediums[TMediumName]>;
+  ): MediumTypesPackedType<TMediumTypes, TInMediums[TMediumName]>;
   encode(medium: Medium, value: unknown): unknown {
     let [unpacked, issues] = this._encode(medium, value, [], true);
 
@@ -63,18 +97,15 @@ export abstract class Type<TInMediums extends TypesInMediums = TypesInMediums> {
   }
 
   transform<
-    TFromMediumName extends keyof XValue.Using,
+    TFromMediumName extends XValue.UsingName,
     TFromMediumTypes extends object,
-    TToMediumName extends keyof XValue.Using,
+    TToMediumName extends XValue.UsingName,
     TToMediumTypes extends object,
   >(
     from: Medium<TFromMediumName, TFromMediumTypes>,
     to: Medium<TToMediumName, TToMediumTypes>,
-    value: __MediumTypesPackedType<
-      TFromMediumTypes,
-      TInMediums[TFromMediumName]
-    >,
-  ): __MediumTypesPackedType<TToMediumTypes, TInMediums[TToMediumName]>;
+    value: MediumTypesPackedType<TFromMediumTypes, TInMediums[TFromMediumName]>,
+  ): MediumTypesPackedType<TToMediumTypes, TInMediums[TToMediumName]>;
   transform(from: Medium, to: Medium, packed: unknown): unknown {
     let unpacked = from.unpack(packed);
     let [transformedUnpacked, issues] = this._transform(from, to, unpacked, []);
@@ -176,23 +207,8 @@ ${this.issues
   }
 }
 
-export type TypeOf<TType extends Type> = TType extends Type<infer TInMediums>
-  ? TInMediums['value']
-  : never;
-
-type __OverloadedRefinedType<
-  TType extends Type,
-  TNominalOrRefinement,
-  TNominal,
-> = RefinedType<
-  TType,
-  TNominalOrRefinement extends __NominalPartial
-    ? unknown
-    : TNominalOrRefinement,
-  TNominalOrRefinement extends __NominalPartial
-    ? TNominalOrRefinement
-    : TNominal
->;
+export type TypeOf<TType extends TypeInMediumsPartial> =
+  TType[__type_in_mediums]['value'];
 
 // Make sure code circularly referenced accessing type.ts after exports ready.
 
