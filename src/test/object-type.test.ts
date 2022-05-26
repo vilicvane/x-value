@@ -376,3 +376,49 @@ test('literal property type should be correct', () => {
 
   type _ = AssertTrue<IsEqual<O['type'], 'foo'>>;
 });
+
+test('object exact type should work', () => {
+  const O = x
+    .object({
+      foo: x.string,
+      bar: x.number.optional(),
+    })
+    .exact();
+
+  const NonExactO = O.exact(false);
+
+  type O = TypeOf<typeof O>;
+
+  let value1 = {foo: 'abc', bar: 123};
+
+  let value2 = {foo: 'abc', bar: 123, x: true, y: {}};
+
+  expect(O.is(value1)).toBe(true);
+  expect(() => O.encode(x.json, value2)).toThrowErrorMatchingInlineSnapshot(`
+    "Failed to encode to medium:
+      Unknown object key(s) \\"x\\", \\"y\\"."
+  `);
+  expect(() => O.decode(x.json, JSON.stringify(value2)))
+    .toThrowErrorMatchingInlineSnapshot(`
+    "Failed to decode from medium:
+      Unknown object key(s) \\"x\\", \\"y\\"."
+  `);
+  expect(() => O.transform(x.json, x.jsonValue, JSON.stringify(value2)))
+    .toThrowErrorMatchingInlineSnapshot(`
+    "Failed to transform medium:
+      Unknown object key(s) \\"x\\", \\"y\\"."
+  `);
+  expect(O.diagnose({foo: 'abc', bar: 123, extra: true}))
+    .toMatchInlineSnapshot(`
+    Array [
+      Object {
+        "message": "Unknown object key(s) \\"extra\\".",
+        "path": Array [],
+      },
+    ]
+  `);
+
+  expect(NonExactO.is(value2)).toBe(true);
+
+  type _ = AssertTrue<IsEqual<O, {foo: string; bar?: number}>>;
+});

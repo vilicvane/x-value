@@ -16,8 +16,11 @@ export class ObjectType<
 > extends Type<ObjectInMediums<TDefinition>> {
   [__type_kind]!: 'object';
 
-  constructor(definition: TDefinition);
-  constructor(readonly definition: Record<string, Type>) {
+  constructor(definition: TDefinition, exact: boolean);
+  constructor(
+    readonly definition: Record<string, Type>,
+    readonly _exact: boolean,
+  ) {
     super();
   }
 
@@ -30,7 +33,7 @@ export class ObjectType<
       ]),
     );
 
-    return new ObjectType(definition);
+    return new ObjectType(definition, this._exact);
   }
 
   pick<TKeys extends string[]>(
@@ -43,7 +46,7 @@ export class ObjectType<
       Object.entries(this.definition).filter(([key]) => keySet.has(key)),
     );
 
-    return new ObjectType(definition);
+    return new ObjectType(definition, this._exact);
   }
 
   omit<TKeys extends string[]>(
@@ -56,7 +59,11 @@ export class ObjectType<
       Object.entries(this.definition).filter(([key]) => !keySet.has(key)),
     );
 
-    return new ObjectType(definition);
+    return new ObjectType(definition, this._exact);
+  }
+
+  exact(exact = true): ObjectType<TDefinition> {
+    return new ObjectType(this.definition as unknown as TDefinition, exact);
   }
 
   /** @internal */
@@ -81,10 +88,18 @@ export class ObjectType<
       ];
     }
 
+    let unknownKeySet = this._exact
+      ? new Set(Object.keys(unpacked))
+      : undefined;
+
     let entries: [string, unknown][] = [];
     let issues: TypeIssue[] = [];
 
     for (let [key, Type] of Object.entries(this.definition)) {
+      if (unknownKeySet) {
+        unknownKeySet.delete(key);
+      }
+
       let [value, entryIssues] = Type._decode(medium, (unpacked as any)[key], [
         ...path,
         key,
@@ -93,6 +108,8 @@ export class ObjectType<
       entries.push([key, value]);
       issues.push(...entryIssues);
     }
+
+    issues.push(...buildUnknownKeyIssues(unknownKeySet, path));
 
     return [
       issues.length === 0 ? Object.fromEntries(entries) : undefined,
@@ -121,10 +138,18 @@ export class ObjectType<
       ];
     }
 
+    let unknownKeySet = this._exact
+      ? new Set(Object.keys(value as any))
+      : undefined;
+
     let entries: [string, unknown][] = [];
     let issues: TypeIssue[] = [];
 
     for (let [key, Type] of Object.entries(this.definition)) {
+      if (unknownKeySet) {
+        unknownKeySet.delete(key);
+      }
+
       let [unpacked, entryIssues] = Type._encode(
         medium,
         (value as any)[key],
@@ -135,6 +160,8 @@ export class ObjectType<
       entries.push([key, unpacked]);
       issues.push(...entryIssues);
     }
+
+    issues.push(...buildUnknownKeyIssues(unknownKeySet, path));
 
     return [
       issues.length === 0 ? Object.fromEntries(entries) : undefined,
@@ -163,10 +190,18 @@ export class ObjectType<
       ];
     }
 
+    let unknownKeySet = this._exact
+      ? new Set(Object.keys(unpacked))
+      : undefined;
+
     let entries: [string, unknown][] = [];
     let issues: TypeIssue[] = [];
 
     for (let [key, Type] of Object.entries(this.definition)) {
+      if (unknownKeySet) {
+        unknownKeySet.delete(key);
+      }
+
       let [transformedUnpacked, entryIssues] = Type._transform(
         from,
         to,
@@ -177,6 +212,8 @@ export class ObjectType<
       entries.push([key, transformedUnpacked]);
       issues.push(...entryIssues);
     }
+
+    issues.push(...buildUnknownKeyIssues(unknownKeySet, path));
 
     return [
       issues.length === 0 ? Object.fromEntries(entries) : undefined,
@@ -197,16 +234,28 @@ export class ObjectType<
       ];
     }
 
-    return Object.entries(this.definition).flatMap(([key, Type]) =>
-      Type._diagnose((value as any)[key], [...path, key]),
-    );
+    let unknownKeySet = this._exact ? new Set(Object.keys(value)) : undefined;
+
+    let issues: TypeIssue[] = [];
+
+    for (let [key, Type] of Object.entries(this.definition)) {
+      if (unknownKeySet) {
+        unknownKeySet.delete(key);
+      }
+
+      issues.push(...Type._diagnose((value as any)[key], [...path, key]));
+    }
+
+    issues.push(...buildUnknownKeyIssues(unknownKeySet, path));
+
+    return issues;
   }
 }
 
 export function object<
   TDefinition extends Record<string, TypeInMediumsPartial>,
 >(definition: TDefinition): ObjectType<TDefinition> {
-  return new ObjectType(definition);
+  return new ObjectType(definition, false);
 }
 
 type ObjectInMediums<TDefinition extends Record<string, TypeInMediumsPartial>> =
@@ -250,3 +299,21 @@ type DefinitionPartial<
     ? TDefinition[TKey]
     : OptionalType<TDefinition[TKey]>;
 };
+
+function buildUnknownKeyIssues(
+  unknownKeySet: Set<string> | undefined,
+  path: TypePath,
+): TypeIssue[] {
+  if (!unknownKeySet || unknownKeySet.size === 0) {
+    return [];
+  }
+
+  return [
+    {
+      path,
+      message: `Unknown object key(s) ${Array.from(unknownKeySet, key =>
+        JSON.stringify(key),
+      ).join(', ')}.`,
+    },
+  ];
+}
