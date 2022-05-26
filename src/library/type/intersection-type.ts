@@ -1,4 +1,4 @@
-import type {TupleInMedium, UnionToIntersection} from '../@internal';
+import type {TupleInMedium} from '../@internal';
 import {merge} from '../@internal';
 import type {Medium} from '../medium';
 
@@ -103,8 +103,15 @@ export function intersection<
   return new IntersectionType(Types);
 }
 
-type IntersectionInMediums<TTypeTuple extends TypeInMediumsPartial[]> = {
-  [TMediumName in XValue.UsingName]: UnionToIntersection<
-    TupleInMedium<TTypeTuple, TMediumName>[number]
+export type IntersectionInMediums<TTypeTuple extends TypeInMediumsPartial[]> = {
+  [TMediumName in XValue.UsingName]: __Intersection<
+    TupleInMedium<TTypeTuple, TMediumName>
   >;
 };
+
+type __Intersection<TTuple extends unknown[]> = TTuple extends [
+  infer T,
+  ...infer TRestTuple,
+]
+  ? T & __Intersection<TRestTuple>
+  : unknown;

@@ -204,8 +204,8 @@ export class ObjectType<
 }
 
 export function object<
-  TTypeDefinition extends Record<string, TypeInMediumsPartial>,
->(definition: TTypeDefinition): ObjectType<TTypeDefinition> {
+  TDefinition extends Record<string, TypeInMediumsPartial>,
+>(definition: TDefinition): ObjectType<TDefinition> {
   return new ObjectType(definition);
 }
 
@@ -221,7 +221,9 @@ type ObjectInMedium<
   [TKey in KeyOfOptional<TDefinition>]?: TDefinition[TKey][__type_in_mediums][TMediumName];
 } & {
   [TKey in KeyOfNonOptional<TDefinition>]: TDefinition[TKey][__type_in_mediums][TMediumName];
-};
+} extends infer T
+  ? {[TKey in keyof T]: T[TKey]}
+  : never;
 
 type KeyOfOptional<TType> = Extract<
   {

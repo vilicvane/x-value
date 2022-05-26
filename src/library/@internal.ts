@@ -28,12 +28,6 @@ export type TupleInMedium<
     : never;
 };
 
-export type UnionToIntersection<TUnion> = (
-  TUnion extends unknown ? (_: TUnion) => unknown : never
-) extends (_: infer TIntersection) => unknown
-  ? TIntersection
-  : never;
-
 export type MediumTypesPackedType<
   TMediumTypes,
   TFallback = never,

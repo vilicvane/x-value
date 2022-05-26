@@ -1,9 +1,15 @@
+import type {AssertTrue, IsEqual} from 'tslang';
+
 import * as x from '../library';
 import type {TypeOf} from '../library';
 import {TypeConstraintError} from '../library';
 
 test('intersection type results in never should work with json medium', () => {
   const Type = x.intersection(x.string, x.number);
+
+  type Type = TypeOf<typeof Type>;
+
+  type _ = AssertTrue<IsEqual<Type, never>>;
 
   let value1 = 'abc';
   let value2 = 123;
@@ -40,7 +46,19 @@ test('intersection type should work with json value medium', () => {
     }),
   );
 
-  let value1: TypeOf<typeof Type> = {
+  type Type = TypeOf<typeof Type>;
+
+  type _ = AssertTrue<
+    IsEqual<
+      Type,
+      {
+        foo: string;
+        bar: number;
+      }
+    >
+  >;
+
+  let value1: Type = {
     foo: 'abc',
     bar: 123,
   };
