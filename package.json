@@ -4,12 +4,13 @@
   "repository": "https://github.com/vilic/x-value.git",
   "license": "MIT",
   "author": "vilicvane",
-  "types": "bld/library/index.d.ts",
   "exports": {
     "library": {
+      "types": "./bld/library/index.d.ts",
       "require": "./bld/library/index.js"
     },
     "node": {
+      "types": "./bld/node/index.d.ts",
       "require": "./bld/node/index.js"
     }
   },
