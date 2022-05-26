@@ -1,6 +1,6 @@
 {
   "root": true,
-  "ignorePatterns": ["/src/", "/bld/"],
+  "ignorePatterns": ["/src/", "/bld/", "/node.d.ts"],
   "extends": ["eslint:recommended"],
   "env": {
     "node": true,

@@ -4,6 +4,9 @@
       "path": "src/library"
     },
     {
+      "path": "src/node"
+    },
+    {
       "path": "src/test"
     }
   ],
