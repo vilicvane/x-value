@@ -35,7 +35,7 @@ test('atomic refinement should work', () => {
       Expected string, getting [object Array]."
   `);
 
-  const Email = x.string.refine<Nominal<'email'>>(value => value.includes('@'));
+  const Email = x.string.refine<'email'>(value => value.includes('@'));
 
   type Email = TypeOf<typeof Email>;
   type EmailInJSONValue = MediumTypeOf<typeof Email, 'json-value'>;
@@ -54,7 +54,7 @@ test('atomic refinement should work', () => {
 
   type EncodedEmailInJSONValue = typeof encodedEmailInJSONValue;
 
-  const LiveEmail = Email.refine<Nominal<'live-email'>>([
+  const LiveEmail = Email.refine<'live-email'>([
     value => value.endsWith('@live'),
   ]);
 
@@ -105,7 +105,7 @@ test('atomic refinement should work', () => {
 test('array refinement should work', () => {
   const Triple = x
     .array(x.string)
-    .refine<{length: 3}>(value => value.length === 3);
+    .refine<never, {length: 3}>(value => value.length === 3);
 
   type Triple = TypeOf<typeof Triple>;
   type TripleInJSONValue = MediumTypeOf<typeof Triple, 'json-value'>;
@@ -126,7 +126,7 @@ test('array refinement should work', () => {
 test('object refinement should work', () => {
   const O = x
     .object({foo: x.string, bar: x.number})
-    .refine<{foo: 'abc'}>(value => value.foo === 'abc');
+    .refine<never, {foo: 'abc'}>(value => value.foo === 'abc');
 
   type O = TypeOf<typeof O>;
 
@@ -146,9 +146,7 @@ test('object refinement should work', () => {
 test('optional refinement should work', () => {
   const O = x
     .optional(x.string)
-    .refine<Nominal<'includes #'>>(
-      value => value === undefined || value.includes('#'),
-    );
+    .refine<'includes #'>(value => value === undefined || value.includes('#'));
 
   type O = TypeOf<typeof O>;
 
@@ -168,7 +166,7 @@ test('optional refinement should work', () => {
 test('record refinement should work', () => {
   const O = x
     .record(x.string, x.number)
-    .refine<Nominal<'not empty'>>(value => Object.keys(value).length > 0);
+    .refine<'not empty'>(value => Object.keys(value).length > 0);
 
   type O = TypeOf<typeof O>;
 
@@ -187,7 +185,7 @@ test('record refinement should work', () => {
 test('tuple refinement should work', () => {
   const O = x
     .tuple(x.string, x.number)
-    .refine<Nominal<'string is abc and number is 123'>>(
+    .refine<'string is abc and number is 123'>(
       ([a, b]) => a === 'abc' && b === 123,
     );
 
@@ -212,7 +210,7 @@ test('tuple refinement should work', () => {
 test('intersection refinement should work', () => {
   const O = x
     .intersection(x.object({foo: x.string}), x.object({bar: x.number}))
-    .refine<Nominal<'foo is abc'>>(value => value.foo === 'abc');
+    .refine<'foo is abc'>(value => value.foo === 'abc');
 
   type O = TypeOf<typeof O>;
 
@@ -233,7 +231,7 @@ test('intersection refinement should work', () => {
 test('union refinement should work', () => {
   const O = x
     .union(x.object({foo: x.string}), x.object({bar: x.number}))
-    .refine<Nominal<'foo is abc or bar is 123'>>(
+    .refine<'foo is abc or bar is 123'>(
       value =>
         ('foo' in value && value.foo === 'abc') ||
         ('bar' in value && value.bar === 123),

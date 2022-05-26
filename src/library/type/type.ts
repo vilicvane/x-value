@@ -1,10 +1,6 @@
 /* eslint-disable @mufan/import-groups */
 
-import type {
-  ElementOrArray,
-  MediumTypesPackedType,
-  NominalPartial,
-} from '../@internal';
+import type {ElementOrArray, MediumTypesPackedType} from '../@internal';
 import type {Medium} from '../medium';
 
 export type TypesInMediums = Record<XValue.UsingName, unknown>;
@@ -38,17 +34,9 @@ export abstract class Type<TInMediums extends TypesInMediums = TypesInMediums> {
 
   [__type_in_mediums]!: TInMediums;
 
-  refine<TRefinement, TNominal>(
+  refine<TNominalKey extends string | symbol = never, TRefinement = unknown>(
     constraints: ElementOrArray<TypeConstraint<TInMediums['value']>>,
-  ): RefinedType<this, TRefinement, TNominal>;
-  refine<TNominalOrRefinement>(
-    constraints: ElementOrArray<TypeConstraint<TInMediums['value']>>,
-  ): TNominalOrRefinement extends NominalPartial
-    ? RefinedType<this, unknown, TNominalOrRefinement>
-    : RefinedType<this, TNominalOrRefinement, unknown>;
-  refine(
-    constraints: ElementOrArray<TypeConstraint<TInMediums['value']>>,
-  ): RefinedType<TypeInMediumsPartial, unknown, unknown> {
+  ): RefinedType<this, TNominalKey, TRefinement> {
     return new RefinedType(
       this,
       Array.isArray(constraints) ? constraints : [constraints],
@@ -57,8 +45,8 @@ export abstract class Type<TInMediums extends TypesInMediums = TypesInMediums> {
 
   nominal<TNominalKey extends string | symbol>(): RefinedType<
     this,
-    unknown,
-    Nominal<TNominalKey>
+    TNominalKey,
+    unknown
   > {
     return new RefinedType(this, []);
   }
@@ -213,5 +201,4 @@ export type TypeOf<TType extends TypeInMediumsPartial> =
 // Make sure code circularly referenced accessing type.ts after exports ready.
 
 import {OptionalType} from './optional-type';
-import type {Nominal} from './refined-type';
 import {RefinedType} from './refined-type';

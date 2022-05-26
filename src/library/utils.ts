@@ -1,19 +1,13 @@
 import isEqual from 'lodash.isequal';
 
 import type {NominalPartial} from './@internal';
-import type {
-  Nominal,
-  TypeInMediumsPartial,
-  TypeOf,
-  __nominal,
-  __type,
-} from './type';
+import type {TypeInMediumsPartial, TypeOf, __nominal, __type} from './type';
 import {RefinedType, record} from './type';
 import {boolean, number, string, unknown} from './types';
 
 export const UnknownRecord = record(string, unknown);
 
-export const Integer = number.refine<Nominal<'integer'>>(
+export const Integer = number.refine<'integer'>(
   value => Number.isInteger(value) || `Expected integer, getting ${value}.`,
 );
 
@@ -25,11 +19,7 @@ export interface IntegerRangeOptions {
 export function integerRange<TNominalKey extends string | symbol>({
   min = -Infinity,
   max = Infinity,
-}: IntegerRangeOptions): RefinedType<
-  typeof Integer,
-  unknown,
-  Nominal<TNominalKey>
-> {
+}: IntegerRangeOptions): RefinedType<typeof Integer, TNominalKey, unknown> {
   return Integer.refine(value => {
     if (value < min) {
       return `Expected integer >= ${min}, getting ${value}.`;
@@ -55,11 +45,7 @@ export function numberRange<TNominalKey extends string | symbol>({
   minExclusive = -Infinity,
   maxInclusive = Infinity,
   maxExclusive = Infinity,
-}: NumberRangeOptions): RefinedType<
-  typeof number,
-  unknown,
-  Nominal<TNominalKey>
-> {
+}: NumberRangeOptions): RefinedType<typeof number, TNominalKey, unknown> {
   return number.refine(value => {
     if (value < minInclusive) {
       return `Expected number >= ${minInclusive}, getting ${value}.`;
@@ -83,16 +69,16 @@ export function numberRange<TNominalKey extends string | symbol>({
 
 export function literal<T extends string>(
   literal: T,
-): RefinedType<typeof string, T, unknown>;
+): RefinedType<typeof string, never, T>;
 export function literal<T extends number>(
   literal: T,
-): RefinedType<typeof number, T, unknown>;
+): RefinedType<typeof number, never, T>;
 export function literal<T extends boolean>(
   literal: T,
-): RefinedType<typeof boolean, T, unknown>;
+): RefinedType<typeof boolean, never, T>;
 export function literal(
   literal: unknown,
-): RefinedType<TypeInMediumsPartial, unknown, unknown> {
+): RefinedType<TypeInMediumsPartial, never, unknown> {
   switch (typeof literal) {
     case 'string':
       return string.refine(value => value === literal);
@@ -105,17 +91,15 @@ export function literal(
   }
 }
 
-export function equal<T>(
-  comparison: T,
-): RefinedType<typeof unknown, T, unknown>;
+export function equal<T>(comparison: T): RefinedType<typeof unknown, never, T>;
 export function equal<
   T extends TypeOf<TType>,
   TType extends TypeInMediumsPartial,
->(comparison: T, Type: TType): RefinedType<TType, T, unknown>;
+>(comparison: T, Type: TType): RefinedType<TType, never, T>;
 export function equal(
   comparison: unknown,
   Type = unknown,
-): RefinedType<TypeInMediumsPartial, unknown, unknown> {
+): RefinedType<TypeInMediumsPartial, never, unknown> {
   return new RefinedType(Type, [value => isEqual(value, comparison)]);
 }
 

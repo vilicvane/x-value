@@ -14,9 +14,9 @@ import {Type, __type_kind} from './type';
 
 export class RefinedType<
   TType extends TypeInMediumsPartial,
+  TNominalKey extends string | symbol,
   TRefinement,
-  TNominal,
-> extends Type<RefinedInMediums<TType, TRefinement, TNominal>> {
+> extends Type<RefinedInMediums<TType, TNominalKey, TRefinement>> {
   [__type_kind]!: 'refined';
 
   constructor(Type: TType, constraints: TypeConstraint[]);
@@ -143,18 +143,18 @@ export type Denominalize<T> = T extends {[__type]: infer TDenominalized}
 
 type RefinedInMediums<
   TType extends TypeInMediumsPartial,
+  TNominalKey extends string | symbol,
   TRefinement,
-  TNominal,
-> = __RefinedInMediums<TType[__type_in_mediums], TRefinement, TNominal>;
+> = __RefinedInMediums<TType[__type_in_mediums], TNominalKey, TRefinement>;
 
 type __RefinedInMediums<
   TInMediums extends TypesInMediums,
+  TNominalKey extends string | symbol,
   TRefinement,
-  TNominal,
 > = {
   [TMediumName in XValue.UsingName]: RefinedMediumType<
     TInMediums[TMediumName],
-    TRefinement,
-    TNominal
+    TNominalKey,
+    TRefinement
   >;
 };

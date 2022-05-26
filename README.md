@@ -76,10 +76,10 @@ Refine type:
 const Email = x.string.refine(value => value.includes('@'));
 
 // Or with refined or nominal type:
-const Email = x.string.refine<`${string}@${string}`>(value =>
+const Email = x.string.refine<never, `${string}@${string}`>(value =>
   value.includes('@'),
 );
-const Email = x.string.refine<Nominal<'email'>>(value => value.includes('@'));
+const Email = x.string.refine<'email'>(value => value.includes('@'));
 
 // Or just nominal type without extra constraints:
 const Email = x.string.nominal<'email'>();

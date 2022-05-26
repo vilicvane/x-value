@@ -1,5 +1,6 @@
 import type {
   Denominalize,
+  Nominal,
   TypeInMediumsPartial,
   TypeIssue,
   TypePath,
@@ -11,12 +12,15 @@ export const hasOwnProperty = Object.prototype.hasOwnProperty;
 
 export const toString = Object.prototype.toString;
 
-export type RefinedMediumType<TInMedium, TRefinement, TNominal> =
-  unknown extends TNominal
-    ? TInMedium & TRefinement
-    : RefinedNominalType<TInMedium & TRefinement, TNominal>;
+export type RefinedMediumType<
+  TInMedium,
+  TNominalKey extends string | symbol,
+  TRefinement,
+> = [TNominalKey] extends [never]
+  ? TInMedium & TRefinement
+  : __RefinedNominalType<TInMedium & TRefinement, Nominal<TNominalKey>>;
 
-type RefinedNominalType<T, TNominal> = T &
+type __RefinedNominalType<T, TNominal extends NominalPartial> = T &
   (TNominal & Record<__type, Denominalize<T>>);
 
 export type TupleInMedium<

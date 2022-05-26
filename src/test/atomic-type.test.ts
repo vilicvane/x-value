@@ -1,8 +1,8 @@
 import * as x from '../library';
-import type {MediumTypeOf, Nominal, TypeOf} from '../library';
+import type {MediumTypeOf, TypeOf} from '../library';
 import {TypeConstraintError, atomic, stringTypeSymbol} from '../library';
 
-const Sunday = x.Date.refine<Nominal<'sunday'>>(date => date.getDay() === 0);
+const Sunday = x.Date.refine<'sunday'>(date => date.getDay() === 0);
 
 type Sunday = TypeOf<typeof Sunday>;
 
