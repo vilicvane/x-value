@@ -119,11 +119,33 @@ test('literal type should work', () => {
   const True = x.literal(true);
 
   expect(Foo.is('foo')).toBe(true);
-  expect(Foo.is('bar')).toBe(false);
   expect(One.is(1)).toBe(true);
-  expect(One.is(2)).toBe(false);
   expect(True.is(true)).toBe(true);
-  expect(True.is(false)).toBe(false);
+
+  expect(Foo.diagnose('bar')).toMatchInlineSnapshot(`
+    Array [
+      Object {
+        "message": "Expected string \\"foo\\", getting \\"bar\\".",
+        "path": Array [],
+      },
+    ]
+  `);
+  expect(One.diagnose(2)).toMatchInlineSnapshot(`
+    Array [
+      Object {
+        "message": "Expected number 1, getting 2.",
+        "path": Array [],
+      },
+    ]
+  `);
+  expect(True.diagnose(false)).toMatchInlineSnapshot(`
+    Array [
+      Object {
+        "message": "Expected boolean true, getting false.",
+        "path": Array [],
+      },
+    ]
+  `);
 
   type _ =
     | AssertTrue<IsEqual<TypeOf<typeof Foo>, 'foo'>>

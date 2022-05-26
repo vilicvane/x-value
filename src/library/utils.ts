@@ -84,25 +84,19 @@ export function literal(
       return string.refine(
         value =>
           value === literal ||
-          `Expected string ${JSON.stringify(literal)}, getting ${
-            typeof value === 'string' ? JSON.stringify(value) : value
-          }.`,
+          `Expected string ${JSON.stringify(literal)}, getting ${JSON.stringify(
+            value,
+          )}.`,
       );
     case 'number':
       return number.refine(
         value =>
-          value === literal ||
-          `Expected number ${literal}, getting ${
-            typeof value === 'string' ? JSON.stringify(value) : value
-          }.`,
+          value === literal || `Expected number ${literal}, getting ${value}.`,
       );
     case 'boolean':
       return boolean.refine(
         value =>
-          value === literal ||
-          `Expected boolean ${literal}, getting ${
-            typeof value === 'string' ? JSON.stringify(value) : value
-          }.`,
+          value === literal || `Expected boolean ${literal}, getting ${value}.`,
       );
     default:
       throw new TypeError('Unsupported literal value');

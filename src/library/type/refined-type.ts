@@ -46,6 +46,12 @@ export class RefinedType<
     path: TypePath,
     diagnose: boolean,
   ): [unknown, TypeIssue[]] {
+    let [unpacked, issues] = this.Type._encode(medium, value, path, diagnose);
+
+    if (issues.length > 0) {
+      return [undefined, issues];
+    }
+
     if (diagnose) {
       let refineIssues = this.diagnoseConstraints(value, path);
 
@@ -54,9 +60,7 @@ export class RefinedType<
       }
     }
 
-    let [unpacked, issues] = this.Type._encode(medium, value, path, diagnose);
-
-    return [issues.length === 0 ? unpacked : undefined, issues];
+    return [unpacked, []];
   }
 
   /** @internal */
