@@ -1,3 +1,5 @@
+import type {AssertTrue, IsEqual} from 'tslang';
+
 import * as x from '../library';
 import type {MediumTypeOf, TypeOf} from '../library';
 import {TypeConstraintError, atomic, stringTypeSymbol} from '../library';
@@ -177,7 +179,11 @@ test('date atomic refinement sunday should work with extended json medium', () =
     ]
   `);
 
-  expect(Sunday.satisfies(sunday)).toBe(sunday);
+  const satisfiedSunday = Sunday.satisfies(sunday as unknown);
+
+  type _ = AssertTrue<IsEqual<typeof satisfiedSunday, Sunday>>;
+
+  expect(satisfiedSunday).toBe(sunday);
   expect(() => Sunday.satisfies(monday)).toThrow(TypeConstraintError);
 });
 

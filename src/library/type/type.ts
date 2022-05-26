@@ -105,7 +105,7 @@ export abstract class Type<TInMediums extends TypesInMediums = TypesInMediums> {
     return to.pack(transformedUnpacked);
   }
 
-  satisfies<T>(value: T): T {
+  satisfies(value: unknown): TInMediums['value'] {
     let issues = this.diagnose(value);
 
     if (issues.length === 0) {
