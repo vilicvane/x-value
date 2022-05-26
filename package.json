@@ -5,11 +5,11 @@
   "license": "MIT",
   "author": "vilicvane",
   "exports": {
-    "library": {
+    ".": {
       "types": "./bld/library/index.d.ts",
       "require": "./bld/library/index.js"
     },
-    "node": {
+    "./node": {
       "types": "./bld/node/index.d.ts",
       "require": "./bld/node/index.js"
     }
