@@ -1,6 +1,8 @@
 import type {
   Denominalize,
   TypeInMediumsPartial,
+  TypeIssue,
+  TypePath,
   __nominal,
   __type,
 } from './type';
@@ -90,4 +92,15 @@ export function merge(partials: unknown[]): unknown {
   }
 
   return merged;
+}
+
+export function buildTypeIssue(error: unknown, path: TypePath): TypeIssue;
+export function buildTypeIssue(
+  error: string | Error,
+  path: TypePath,
+): TypeIssue {
+  return {
+    path,
+    message: typeof error === 'string' ? error : error.message,
+  };
 }

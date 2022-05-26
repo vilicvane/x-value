@@ -1,3 +1,4 @@
+import {buildTypeIssue} from '../@internal';
 import type {Medium} from '../medium';
 
 import type {TypeConstraint, TypeIssue, TypePath} from './type';
@@ -23,7 +24,7 @@ export class AtomicType<TSymbol extends symbol> extends Type<
 
     try {
       value = medium.requireCodec(this.symbol).decode(unpacked);
-    } catch (error: any) {
+    } catch (error) {
       return buildCodecErrorResult(error, path);
     }
 
@@ -49,7 +50,7 @@ export class AtomicType<TSymbol extends symbol> extends Type<
 
     try {
       return [medium.requireCodec(this.symbol).encode(value), []];
-    } catch (error: any) {
+    } catch (error) {
       return buildCodecErrorResult(error, path);
     }
   }
@@ -67,7 +68,7 @@ export class AtomicType<TSymbol extends symbol> extends Type<
 
     try {
       value = from.requireCodec(symbol).decode(unpacked);
-    } catch (error: any) {
+    } catch (error) {
       return buildCodecErrorResult(error, path);
     }
 
@@ -79,7 +80,7 @@ export class AtomicType<TSymbol extends symbol> extends Type<
 
     try {
       return [to.requireCodec(symbol).encode(value), issues];
-    } catch (error: any) {
+    } catch (error) {
       return buildCodecErrorResult(error, path);
     }
   }
@@ -116,18 +117,14 @@ export function atomic<TSymbol extends symbol>(
 }
 
 function buildCodecErrorResult(
+  error: unknown,
+  path: TypePath,
+): [undefined, TypeIssue[]];
+function buildCodecErrorResult(
   error: string | Error,
   path: TypePath,
 ): [undefined, TypeIssue[]] {
-  return [
-    undefined,
-    [
-      {
-        path,
-        message: typeof error === 'string' ? error : error.message,
-      },
-    ],
-  ];
+  return [undefined, [buildTypeIssue(error, path)]];
 }
 
 type AtomicInMediums<TSymbol extends symbol> = {

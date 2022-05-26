@@ -1,4 +1,5 @@
 import type {RefinedMediumType} from '../@internal';
+import {buildTypeIssue} from '../@internal';
 import type {Medium} from '../medium';
 
 import type {
@@ -89,7 +90,14 @@ export class RefinedType<
     let issues: TypeIssue[] = [];
 
     for (let constraint of this.constraints) {
-      let result = constraint(value);
+      let result: boolean | string;
+
+      try {
+        result = constraint(value) ?? true;
+      } catch (error) {
+        issues.push(buildTypeIssue(error, path));
+        continue;
+      }
 
       if (result === true) {
         continue;

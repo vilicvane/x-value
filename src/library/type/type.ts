@@ -175,7 +175,7 @@ export interface TypeIssue {
   message: string;
 }
 
-export type TypeConstraint<T = unknown> = (value: T) => string | boolean;
+export type TypeConstraint<T = unknown> = (value: T) => string | boolean | void;
 
 export class TypeConstraintError extends TypeError {
   constructor(private _message: string, readonly issues: TypeIssue[]) {

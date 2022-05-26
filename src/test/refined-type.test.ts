@@ -14,9 +14,11 @@ import {Identifier, mediumA} from './@usage';
 let unknownValue: unknown;
 
 test('atomic refinement should work', () => {
-  const NonEmptyString = x.string.refine(value =>
-    value.length > 0 ? true : 'Empty',
-  );
+  const NonEmptyString = x.string.refine(value => {
+    if (value.length === 0) {
+      throw new TypeError('Empty');
+    }
+  });
 
   type NonEmptyString = TypeOf<typeof NonEmptyString>;
 
