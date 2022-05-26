@@ -40,7 +40,7 @@ test('recursive type should work', () => {
   expect(() => R.encode(x.jsonValue, {} as any))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to encode to medium:
-      [\\"type\\"] Unexpected value.
+      [\\"type\\"] Expected string \\"node\\", getting undefined.
       [\\"children\\"] Expecting value to be an array, getting [object Undefined]."
   `);
   expect(() =>
@@ -69,7 +69,7 @@ test('recursive type should work', () => {
     } as any),
   ).toThrowErrorMatchingInlineSnapshot(`
     "Failed to transform medium:
-      [\\"children\\"][0][\\"children\\"][0][\\"type\\"] Unexpected value."
+      [\\"children\\"][0][\\"children\\"][0][\\"type\\"] Expected string \\"node\\", getting \\"oops\\"."
   `);
 
   interface RefR {

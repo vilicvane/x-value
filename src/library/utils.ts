@@ -81,11 +81,29 @@ export function literal(
 ): RefinedType<TypeInMediumsPartial, never, unknown> {
   switch (typeof literal) {
     case 'string':
-      return string.refine(value => value === literal);
+      return string.refine(
+        value =>
+          value === literal ||
+          `Expected string ${JSON.stringify(literal)}, getting ${
+            typeof value === 'string' ? JSON.stringify(value) : value
+          }.`,
+      );
     case 'number':
-      return number.refine(value => value === literal);
+      return number.refine(
+        value =>
+          value === literal ||
+          `Expected number ${literal}, getting ${
+            typeof value === 'string' ? JSON.stringify(value) : value
+          }.`,
+      );
     case 'boolean':
-      return boolean.refine(value => value === literal);
+      return boolean.refine(
+        value =>
+          value === literal ||
+          `Expected boolean ${literal}, getting ${
+            typeof value === 'string' ? JSON.stringify(value) : value
+          }.`,
+      );
     default:
       throw new TypeError('Unsupported literal value');
   }

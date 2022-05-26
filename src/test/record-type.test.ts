@@ -129,8 +129,8 @@ test('record type with number key should work', () => {
 });
 
 test('record type with nominal string key should work', () => {
-  const Email = x.string.refine<string & {_nominal: 'email'}>(value =>
-    value.includes('@') ? true : 'Expected an email address.',
+  const Email = x.string.refine<string & {_nominal: 'email'}>(
+    value => value.includes('@') || 'Expected an email address.',
   );
 
   const Type = x.record(Email, x.string);
@@ -168,8 +168,8 @@ test('record type with nominal string key should work', () => {
 });
 
 test('record type with union string key should work', () => {
-  const Email = x.string.refine<string & {_nominal: 'email'}>(value =>
-    value.includes('@') ? true : 'Expected an email address.',
+  const Email = x.string.refine<string & {_nominal: 'email'}>(
+    value => value.includes('@') || 'Expected an email address.',
   );
 
   const Type = x.record(x.union(x.literal('foo'), Email), x.string);
@@ -178,9 +178,8 @@ test('record type with union string key should work', () => {
 
   const value1: TypeOf<typeof Type> = {
     foo: 'oops',
+    [email]: 'oops',
   };
-
-  value1[email] = 'oops';
 
   const value2 = {
     foo: 'oops',
@@ -193,7 +192,7 @@ test('record type with union string key should work', () => {
   expect(() => Type.decode(x.jsonValue, value2))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to decode from medium:
-      [key:\\"invalid key\\"] Expected an email address."
+      [key:\\"invalid key\\"] Expected string \\"foo\\", getting \\"invalid key\\"."
   `);
   expect(() => Type.decode(x.jsonValue, value3))
     .toThrowErrorMatchingInlineSnapshot(`
@@ -205,7 +204,7 @@ test('record type with union string key should work', () => {
   expect(() => Type.encode(x.jsonValue, value2))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to encode to medium:
-      [key:\\"invalid key\\"] Expected an email address."
+      [key:\\"invalid key\\"] Expected string \\"foo\\", getting \\"invalid key\\"."
   `);
   expect(() => Type.encode(x.jsonValue, value3))
     .toThrowErrorMatchingInlineSnapshot(`
@@ -219,7 +218,7 @@ test('record type with union string key should work', () => {
   expect(() => Type.transform(x.jsonValue, x.json, value2))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to transform medium:
-      [key:\\"invalid key\\"] Expected an email address."
+      [key:\\"invalid key\\"] Expected string \\"foo\\", getting \\"invalid key\\"."
   `);
   expect(() => Type.transform(x.jsonValue, x.json, value3))
     .toThrowErrorMatchingInlineSnapshot(`

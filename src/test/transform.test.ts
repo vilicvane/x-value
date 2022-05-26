@@ -82,7 +82,7 @@ test('transform medium A to medium B and back', () => {
       [\\"data\\"][0] Expecting unpacked value to be a non-null object, getting [object Number].
       [\\"data\\"][0] Expecting unpacked value to be a non-null object, getting [object Number].
       [\\"data\\"][1][\\"x\\"] The unpacked value satisfies none of the type in the union type.
-      [\\"data\\"][1][\\"x\\"] Expected string, getting [object Boolean].
+      [\\"data\\"][1][\\"x\\"] Expected number, getting [object Boolean].
       [\\"data\\"][1][\\"y\\"] Expected number, getting [object String]."
   `);
 

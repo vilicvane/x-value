@@ -23,7 +23,7 @@ test('union type of atomic types should work with json medium', () => {
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to encode to medium:
       The unpacked value satisfies none of the type in the union type.
-      Expected number, getting [object Boolean]."
+      Expected string, getting [object Boolean]."
   `);
 
   expect(Type.is(value1)).toBe(true);
@@ -65,12 +65,12 @@ test('union type of mixed types should work with json medium', () => {
   expect(() => Type.encode(x.json, value3)).toThrowErrorMatchingInlineSnapshot(`
     "Failed to encode to medium:
       The unpacked value satisfies none of the type in the union type.
-      Expected number, getting [object Boolean]."
+      Expecting value to be a non-null object, getting [object Boolean]."
   `);
   expect(() => Type.encode(x.json, value4)).toThrowErrorMatchingInlineSnapshot(`
     "Failed to encode to medium:
       The unpacked value satisfies none of the type in the union type.
-      Expected number, getting [object Object]."
+      [\\"value\\"] Expected string, getting [object Number]."
   `);
 
   expect(Type.is(value1)).toBe(true);

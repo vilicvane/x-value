@@ -66,7 +66,8 @@ export class UnionType<
     path: TypePath,
     diagnose: boolean,
   ): [unknown, TypeIssue[]] {
-    let lastIssues!: TypeIssue[];
+    let maxIssuePathLength = -1;
+    let outputIssues!: TypeIssue[];
 
     for (let Type of this.TypeTuple) {
       let [unpacked, issues] = Type._encode(medium, value, path, diagnose);
@@ -75,7 +76,12 @@ export class UnionType<
         return [unpacked, issues];
       }
 
-      lastIssues = issues;
+      let pathLength = Math.max(...issues.map(issue => issue.path.length));
+
+      if (pathLength > maxIssuePathLength) {
+        maxIssuePathLength = pathLength;
+        outputIssues = issues;
+      }
     }
 
     // If diagnose is `false`, it will never reach here.
@@ -88,7 +94,7 @@ export class UnionType<
           message:
             'The unpacked value satisfies none of the type in the union type.',
         },
-        ...lastIssues,
+        ...outputIssues,
       ],
     ];
   }
@@ -100,7 +106,8 @@ export class UnionType<
     unpacked: unknown,
     path: TypePath,
   ): [unknown, TypeIssue[]] {
-    let lastIssues!: TypeIssue[];
+    let maxIssuePathLength = -1;
+    let outputIssues!: TypeIssue[];
 
     for (let Type of this.TypeTuple) {
       let [transformedUnpacked, issues] = Type._transform(
@@ -114,7 +121,12 @@ export class UnionType<
         return [transformedUnpacked, issues];
       }
 
-      lastIssues = issues;
+      let pathLength = Math.max(...issues.map(issue => issue.path.length));
+
+      if (pathLength > maxIssuePathLength) {
+        maxIssuePathLength = pathLength;
+        outputIssues = issues;
+      }
     }
 
     return [
@@ -125,26 +137,32 @@ export class UnionType<
           message:
             'The unpacked value satisfies none of the type in the union type.',
         },
-        ...lastIssues,
+        ...outputIssues,
       ],
     ];
   }
 
   /** @internal */
   _diagnose(value: unknown, path: TypePath): TypeIssue[] {
-    let lastIssues!: TypeIssue[];
+    let maxIssuePathLength = -1;
+    let outputIssues!: TypeIssue[];
 
     for (let Type of this.TypeTuple) {
       let issues = Type._diagnose(value, path);
 
-      lastIssues = issues;
-
       if (issues.length === 0) {
         return issues;
       }
+
+      let pathLength = Math.max(...issues.map(issue => issue.path.length));
+
+      if (pathLength > maxIssuePathLength) {
+        maxIssuePathLength = pathLength;
+        outputIssues = issues;
+      }
     }
 
-    return lastIssues;
+    return outputIssues;
   }
 }
 
