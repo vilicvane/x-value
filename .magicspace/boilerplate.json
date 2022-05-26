@@ -10,6 +10,11 @@
         "name": "library"
       },
       {
+        "name": "node",
+        "type": "library",
+        "references": ["library"]
+      },
+      {
         "name": "test",
         "references": ["library"]
       }
