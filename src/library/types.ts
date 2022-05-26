@@ -28,17 +28,17 @@ export const unknownTypeSymbol = Symbol();
 export const unknown = atomic(unknownTypeSymbol, () => true);
 
 export const undefinedTypeSymbol = Symbol();
-export const undefined = atomic(undefinedTypeSymbol, value =>
-  value === void 0
-    ? true
-    : `Expected undefined, getting ${toString.call(value)}.`,
+export const undefined = atomic(
+  undefinedTypeSymbol,
+  value =>
+    value === void 0 || `Expected undefined, getting ${toString.call(value)}.`,
 );
 
 export const voidTypeSymbol = Symbol();
-export const voidType = atomic(voidTypeSymbol, value =>
-  value === void 0
-    ? true
-    : `Expected undefined, getting ${toString.call(value)}.`,
+export const voidType = atomic(
+  voidTypeSymbol,
+  value =>
+    value === void 0 || `Expected undefined, getting ${toString.call(value)}.`,
 );
 
 export const nullTypeSymbol = Symbol();
@@ -47,43 +47,49 @@ export const nullType = atomic(nullTypeSymbol, value =>
 );
 
 export const stringTypeSymbol = Symbol();
-export const string = atomic(stringTypeSymbol, value =>
-  typeof value === 'string'
-    ? true
-    : `Expected string, getting ${toString.call(value)}.`,
+export const string = atomic(
+  stringTypeSymbol,
+  value =>
+    typeof value === 'string' ||
+    `Expected string, getting ${toString.call(value)}.`,
 );
 
 export const numberTypeSymbol = Symbol();
-export const number = atomic(numberTypeSymbol, value =>
-  typeof value === 'number'
-    ? true
-    : `Expected number, getting ${toString.call(value)}.`,
+export const number = atomic(
+  numberTypeSymbol,
+  value =>
+    typeof value === 'number' ||
+    `Expected number, getting ${toString.call(value)}.`,
 );
 
 export const bigintTypeSymbol = Symbol();
-export const bigint = atomic(bigintTypeSymbol, value =>
-  typeof value === 'bigint'
-    ? true
-    : `Expected bigint, getting ${toString.call(value)}.`,
+export const bigint = atomic(
+  bigintTypeSymbol,
+  value =>
+    typeof value === 'bigint' ||
+    `Expected bigint, getting ${toString.call(value)}.`,
 );
 
 export const booleanTypeSymbol = Symbol();
-export const boolean = atomic(booleanTypeSymbol, value =>
-  typeof value === 'boolean'
-    ? true
-    : `Expected boolean, getting ${toString.call(value)}.`,
+export const boolean = atomic(
+  booleanTypeSymbol,
+  value =>
+    typeof value === 'boolean' ||
+    `Expected boolean, getting ${toString.call(value)}.`,
 );
 
 export const dateTypeSymbol = Symbol();
-export const Date = atomic(dateTypeSymbol, value =>
-  value instanceof globalThis.Date
-    ? true
-    : `Expected instance of Date, getting ${toString.call(value)}.`,
+export const Date = atomic(
+  dateTypeSymbol,
+  value =>
+    value instanceof globalThis.Date ||
+    `Expected instance of Date, getting ${toString.call(value)}.`,
 );
 
 export const regexpTypeSymbol = Symbol();
-export const RegExp = atomic(regexpTypeSymbol, value =>
-  value instanceof globalThis.RegExp
-    ? true
-    : `Expected instance of RegExp, getting ${toString.call(value)}.`,
+export const RegExp = atomic(
+  regexpTypeSymbol,
+  value =>
+    value instanceof globalThis.RegExp ||
+    `Expected instance of RegExp, getting ${toString.call(value)}.`,
 );
