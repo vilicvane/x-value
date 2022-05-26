@@ -28,7 +28,8 @@ export class UnionType<
     unpacked: unknown,
     path: TypePath,
   ): [unknown, TypeIssue[]] {
-    let lastIssues!: TypeIssue[];
+    let maxIssuePathLength = -1;
+    let outputIssues!: TypeIssue[];
 
     for (let Type of this.TypeTuple) {
       let [value, issues] = Type._decode(medium, unpacked, path);
@@ -37,7 +38,12 @@ export class UnionType<
         return [value, issues];
       }
 
-      lastIssues = issues;
+      let pathLength = Math.max(...issues.map(issue => issue.path.length));
+
+      if (pathLength > maxIssuePathLength) {
+        maxIssuePathLength = pathLength;
+        outputIssues = issues;
+      }
     }
 
     return [
@@ -48,7 +54,7 @@ export class UnionType<
           message:
             'The unpacked value satisfies none of the type in the union type.',
         },
-        ...lastIssues,
+        ...outputIssues,
       ],
     ];
   }
