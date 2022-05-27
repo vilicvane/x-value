@@ -13,7 +13,7 @@ test('transform medium A to medium B and back', () => {
           x: x.union(x.number, x.string),
         }),
         x.object({
-          y: x.optional(x.number),
+          y: x.number.optional(),
         }),
       ),
     ),

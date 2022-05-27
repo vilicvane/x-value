@@ -203,7 +203,7 @@ test('object type with intersection type property should work with json medium',
     profile: x.intersection(
       x.object({
         name: x.string,
-        age: x.optional(x.number),
+        age: x.number.optional(),
       }),
       x.object({
         displayName: x.string,
@@ -265,7 +265,7 @@ test('object type with intersection type property should work with json medium',
 test('partial() should work', () => {
   const O = x.object({
     foo: x.string,
-    bar: x.optional(x.number),
+    bar: x.number.optional(),
   });
 
   const PartialO = O.partial();
@@ -296,7 +296,7 @@ test('partial() should work', () => {
 test('pick() should work', () => {
   const O = x.object({
     foo: x.string,
-    bar: x.optional(x.number),
+    bar: x.number.optional(),
     extra: x.boolean,
   });
 
@@ -328,7 +328,7 @@ test('pick() should work', () => {
 test('omit() should work', () => {
   const O = x.object({
     foo: x.string,
-    bar: x.optional(x.number),
+    bar: x.number.optional(),
     extra: x.boolean,
   });
 
@@ -377,7 +377,7 @@ test('literal property type should be correct', () => {
   type _ = AssertTrue<IsEqual<O['type'], 'foo'>>;
 });
 
-test('object exact type should work', () => {
+test('object shallow exact type should work', () => {
   const O = x
     .object({
       foo: x.string,
@@ -396,23 +396,23 @@ test('object exact type should work', () => {
   expect(O.is(value1)).toBe(true);
   expect(() => O.encode(x.json, value2)).toThrowErrorMatchingInlineSnapshot(`
     "Failed to encode to medium:
-      Unknown object key(s) \\"x\\", \\"y\\"."
+      Unknown key(s) \\"x\\", \\"y\\"."
   `);
   expect(() => O.decode(x.json, JSON.stringify(value2)))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to decode from medium:
-      Unknown object key(s) \\"x\\", \\"y\\"."
+      Unknown key(s) \\"x\\", \\"y\\"."
   `);
   expect(() => O.transform(x.json, x.jsonValue, JSON.stringify(value2)))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to transform medium:
-      Unknown object key(s) \\"x\\", \\"y\\"."
+      Unknown key(s) \\"x\\", \\"y\\"."
   `);
   expect(O.diagnose({foo: 'abc', bar: 123, extra: true}))
     .toMatchInlineSnapshot(`
     Array [
       Object {
-        "message": "Unknown object key(s) \\"extra\\".",
+        "message": "Unknown key(s) \\"extra\\".",
         "path": Array [],
       },
     ]
@@ -421,4 +421,190 @@ test('object exact type should work', () => {
   expect(NonExactO.is(value2)).toBe(true);
 
   type _ = AssertTrue<IsEqual<O, {foo: string; bar?: number}>>;
+});
+
+test('object nested exact should work', () => {
+  const O = x
+    .object({
+      foo: x.string,
+      bar: x.object({
+        yo: x.number,
+        ha: x
+          .union(
+            x.string,
+            x.object({
+              x: x.number,
+              y: x.number,
+              oops: x
+                .object({
+                  z: x.number,
+                })
+                .exact(false),
+            }),
+          )
+          .optional(),
+      }),
+    })
+    .exact();
+
+  const value1 = {
+    foo: 'abc',
+    bar: {
+      yo: 123,
+      ha: 'def',
+    },
+  };
+
+  const value2 = {
+    foo: 'abc',
+    bar: {
+      yo: 123,
+      ha: {
+        x: 1,
+        y: 2,
+        oops: {
+          z: 3,
+          extra: 1,
+        },
+      },
+    },
+  };
+
+  const value2WithOutExtra = {
+    foo: 'abc',
+    bar: {
+      yo: 123,
+      ha: {
+        x: 1,
+        y: 2,
+        oops: {
+          z: 3,
+        },
+      },
+    },
+  };
+
+  const value3 = {
+    foo: 'abc',
+    bar: {
+      yo: 123,
+      ha: 'def',
+      extra: '!',
+    },
+  };
+
+  const value4 = {
+    foo: 'abc',
+    bar: {
+      yo: 123,
+      ha: {
+        x: 1,
+        y: 2,
+        extra1: 3,
+        extra2: 4,
+        oops: {
+          z: 3,
+        },
+      },
+    },
+  };
+
+  expect(O.is(value1)).toBe(true);
+  expect(O.is(value2)).toBe(true);
+  expect(O.encode(x.jsonValue, value1)).toStrictEqual(value1);
+  expect(O.encode(x.jsonValue, value2)).toStrictEqual(value2WithOutExtra);
+  expect(O.decode(x.jsonValue, value1)).toStrictEqual(value1);
+  expect(O.decode(x.jsonValue, value2)).toStrictEqual(value2WithOutExtra);
+  expect(O.transform(x.jsonValue, x.json, value1)).toBe(JSON.stringify(value1));
+  expect(O.transform(x.jsonValue, x.json, value2)).toBe(
+    JSON.stringify(value2WithOutExtra),
+  );
+
+  expect(O.diagnose(value3)).toMatchInlineSnapshot(`
+    Array [
+      Object {
+        "message": "Unknown key(s) \\"extra\\".",
+        "path": Array [
+          "bar",
+        ],
+      },
+    ]
+  `);
+  expect(O.diagnose(value4)).toMatchInlineSnapshot(`
+    Array [
+      Object {
+        "message": "Unknown key(s) \\"extra1\\", \\"extra2\\".",
+        "path": Array [
+          "bar",
+          "ha",
+        ],
+      },
+    ]
+  `);
+  expect(() => O.encode(x.json, value3)).toThrowErrorMatchingInlineSnapshot(`
+    "Failed to encode to medium:
+      [\\"bar\\"] Unknown key(s) \\"extra\\"."
+  `);
+  expect(() => O.encode(x.json, value4)).toThrowErrorMatchingInlineSnapshot(`
+    "Failed to encode to medium:
+      [\\"bar\\"][\\"ha\\"] Unknown key(s) \\"extra1\\", \\"extra2\\"."
+  `);
+  expect(() => O.decode(x.jsonValue, value3))
+    .toThrowErrorMatchingInlineSnapshot(`
+    "Failed to decode from medium:
+      [\\"bar\\"] Unknown key(s) \\"extra\\"."
+  `);
+  expect(() => O.decode(x.jsonValue, value4))
+    .toThrowErrorMatchingInlineSnapshot(`
+    "Failed to decode from medium:
+      [\\"bar\\"][\\"ha\\"] Unknown key(s) \\"extra1\\", \\"extra2\\"."
+  `);
+  expect(() => O.transform(x.jsonValue, x.json, value3))
+    .toThrowErrorMatchingInlineSnapshot(`
+    "Failed to transform medium:
+      [\\"bar\\"] Unknown key(s) \\"extra\\"."
+  `);
+  expect(() => O.transform(x.jsonValue, x.json, value4))
+    .toThrowErrorMatchingInlineSnapshot(`
+    "Failed to transform medium:
+      [\\"bar\\"][\\"ha\\"] Unknown key(s) \\"extra1\\", \\"extra2\\"."
+  `);
+});
+
+test('explicit non-exact object with intersection', () => {
+  const O = x
+    .intersection(
+      x
+        .object({
+          foo: x.string,
+        })
+        .exact(false),
+      x.object({
+        bar: x.number,
+      }),
+    )
+    .exact(true);
+
+  const valid1: any = {
+    foo: 'abc',
+    bar: 123,
+    extra: 1,
+  };
+
+  const invalid1: any = {
+    bar: 123,
+  };
+
+  expect(O.is(valid1)).toBe(true);
+
+  expect(O.diagnose(invalid1)).toMatchInlineSnapshot(`
+    Array [
+      Object {
+        "message": "Expected string, getting [object Undefined].",
+        "path": Array [
+          "foo",
+        ],
+      },
+    ]
+  `);
 });

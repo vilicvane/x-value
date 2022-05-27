@@ -108,3 +108,54 @@ export function buildTypeIssue(
     message: typeof error === 'string' ? error : error.message,
   };
 }
+
+export class ExactContext {
+  activated = false;
+  neutralized = false;
+
+  private keySet = new Set<string>();
+
+  get keys(): string[] {
+    return Array.from(this.keySet);
+  }
+
+  activate(): void {
+    this.activated = true;
+  }
+
+  neutralize(): void {
+    this.neutralized = true;
+  }
+
+  addKeys(keys: string[]): void {
+    let set = this.keySet;
+
+    for (let key of keys) {
+      set.add(key);
+    }
+  }
+
+  getIssues(value: unknown, path: TypePath): TypeIssue[] {
+    if (!this.activated || this.neutralized) {
+      return [];
+    }
+
+    let keySet = this.keySet;
+    let unknownKeys = Object.keys(value as object).filter(
+      key => !keySet.has(key),
+    );
+
+    if (unknownKeys.length === 0) {
+      return [];
+    }
+
+    return [
+      {
+        path,
+        message: `Unknown key(s) ${unknownKeys
+          .map(key => JSON.stringify(key))
+          .join(', ')}.`,
+      },
+    ];
+  }
+}

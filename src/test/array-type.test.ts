@@ -162,3 +162,101 @@ test('object array type should work with json medium', () => {
     ]
   `);
 });
+
+test('exact with array type should work', () => {
+  const Type = x
+    .array(
+      x.object({
+        foo: x.string,
+      }),
+    )
+    .exact();
+
+  const value1 = [{foo: 'abc'}];
+  const value2 = [{foo: 'abc'}, {foo: 'def', bar: 123}];
+
+  expect(Type.is(value1)).toBe(true);
+  expect(Type.encode(x.json, value1)).toBe(JSON.stringify(value1));
+  expect(Type.decode(x.json, JSON.stringify(value1))).toStrictEqual(value1);
+  expect(
+    Type.transform(x.json, x.jsonValue, JSON.stringify(value1)),
+  ).toStrictEqual(value1);
+
+  expect(Type.diagnose(value2)).toMatchInlineSnapshot(`
+    Array [
+      Object {
+        "message": "Unknown key(s) \\"bar\\".",
+        "path": Array [
+          1,
+        ],
+      },
+    ]
+  `);
+  expect(() => Type.encode(x.json, value2)).toThrowErrorMatchingInlineSnapshot(`
+    "Failed to encode to medium:
+      [1] Unknown key(s) \\"bar\\"."
+  `);
+  expect(() => Type.decode(x.json, JSON.stringify(value2)))
+    .toThrowErrorMatchingInlineSnapshot(`
+    "Failed to decode from medium:
+      [1] Unknown key(s) \\"bar\\"."
+  `);
+  expect(() => Type.transform(x.json, x.jsonValue, JSON.stringify(value2)))
+    .toThrowErrorMatchingInlineSnapshot(`
+    "Failed to transform medium:
+      [1] Unknown key(s) \\"bar\\"."
+  `);
+});
+
+test('explicit non-exact array', () => {
+  const O = x
+    .object({
+      foo: x
+        .array(
+          x.object({
+            bar: x.string,
+          }),
+        )
+        .exact(false),
+    })
+    .exact(true);
+
+  const valid1 = {
+    foo: [{bar: 'abc'}],
+  };
+
+  const valid2 = {
+    foo: [{bar: 'abc', oops: 123}],
+  };
+
+  const invalid1: any = {
+    foo: [{bar: 'abc', oops: 123}],
+    extra: true,
+  };
+
+  const invalid2: any = {
+    foo: 'abc',
+  };
+
+  expect(O.is(valid1)).toBe(true);
+  expect(O.is(valid2)).toBe(true);
+
+  expect(O.diagnose(invalid1)).toMatchInlineSnapshot(`
+    Array [
+      Object {
+        "message": "Unknown key(s) \\"extra\\".",
+        "path": Array [],
+      },
+    ]
+  `);
+  expect(O.diagnose(invalid2)).toMatchInlineSnapshot(`
+    Array [
+      Object {
+        "message": "Expecting an array, getting [object String].",
+        "path": Array [
+          "foo",
+        ],
+      },
+    ]
+  `);
+});

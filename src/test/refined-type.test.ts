@@ -143,9 +143,9 @@ test('object refinement should work', () => {
   type _ = AssertTrue<IsEqual<O, {foo: 'abc'; bar: number}>>;
 });
 
-test('optional refinement should work', () => {
+test('nullable refinement should work', () => {
   const O = x
-    .optional(x.string)
+    .union(x.string, x.undefined)
     .refine<'includes #'>(value => value === undefined || value.includes('#'));
 
   type O = TypeOf<typeof O>;
@@ -256,4 +256,224 @@ test('union refinement should work', () => {
       Nominal<'foo is abc or bar is 123', {foo: string} | {bar: number}>
     >
   >;
+});
+
+test('exact with refined type should work', () => {
+  const O = x
+    .object({
+      foo: x.string,
+    })
+    .refine(value => value.foo.startsWith('#'))
+    .exact();
+
+  const valid1 = {
+    foo: '#abc',
+  };
+
+  const invalid1 = {
+    foo: 'abc',
+    bar: 123,
+  };
+
+  const invalid2 = {
+    foo: '#def',
+    bar: 123,
+  };
+
+  expect(O.is(valid1)).toBe(true);
+  expect(O.encode(x.jsonValue, valid1)).toEqual(valid1);
+  expect(O.decode(x.jsonValue, valid1)).toEqual(valid1);
+  expect(O.transform(x.jsonValue, x.json, valid1)).toBe(JSON.stringify(valid1));
+
+  expect(O.diagnose(invalid1)).toMatchInlineSnapshot(`
+    Array [
+      Object {
+        "message": "Unexpected value.",
+        "path": Array [],
+      },
+      Object {
+        "message": "Unknown key(s) \\"bar\\".",
+        "path": Array [],
+      },
+    ]
+  `);
+  expect(O.diagnose(invalid2)).toMatchInlineSnapshot(`
+    Array [
+      Object {
+        "message": "Unknown key(s) \\"bar\\".",
+        "path": Array [],
+      },
+    ]
+  `);
+  expect(() => O.encode(x.json, invalid1)).toThrowErrorMatchingInlineSnapshot(`
+    "Failed to encode to medium:
+      Unexpected value.
+      Unknown key(s) \\"bar\\"."
+  `);
+  expect(() => O.encode(x.json, invalid2)).toThrowErrorMatchingInlineSnapshot(`
+    "Failed to encode to medium:
+      Unknown key(s) \\"bar\\"."
+  `);
+  expect(() => O.decode(x.jsonValue, invalid1))
+    .toThrowErrorMatchingInlineSnapshot(`
+    "Failed to decode from medium:
+      Unexpected value.
+      Unknown key(s) \\"bar\\"."
+  `);
+  expect(() => O.decode(x.jsonValue, invalid2))
+    .toThrowErrorMatchingInlineSnapshot(`
+    "Failed to decode from medium:
+      Unknown key(s) \\"bar\\"."
+  `);
+  expect(() => O.transform(x.jsonValue, x.json, invalid1))
+    .toThrowErrorMatchingInlineSnapshot(`
+    "Failed to transform medium:
+      Unexpected value.
+      Unknown key(s) \\"bar\\"."
+  `);
+  expect(() => O.transform(x.jsonValue, x.json, invalid2))
+    .toThrowErrorMatchingInlineSnapshot(`
+    "Failed to transform medium:
+      Unknown key(s) \\"bar\\"."
+  `);
+});
+
+test('transform exact refined type', () => {
+  const T1 = x
+    .union(x.object({foo: x.string}), x.object({bar: x.number}))
+    .refine(() => true)
+    .exact();
+
+  const T2 = x
+    .array(x.object({foo: x.string}))
+    .refine(() => true)
+    .exact();
+
+  const T3 = x
+    .intersection(x.object({foo: x.string}), x.object({bar: x.number}))
+    .refine(() => true)
+    .exact();
+
+  const T4 = x
+    .record(x.string, x.object({bar: x.number}))
+    .refine(() => true)
+    .exact();
+
+  const T5 = x
+    .tuple(x.string, x.object({bar: x.number}))
+    .refine(() => true)
+    .exact();
+
+  interface T6 {
+    next?: T6;
+  }
+
+  const T6 = x
+    .recursive<T6>(T6 => x.object({next: T6.optional()}))
+    .refine(() => true)
+    .exact();
+
+  const valid1 = {
+    foo: 'abc',
+  };
+
+  const valid2 = [valid1];
+
+  const valid3 = {
+    foo: 'abc',
+    bar: 123,
+  };
+
+  const valid4 = {
+    foo: {
+      bar: 123,
+    },
+  };
+
+  const valid5: x.TypeOf<typeof T5> = ['abc', {bar: 123}];
+
+  const valid6 = {
+    next: {
+      next: {},
+    },
+  };
+
+  const invalid1 = {
+    ...valid1,
+    bar: 123,
+  };
+
+  const invalid2 = [invalid1];
+
+  const invalid3 = {
+    ...valid3,
+    extra: true,
+  };
+
+  const invalid4 = {
+    foo: {
+      bar: 123,
+      extra: true,
+    },
+  };
+
+  const invalid5: any = ['abc', {bar: 123, extra: true}];
+
+  const invalid6: any = {
+    next: {
+      next: {
+        extra: true,
+      },
+    },
+  };
+
+  expect(T1.transform(x.jsonValue, x.json, valid1)).toBe(
+    JSON.stringify(valid1),
+  );
+  expect(T2.transform(x.jsonValue, x.json, valid2)).toBe(
+    JSON.stringify(valid2),
+  );
+  expect(T3.transform(x.jsonValue, x.json, valid3)).toBe(
+    JSON.stringify(valid3),
+  );
+  expect(T4.transform(x.jsonValue, x.json, valid4)).toBe(
+    JSON.stringify(valid4),
+  );
+  expect(T5.transform(x.jsonValue, x.json, valid5)).toBe(
+    JSON.stringify(valid5),
+  );
+  expect(T6.transform(x.jsonValue, x.json, valid6)).toBe(
+    JSON.stringify(valid6),
+  );
+
+  expect(() => T1.transform(x.jsonValue, x.json, invalid1))
+    .toThrowErrorMatchingInlineSnapshot(`
+    "Failed to transform medium:
+      Unknown key(s) \\"bar\\"."
+  `);
+  expect(() => T2.transform(x.jsonValue, x.json, invalid2))
+    .toThrowErrorMatchingInlineSnapshot(`
+    "Failed to transform medium:
+      [0] Unknown key(s) \\"bar\\"."
+  `);
+  expect(() => T3.transform(x.jsonValue, x.json, invalid3))
+    .toThrowErrorMatchingInlineSnapshot(`
+    "Failed to transform medium:
+      Unknown key(s) \\"extra\\"."
+  `);
+  expect(() => T4.transform(x.jsonValue, x.json, invalid4))
+    .toThrowErrorMatchingInlineSnapshot(`
+    "Failed to transform medium:
+      [\\"foo\\"] Unknown key(s) \\"extra\\"."
+  `);
+  expect(() => T5.transform(x.jsonValue, x.json, invalid5))
+    .toThrowErrorMatchingInlineSnapshot(`
+    "Failed to transform medium:
+      [1] Unknown key(s) \\"extra\\"."
+  `);
+  expect(() => T6.transform(x.jsonValue, x.json, invalid6))
+    .toThrowErrorMatchingInlineSnapshot(`
+    "Failed to transform medium:
+      [\\"next\\"][\\"next\\"] Unknown key(s) \\"extra\\"."
+  `);
 });

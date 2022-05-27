@@ -1,7 +1,8 @@
 import type {TupleInMedium} from '../@internal';
+import {ExactContext} from '../@internal';
 import type {Medium} from '../medium';
 
-import type {TypeInMediumsPartial, TypeIssue, TypePath} from './type';
+import type {Exact, TypeInMediumsPartial, TypeIssue, TypePath} from './type';
 import {Type, __type_kind} from './type';
 
 export class UnionType<
@@ -27,15 +28,38 @@ export class UnionType<
     medium: Medium,
     unpacked: unknown,
     path: TypePath,
+    exact: Exact,
   ): [unknown, TypeIssue[]] {
+    let [exactContext, nestedExact, inherited] = this.getExactContext(
+      exact,
+      false,
+    );
+
     let maxIssuePathLength = -1;
     let outputIssues!: TypeIssue[];
 
     for (let Type of this.TypeTuple) {
-      let [value, issues] = Type._decode(medium, unpacked, path);
+      let dedicatedExact = nestedExact ? new ExactContext() : false;
+
+      let [value, issues] = Type._decode(
+        medium,
+        unpacked,
+        path,
+        dedicatedExact,
+      );
 
       if (issues.length === 0) {
-        return [value, issues];
+        issues.push(
+          ...syncDedicatedExactAndGetIssues(
+            exactContext,
+            dedicatedExact,
+            inherited,
+            unpacked,
+            path,
+          ),
+        );
+
+        return [issues.length > 0 ? undefined : value, issues];
       }
 
       let pathLength = Math.max(...issues.map(issue => issue.path.length));
@@ -64,16 +88,39 @@ export class UnionType<
     medium: Medium,
     value: unknown,
     path: TypePath,
+    exact: Exact,
     diagnose: boolean,
   ): [unknown, TypeIssue[]] {
+    let [exactContext, nestedExact, inherited] = diagnose
+      ? this.getExactContext(exact, false)
+      : [undefined, false, false];
+
     let maxIssuePathLength = -1;
     let outputIssues!: TypeIssue[];
 
     for (let Type of this.TypeTuple) {
-      let [unpacked, issues] = Type._encode(medium, value, path, diagnose);
+      let dedicatedExact = nestedExact ? new ExactContext() : false;
+
+      let [unpacked, issues] = Type._encode(
+        medium,
+        value,
+        path,
+        dedicatedExact,
+        diagnose,
+      );
 
       if (issues.length === 0) {
-        return [unpacked, issues];
+        issues.push(
+          ...syncDedicatedExactAndGetIssues(
+            exactContext,
+            dedicatedExact,
+            inherited,
+            value,
+            path,
+          ),
+        );
+
+        return [issues.length > 0 ? undefined : unpacked, issues];
       }
 
       let pathLength = Math.max(...issues.map(issue => issue.path.length));
@@ -105,20 +152,39 @@ export class UnionType<
     to: Medium,
     unpacked: unknown,
     path: TypePath,
+    exact: Exact,
   ): [unknown, TypeIssue[]] {
+    let [exactContext, nestedExact, inherited] = this.getExactContext(
+      exact,
+      false,
+    );
+
     let maxIssuePathLength = -1;
     let outputIssues!: TypeIssue[];
 
     for (let Type of this.TypeTuple) {
+      let dedicatedExact = nestedExact ? new ExactContext() : false;
+
       let [transformedUnpacked, issues] = Type._transform(
         from,
         to,
         unpacked,
         path,
+        dedicatedExact,
       );
 
       if (issues.length === 0) {
-        return [transformedUnpacked, issues];
+        issues.push(
+          ...syncDedicatedExactAndGetIssues(
+            exactContext,
+            dedicatedExact,
+            inherited,
+            unpacked,
+            path,
+          ),
+        );
+
+        return [issues.length > 0 ? undefined : transformedUnpacked, issues];
       }
 
       let pathLength = Math.max(...issues.map(issue => issue.path.length));
@@ -143,14 +209,31 @@ export class UnionType<
   }
 
   /** @internal */
-  _diagnose(value: unknown, path: TypePath): TypeIssue[] {
+  _diagnose(value: unknown, path: TypePath, exact: Exact): TypeIssue[] {
+    let [exactContext, nestedExact, inherited] = this.getExactContext(
+      exact,
+      false,
+    );
+
     let maxIssuePathLength = -1;
     let outputIssues!: TypeIssue[];
 
     for (let Type of this.TypeTuple) {
-      let issues = Type._diagnose(value, path);
+      let dedicatedExact = nestedExact ? new ExactContext() : false;
+
+      let issues = Type._diagnose(value, path, dedicatedExact);
 
       if (issues.length === 0) {
+        issues.push(
+          ...syncDedicatedExactAndGetIssues(
+            exactContext,
+            dedicatedExact,
+            inherited,
+            value,
+            path,
+          ),
+        );
+
         return issues;
       }
 
@@ -179,3 +262,25 @@ export function union<
 type UnionInMediums<TTypeTuple extends TypeInMediumsPartial[]> = {
   [TKey in XValue.UsingName]: TupleInMedium<TTypeTuple, TKey>[number];
 };
+
+function syncDedicatedExactAndGetIssues(
+  exactContext: ExactContext | undefined,
+  dedicatedExact: ExactContext | false,
+  inherited: boolean,
+  object: unknown,
+  path: TypePath,
+): TypeIssue[] {
+  if (exactContext && dedicatedExact && dedicatedExact.activated) {
+    if (dedicatedExact.activated) {
+      exactContext.addKeys(dedicatedExact.keys);
+    }
+
+    if (dedicatedExact.neutralized) {
+      exactContext.neutralize();
+    }
+
+    return inherited ? [] : exactContext.getIssues(object, path);
+  }
+
+  return [];
+}

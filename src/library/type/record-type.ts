@@ -2,6 +2,7 @@ import {toString} from '../@internal';
 import type {Medium} from '../medium';
 
 import type {
+  Exact,
   TypeInMediumsPartial,
   TypeIssue,
   TypePath,
@@ -25,9 +26,8 @@ export class RecordType<
     medium: Medium,
     unpacked: unknown,
     path: TypePath,
+    exact: Exact,
   ): [unknown, TypeIssue[]] {
-    // TODO: implicit conversion to object?
-
     if (typeof unpacked !== 'object' || unpacked === null) {
       return [
         undefined,
@@ -45,17 +45,24 @@ export class RecordType<
     let Key = this.Key;
     let Value = this.Value;
 
+    let [, nestedExact] = this.getExactContext(exact, false, true);
+
     let entries: [string | number, unknown][] = [];
     let issues: TypeIssue[] = [];
 
     for (let [key, unpackedValue] of getRecordEntries(unpacked)) {
-      let [value, valueIssues] = Value._decode(medium, unpackedValue, [
-        ...path,
-        key,
-      ]);
+      let [value, valueIssues] = Value._decode(
+        medium,
+        unpackedValue,
+        [...path, key],
+        nestedExact,
+      );
 
       entries.push([key, value]);
-      issues.push(...Key._diagnose(key, [...path, {key}]), ...valueIssues);
+      issues.push(
+        ...Key._diagnose(key, [...path, {key}], nestedExact),
+        ...valueIssues,
+      );
     }
 
     return [
@@ -69,6 +76,7 @@ export class RecordType<
     medium: Medium,
     value: unknown,
     path: TypePath,
+    exact: Exact,
     diagnose: boolean,
   ): [unknown, TypeIssue[]] {
     if (diagnose && (typeof value !== 'object' || value === null)) {
@@ -88,6 +96,10 @@ export class RecordType<
     let Key = this.Key;
     let Value = this.Value;
 
+    let [, nestedExact] = diagnose
+      ? this.getExactContext(exact, false, true)
+      : [undefined, false];
+
     let entries: [string | number, unknown][] = [];
     let issues: TypeIssue[] = [];
 
@@ -96,11 +108,15 @@ export class RecordType<
         medium,
         nestedValue,
         [...path, key],
+        nestedExact,
         diagnose,
       );
 
       entries.push([key, unpacked]);
-      issues.push(...Key._diagnose(key, [...path, {key}]), ...valueIssues);
+      issues.push(
+        ...Key._diagnose(key, [...path, {key}], nestedExact),
+        ...valueIssues,
+      );
     }
 
     return [
@@ -115,6 +131,7 @@ export class RecordType<
     to: Medium,
     unpacked: unknown,
     path: TypePath,
+    exact: Exact,
   ): [unknown, TypeIssue[]] {
     if (typeof unpacked !== 'object' || unpacked === null) {
       return [
@@ -133,6 +150,8 @@ export class RecordType<
     let Key = this.Key;
     let Value = this.Value;
 
+    let [, nestedExact] = this.getExactContext(exact, false, true);
+
     let entries: [string | number, unknown][] = [];
     let issues: TypeIssue[] = [];
 
@@ -142,10 +161,14 @@ export class RecordType<
         to,
         unpackedValue,
         [...path, key],
+        nestedExact,
       );
 
       entries.push([key, transformedUnpacked]);
-      issues.push(...Key._diagnose(key, [...path, {key}]), ...valueIssues);
+      issues.push(
+        ...Key._diagnose(key, [...path, {key}], nestedExact),
+        ...valueIssues,
+      );
     }
 
     return [
@@ -155,7 +178,7 @@ export class RecordType<
   }
 
   /** @internal */
-  _diagnose(value: unknown, path: TypePath): TypeIssue[] {
+  _diagnose(value: unknown, path: TypePath, exact: Exact): TypeIssue[] {
     if (typeof value !== 'object' || value === null) {
       return [
         {
@@ -170,9 +193,11 @@ export class RecordType<
     let Key = this.Key;
     let Value = this.Value;
 
+    let [, nestedExact] = this.getExactContext(exact, false, true);
+
     return getRecordEntries(value).flatMap(([key, nestedValue]) => [
-      ...Key._diagnose(key, [...path, {key}]),
-      ...Value._diagnose(nestedValue, [...path, key]),
+      ...Key._diagnose(key, [...path, {key}], nestedExact),
+      ...Value._diagnose(nestedValue, [...path, key], nestedExact),
     ]);
   }
 }

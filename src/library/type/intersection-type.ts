@@ -2,7 +2,7 @@ import type {TupleInMedium} from '../@internal';
 import {merge} from '../@internal';
 import type {Medium} from '../medium';
 
-import type {TypeInMediumsPartial, TypeIssue, TypePath} from './type';
+import type {Exact, TypeInMediumsPartial, TypeIssue, TypePath} from './type';
 import {Type, __type_kind} from './type';
 
 export class IntersectionType<
@@ -28,15 +28,30 @@ export class IntersectionType<
     medium: Medium,
     unpacked: unknown,
     path: TypePath,
+    exact: Exact,
   ): [unknown, TypeIssue[]] {
+    let [exactContext, nestedExact, inherited] = this.getExactContext(
+      exact,
+      true,
+    );
+
     let partials: unknown[] = [];
     let issues: TypeIssue[] = [];
 
     for (let Type of this.TypeTuple) {
-      let [partial, partialIssues] = Type._decode(medium, unpacked, path);
+      let [partial, partialIssues] = Type._decode(
+        medium,
+        unpacked,
+        path,
+        nestedExact,
+      );
 
       partials.push(partial);
       issues.push(...partialIssues);
+    }
+
+    if (exactContext && !inherited) {
+      issues.push(...exactContext.getIssues(unpacked, path));
     }
 
     return [issues.length === 0 ? merge(partials) : undefined, issues];
@@ -47,8 +62,13 @@ export class IntersectionType<
     medium: Medium,
     value: unknown,
     path: TypePath,
+    exact: Exact,
     diagnose: boolean,
   ): [unknown, TypeIssue[]] {
+    let [exactContext, nestedExact, inherited] = diagnose
+      ? this.getExactContext(exact, true)
+      : [undefined, false, false];
+
     let partials: unknown[] = [];
     let issues: TypeIssue[] = [];
 
@@ -57,11 +77,16 @@ export class IntersectionType<
         medium,
         value,
         path,
+        nestedExact,
         diagnose,
       );
 
       partials.push(partial);
       issues.push(...partialIssues);
+    }
+
+    if (exactContext && !inherited) {
+      issues.push(...exactContext.getIssues(value, path));
     }
 
     return [issues.length === 0 ? merge(partials) : undefined, issues];
@@ -73,23 +98,52 @@ export class IntersectionType<
     to: Medium,
     unpacked: unknown,
     path: TypePath,
+    exact: Exact,
   ): [unknown, TypeIssue[]] {
+    let [exactContext, nestedExact, inherited] = this.getExactContext(
+      exact,
+      true,
+    );
+
     let partials: unknown[] = [];
     let issues: TypeIssue[] = [];
 
     for (let Type of this.TypeTuple) {
-      let [partial, partialIssues] = Type._transform(from, to, unpacked, path);
+      let [partial, partialIssues] = Type._transform(
+        from,
+        to,
+        unpacked,
+        path,
+        nestedExact,
+      );
 
       partials.push(partial);
       issues.push(...partialIssues);
+    }
+
+    if (exactContext && !inherited) {
+      issues.push(...exactContext.getIssues(unpacked, path));
     }
 
     return [issues.length === 0 ? merge(partials) : undefined, issues];
   }
 
   /** @internal */
-  _diagnose(value: unknown, path: TypePath): TypeIssue[] {
-    return this.TypeTuple.flatMap(Type => Type._diagnose(value, path));
+  _diagnose(value: unknown, path: TypePath, exact: Exact): TypeIssue[] {
+    let [exactContext, nestedExact, inherited] = this.getExactContext(
+      exact,
+      true,
+    );
+
+    let issues = this.TypeTuple.flatMap(Type =>
+      Type._diagnose(value, path, nestedExact),
+    );
+
+    if (exactContext && !inherited) {
+      issues.push(...exactContext.getIssues(value, path));
+    }
+
+    return issues;
   }
 }
 

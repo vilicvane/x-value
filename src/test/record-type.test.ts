@@ -1,3 +1,5 @@
+import type {AssertTrue, IsEqual} from 'tslang';
+
 import * as x from '../library';
 import type {TypeOf} from '../library';
 
@@ -224,5 +226,253 @@ test('record type with union string key should work', () => {
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to transform medium:
       [\\"foo\\"] Expected string, getting [object Number]."
+  `);
+});
+
+test('exact with record type should work', () => {
+  const O = x
+    .object({
+      foo: x.string,
+      bar: x.record(
+        x.string,
+        x.object({
+          oops: x.string,
+        }),
+      ),
+    })
+    .exact();
+
+  const valid1 = {
+    foo: 'abc',
+    bar: {
+      a: {
+        oops: 'a',
+      },
+      b: {
+        oops: 'a',
+      },
+    },
+  };
+
+  const invalid1 = {
+    foo: 'abc',
+    bar: {
+      a: {
+        oops: 'a',
+      },
+      b: {
+        oops: 'a',
+      },
+    },
+    extra: true,
+  };
+
+  const invalid2 = {
+    foo: 'abc',
+    bar: {
+      a: {
+        oops: 'a',
+      },
+      b: {
+        oops: 'a',
+        extra: true,
+      },
+    },
+  };
+
+  const invalid3 = {
+    foo: 'abc',
+    bar: {
+      a: {
+        oops: 'a',
+      },
+      b: {
+        oops: 'a',
+        extra2: true,
+      },
+    },
+    extra1: true,
+  };
+
+  expect(O.is(valid1)).toBe(true);
+  expect(O.encode(x.json, valid1)).toBe(JSON.stringify(valid1));
+  expect(O.decode(x.json, JSON.stringify(valid1))).toEqual(valid1);
+  expect(O.transform(x.json, x.jsonValue, JSON.stringify(valid1))).toEqual(
+    valid1,
+  );
+
+  expect(O.diagnose(invalid1)).toMatchInlineSnapshot(`
+    Array [
+      Object {
+        "message": "Unknown key(s) \\"extra\\".",
+        "path": Array [],
+      },
+    ]
+  `);
+  expect(O.diagnose(invalid2)).toMatchInlineSnapshot(`
+    Array [
+      Object {
+        "message": "Unknown key(s) \\"extra\\".",
+        "path": Array [
+          "bar",
+          "b",
+        ],
+      },
+    ]
+  `);
+  expect(O.diagnose(invalid3)).toMatchInlineSnapshot(`
+    Array [
+      Object {
+        "message": "Unknown key(s) \\"extra2\\".",
+        "path": Array [
+          "bar",
+          "b",
+        ],
+      },
+      Object {
+        "message": "Unknown key(s) \\"extra1\\".",
+        "path": Array [],
+      },
+    ]
+  `);
+  expect(() => O.encode(x.json, invalid1)).toThrowErrorMatchingInlineSnapshot(`
+    "Failed to encode to medium:
+      Unknown key(s) \\"extra\\"."
+  `);
+  expect(() => O.encode(x.json, invalid2)).toThrowErrorMatchingInlineSnapshot(`
+    "Failed to encode to medium:
+      [\\"bar\\"][\\"b\\"] Unknown key(s) \\"extra\\"."
+  `);
+  expect(() => O.encode(x.json, invalid3)).toThrowErrorMatchingInlineSnapshot(`
+    "Failed to encode to medium:
+      [\\"bar\\"][\\"b\\"] Unknown key(s) \\"extra2\\".
+      Unknown key(s) \\"extra1\\"."
+  `);
+  expect(() => O.decode(x.jsonValue, invalid1))
+    .toThrowErrorMatchingInlineSnapshot(`
+    "Failed to decode from medium:
+      Unknown key(s) \\"extra\\"."
+  `);
+  expect(() => O.decode(x.jsonValue, invalid2))
+    .toThrowErrorMatchingInlineSnapshot(`
+    "Failed to decode from medium:
+      [\\"bar\\"][\\"b\\"] Unknown key(s) \\"extra\\"."
+  `);
+  expect(() => O.decode(x.jsonValue, invalid3))
+    .toThrowErrorMatchingInlineSnapshot(`
+    "Failed to decode from medium:
+      [\\"bar\\"][\\"b\\"] Unknown key(s) \\"extra2\\".
+      Unknown key(s) \\"extra1\\"."
+  `);
+  expect(() => O.transform(x.jsonValue, x.json, invalid1))
+    .toThrowErrorMatchingInlineSnapshot(`
+    "Failed to transform medium:
+      Unknown key(s) \\"extra\\"."
+  `);
+  expect(() => O.transform(x.jsonValue, x.json, invalid2))
+    .toThrowErrorMatchingInlineSnapshot(`
+    "Failed to transform medium:
+      [\\"bar\\"][\\"b\\"] Unknown key(s) \\"extra\\"."
+  `);
+  expect(() => O.transform(x.jsonValue, x.json, invalid3))
+    .toThrowErrorMatchingInlineSnapshot(`
+    "Failed to transform medium:
+      [\\"bar\\"][\\"b\\"] Unknown key(s) \\"extra2\\".
+      Unknown key(s) \\"extra1\\"."
+  `);
+});
+
+test('exact intersection with record', () => {
+  const O = x
+    .object({
+      foo: x.intersection(
+        x.object({
+          bar: x.literal('oops'),
+        }),
+        x.record(x.string, x.string),
+      ),
+    })
+    .exact();
+
+  type O = x.TypeOf<typeof O>;
+
+  type _ = AssertTrue<
+    IsEqual<
+      O,
+      {
+        foo: {
+          bar: 'oops';
+          [key: string]: string;
+        };
+      }
+    >
+  >;
+
+  const valid1: O = {
+    foo: {
+      bar: 'oops',
+      oops: 'def',
+    },
+  };
+
+  const invalid1: any = {
+    foo: {
+      bar: 'oops',
+      oops: 'def',
+    },
+    extra: true,
+  };
+
+  expect(O.is(valid1)).toBe(true);
+
+  expect(O.diagnose(invalid1)).toMatchInlineSnapshot(`
+    Array [
+      Object {
+        "message": "Unknown key(s) \\"extra\\".",
+        "path": Array [],
+      },
+    ]
+  `);
+});
+
+test('exact intersect + union with record type', () => {
+  const Type = x
+    .intersection(
+      x.object({foo: x.string}),
+      x.union(
+        x.object({
+          type: x.literal('a'),
+        }),
+        x.record(x.string, x.string),
+      ),
+    )
+    .exact();
+
+  const valid1 = {
+    foo: 'abc',
+    type: 'a',
+  };
+
+  const valid2 = {
+    foo: 'abc',
+    bar: 'def',
+  };
+
+  const invalid1 = {
+    foo: 'abc',
+    type: 'a',
+    extra: true,
+  };
+
+  expect(Type.is(valid1)).toBe(true);
+  expect(Type.is(valid2)).toBe(true);
+
+  expect(Type.diagnose(invalid1)).toMatchInlineSnapshot(`
+    Array [
+      Object {
+        "message": "Unknown key(s) \\"extra\\".",
+        "path": Array [],
+      },
+    ]
   `);
 });

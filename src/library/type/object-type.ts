@@ -3,9 +3,11 @@ import type {Medium} from '../medium';
 
 import {OptionalType} from './optional-type';
 import type {
+  Exact,
   TypeInMediumsPartial,
   TypeIssue,
   TypeKindPartial,
+  TypeLike,
   TypePath,
   __type_in_mediums,
 } from './type';
@@ -16,16 +18,12 @@ export class ObjectType<
 > extends Type<ObjectInMediums<TDefinition>> {
   [__type_kind]!: 'object';
 
-  constructor(definition: TDefinition, exact: boolean);
-  constructor(
-    readonly definition: Record<string, Type>,
-    readonly _exact: boolean,
-  ) {
+  constructor(definition: TDefinition);
+  constructor(readonly definition: Record<string, TypeLike>) {
     super();
   }
 
-  partial(): ObjectType<DefinitionPartial<TDefinition>>;
-  partial(): ObjectType<Record<string, any>> {
+  partial(): ObjectType<DefinitionPartial<TDefinition>> {
     let definition = Object.fromEntries(
       Object.entries(this.definition).map(([key, Type]) => [
         key,
@@ -33,37 +31,31 @@ export class ObjectType<
       ]),
     );
 
-    return new ObjectType(definition, this._exact);
+    return Object.create(this, {definition: {value: definition}});
   }
 
   pick<TKeys extends string[]>(
     ...keys: TKeys
-  ): ObjectType<Pick<TDefinition, TKeys[number]>>;
-  pick(...keys: string[]): ObjectType<Record<string, TypeInMediumsPartial>> {
+  ): ObjectType<Pick<TDefinition, TKeys[number]>> {
     let keySet = new Set(keys);
 
     let definition = Object.fromEntries(
       Object.entries(this.definition).filter(([key]) => keySet.has(key)),
     );
 
-    return new ObjectType(definition, this._exact);
+    return Object.create(this, {definition: {value: definition}});
   }
 
   omit<TKeys extends string[]>(
     ...keys: TKeys
-  ): ObjectType<Omit<TDefinition, TKeys[number]>>;
-  omit(...keys: string[]): ObjectType<Record<string, TypeInMediumsPartial>> {
+  ): ObjectType<Omit<TDefinition, TKeys[number]>> {
     let keySet = new Set(keys);
 
     let definition = Object.fromEntries(
       Object.entries(this.definition).filter(([key]) => !keySet.has(key)),
     );
 
-    return new ObjectType(definition, this._exact);
-  }
-
-  exact(exact = true): ObjectType<TDefinition> {
-    return new ObjectType(this.definition as unknown as TDefinition, exact);
+    return Object.create(this, {definition: {value: definition}});
   }
 
   /** @internal */
@@ -71,6 +63,7 @@ export class ObjectType<
     medium: Medium,
     unpacked: unknown,
     path: TypePath,
+    exact: Exact,
   ): [unknown, TypeIssue[]] {
     // TODO: implicit conversion to object?
 
@@ -88,28 +81,33 @@ export class ObjectType<
       ];
     }
 
-    let unknownKeySet = this._exact
-      ? new Set(Object.keys(unpacked))
-      : undefined;
+    let [exactContext, nestedExact, inherited] = this.getExactContext(
+      exact,
+      false,
+    );
 
     let entries: [string, unknown][] = [];
     let issues: TypeIssue[] = [];
 
     for (let [key, Type] of Object.entries(this.definition)) {
-      if (unknownKeySet) {
-        unknownKeySet.delete(key);
-      }
-
-      let [value, entryIssues] = Type._decode(medium, (unpacked as any)[key], [
-        ...path,
-        key,
-      ]);
+      let [value, entryIssues] = Type._decode(
+        medium,
+        (unpacked as any)[key],
+        [...path, key],
+        nestedExact,
+      );
 
       entries.push([key, value]);
       issues.push(...entryIssues);
     }
 
-    issues.push(...buildUnknownKeyIssues(unknownKeySet, path));
+    if (exactContext) {
+      exactContext.addKeys(entries.map(([key]) => key));
+
+      if (!inherited) {
+        issues.push(...exactContext.getIssues(unpacked, path));
+      }
+    }
 
     return [
       issues.length === 0 ? Object.fromEntries(entries) : undefined,
@@ -122,6 +120,7 @@ export class ObjectType<
     medium: Medium,
     value: unknown,
     path: TypePath,
+    exact: Exact,
     diagnose: boolean,
   ): [unknown, TypeIssue[]] {
     if (diagnose && (typeof value !== 'object' || value === null)) {
@@ -138,22 +137,19 @@ export class ObjectType<
       ];
     }
 
-    let unknownKeySet = this._exact
-      ? new Set(Object.keys(value as any))
-      : undefined;
+    let [exactContext, nestedExact, inherited] = diagnose
+      ? this.getExactContext(exact, false)
+      : [undefined, false, false];
 
     let entries: [string, unknown][] = [];
     let issues: TypeIssue[] = [];
 
     for (let [key, Type] of Object.entries(this.definition)) {
-      if (unknownKeySet) {
-        unknownKeySet.delete(key);
-      }
-
       let [unpacked, entryIssues] = Type._encode(
         medium,
         (value as any)[key],
         [...path, key],
+        nestedExact,
         diagnose,
       );
 
@@ -161,7 +157,13 @@ export class ObjectType<
       issues.push(...entryIssues);
     }
 
-    issues.push(...buildUnknownKeyIssues(unknownKeySet, path));
+    if (exactContext) {
+      exactContext.addKeys(entries.map(([key]) => key));
+
+      if (!inherited) {
+        issues.push(...exactContext.getIssues(value, path));
+      }
+    }
 
     return [
       issues.length === 0 ? Object.fromEntries(entries) : undefined,
@@ -175,6 +177,7 @@ export class ObjectType<
     to: Medium,
     unpacked: unknown,
     path: TypePath,
+    exact: Exact,
   ): [unknown, TypeIssue[]] {
     if (typeof unpacked !== 'object' || unpacked === null) {
       return [
@@ -190,30 +193,34 @@ export class ObjectType<
       ];
     }
 
-    let unknownKeySet = this._exact
-      ? new Set(Object.keys(unpacked))
-      : undefined;
+    let [exactContext, nestedExact, inherited] = this.getExactContext(
+      exact,
+      false,
+    );
 
     let entries: [string, unknown][] = [];
     let issues: TypeIssue[] = [];
 
     for (let [key, Type] of Object.entries(this.definition)) {
-      if (unknownKeySet) {
-        unknownKeySet.delete(key);
-      }
-
       let [transformedUnpacked, entryIssues] = Type._transform(
         from,
         to,
         (unpacked as any)[key],
         [...path, key],
+        nestedExact,
       );
 
       entries.push([key, transformedUnpacked]);
       issues.push(...entryIssues);
     }
 
-    issues.push(...buildUnknownKeyIssues(unknownKeySet, path));
+    if (exactContext) {
+      exactContext.addKeys(entries.map(([key]) => key));
+
+      if (!inherited) {
+        issues.push(...exactContext.getIssues(unpacked, path));
+      }
+    }
 
     return [
       issues.length === 0 ? Object.fromEntries(entries) : undefined,
@@ -222,7 +229,7 @@ export class ObjectType<
   }
 
   /** @internal */
-  _diagnose(value: unknown, path: TypePath): TypeIssue[] {
+  _diagnose(value: unknown, path: TypePath, exact: Exact): TypeIssue[] {
     if (typeof value !== 'object' || value === null) {
       return [
         {
@@ -234,19 +241,27 @@ export class ObjectType<
       ];
     }
 
-    let unknownKeySet = this._exact ? new Set(Object.keys(value)) : undefined;
+    let [exactContext, nestedExact, inherited] = this.getExactContext(
+      exact,
+      false,
+    );
 
     let issues: TypeIssue[] = [];
+    let entries = Object.entries(this.definition);
 
-    for (let [key, Type] of Object.entries(this.definition)) {
-      if (unknownKeySet) {
-        unknownKeySet.delete(key);
-      }
-
-      issues.push(...Type._diagnose((value as any)[key], [...path, key]));
+    for (let [key, Type] of entries) {
+      issues.push(
+        ...Type._diagnose((value as any)[key], [...path, key], nestedExact),
+      );
     }
 
-    issues.push(...buildUnknownKeyIssues(unknownKeySet, path));
+    if (exactContext) {
+      exactContext.addKeys(entries.map(([key]) => key));
+
+      if (!inherited) {
+        issues.push(...exactContext.getIssues(value, path));
+      }
+    }
 
     return issues;
   }
@@ -255,7 +270,7 @@ export class ObjectType<
 export function object<
   TDefinition extends Record<string, TypeInMediumsPartial>,
 >(definition: TDefinition): ObjectType<TDefinition> {
-  return new ObjectType(definition, false);
+  return new ObjectType(definition);
 }
 
 type ObjectInMediums<TDefinition extends Record<string, TypeInMediumsPartial>> =
@@ -299,21 +314,3 @@ type DefinitionPartial<
     ? TDefinition[TKey]
     : OptionalType<TDefinition[TKey]>;
 };
-
-function buildUnknownKeyIssues(
-  unknownKeySet: Set<string> | undefined,
-  path: TypePath,
-): TypeIssue[] {
-  if (!unknownKeySet || unknownKeySet.size === 0) {
-    return [];
-  }
-
-  return [
-    {
-      path,
-      message: `Unknown object key(s) ${Array.from(unknownKeySet, key =>
-        JSON.stringify(key),
-      ).join(', ')}.`,
-    },
-  ];
-}

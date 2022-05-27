@@ -3,6 +3,7 @@ import {buildTypeIssue} from '../@internal';
 import type {Medium} from '../medium';
 
 import type {
+  Exact,
   TypeConstraint,
   TypeInMediumsPartial,
   TypeIssue,
@@ -29,11 +30,26 @@ export class RefinedType<
     medium: Medium,
     unpacked: unknown,
     path: TypePath,
+    exact: Exact,
   ): [unknown, TypeIssue[]] {
-    let [value, issues] = this.Type._decode(medium, unpacked, path);
+    let [exactContext, nestedExact, inherited] = this.getExactContext(
+      exact,
+      true,
+    );
+
+    let [value, issues] = this.Type._decode(
+      medium,
+      unpacked,
+      path,
+      nestedExact,
+    );
 
     if (issues.length === 0) {
       issues = this.diagnoseConstraints(value, path);
+    }
+
+    if (exactContext && !inherited) {
+      issues.push(...exactContext.getIssues(unpacked, path));
     }
 
     return [issues.length === 0 ? value : undefined, issues];
@@ -44,23 +60,34 @@ export class RefinedType<
     medium: Medium,
     value: unknown,
     path: TypePath,
+    exact: Exact,
     diagnose: boolean,
   ): [unknown, TypeIssue[]] {
-    let [unpacked, issues] = this.Type._encode(medium, value, path, diagnose);
+    let [exactContext, nestedExact, inherited] = diagnose
+      ? this.getExactContext(exact, true)
+      : [undefined, false, false];
+
+    let [unpacked, issues] = this.Type._encode(
+      medium,
+      value,
+      path,
+      nestedExact,
+      diagnose,
+    );
 
     if (issues.length > 0) {
       return [undefined, issues];
     }
 
     if (diagnose) {
-      let refineIssues = this.diagnoseConstraints(value, path);
+      issues = this.diagnoseConstraints(value, path);
 
-      if (refineIssues.length > 0) {
-        return [undefined, refineIssues];
+      if (exactContext && !inherited) {
+        issues.push(...exactContext.getIssues(value, path));
       }
     }
 
-    return [unpacked, []];
+    return [issues.length === 0 ? unpacked : undefined, issues];
   }
 
   /** @internal */
@@ -69,25 +96,37 @@ export class RefinedType<
     to: Medium,
     unpacked: unknown,
     path: TypePath,
+    exact: Exact,
   ): [unknown, TypeIssue[]] {
-    let [value, issues] = this._decode(from, unpacked, path);
+    let [value, issues] = this._decode(from, unpacked, path, exact);
 
     if (issues.length > 0) {
       return [undefined, issues];
     }
 
-    return this._encode(to, value, path, false);
+    return this._encode(to, value, path, false, false);
   }
 
   /** @internal */
-  _diagnose(value: unknown, path: TypePath): TypeIssue[] {
-    let issues = this.Type._diagnose(value, path);
+  _diagnose(value: unknown, path: TypePath, exact: Exact): TypeIssue[] {
+    let [exactContext, nestedExact, inherited] = this.getExactContext(
+      exact,
+      true,
+    );
+
+    let issues = this.Type._diagnose(value, path, nestedExact);
 
     if (issues.length > 0) {
       return issues;
     }
 
-    return this.diagnoseConstraints(value, path);
+    issues = this.diagnoseConstraints(value, path);
+
+    if (exactContext && !inherited) {
+      issues.push(...exactContext.getIssues(value, path));
+    }
+
+    return issues;
   }
 
   private diagnoseConstraints(value: unknown, path: TypePath): TypeIssue[] {

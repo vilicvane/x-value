@@ -109,3 +109,108 @@ test('union type of mixed types should work with json value medium', () => {
   expect(() => Type.encode(x.jsonValue, value3)).toThrow(TypeConstraintError);
   expect(() => Type.encode(x.jsonValue, value4)).toThrow(TypeConstraintError);
 });
+
+test('exact with union type', () => {
+  const Type = x
+    .union(
+      x.object({
+        type: x.literal('a'),
+      }),
+      x.intersection(
+        x.object({
+          type: x.literal('b'),
+        }),
+        x.object({
+          foo: x.string,
+        }),
+        x.object({
+          bar: x.number,
+        }),
+      ),
+    )
+    .exact();
+
+  type Type = x.TypeOf<typeof Type>;
+
+  const valid1: Type = {
+    type: 'a',
+  };
+
+  const valid2: Type = {
+    type: 'b',
+    foo: 'abc',
+    bar: 123,
+  };
+
+  const invalid1: any = {
+    type: 'a',
+    extra: true,
+  };
+
+  const invalid2: any = {
+    type: 'b',
+    foo: 'abc',
+    bar: 123,
+    extra: true,
+  };
+
+  expect(Type.is(valid1)).toBe(true);
+  expect(Type.is(valid2)).toBe(true);
+  expect(Type.encode(x.jsonValue, valid1)).toEqual(valid1);
+  expect(Type.encode(x.jsonValue, valid2)).toEqual(valid2);
+  expect(Type.decode(x.jsonValue, valid1)).toEqual(valid1);
+  expect(Type.decode(x.jsonValue, valid2)).toEqual(valid2);
+  expect(Type.transform(x.jsonValue, x.json, valid1)).toBe(
+    JSON.stringify(valid1),
+  );
+  expect(Type.transform(x.jsonValue, x.json, valid2)).toBe(
+    JSON.stringify(valid2),
+  );
+
+  expect(Type.diagnose(invalid1)).toMatchInlineSnapshot(`
+    Array [
+      Object {
+        "message": "Unknown key(s) \\"extra\\".",
+        "path": Array [],
+      },
+    ]
+  `);
+  expect(Type.diagnose(invalid2)).toMatchInlineSnapshot(`
+    Array [
+      Object {
+        "message": "Unknown key(s) \\"extra\\".",
+        "path": Array [],
+      },
+    ]
+  `);
+  expect(() => Type.encode(x.json, invalid1))
+    .toThrowErrorMatchingInlineSnapshot(`
+    "Failed to encode to medium:
+      Unknown key(s) \\"extra\\"."
+  `);
+  expect(() => Type.encode(x.json, invalid2))
+    .toThrowErrorMatchingInlineSnapshot(`
+    "Failed to encode to medium:
+      Unknown key(s) \\"extra\\"."
+  `);
+  expect(() => Type.decode(x.jsonValue, invalid1))
+    .toThrowErrorMatchingInlineSnapshot(`
+    "Failed to decode from medium:
+      Unknown key(s) \\"extra\\"."
+  `);
+  expect(() => Type.decode(x.jsonValue, invalid2))
+    .toThrowErrorMatchingInlineSnapshot(`
+    "Failed to decode from medium:
+      Unknown key(s) \\"extra\\"."
+  `);
+  expect(() => Type.transform(x.jsonValue, x.json, invalid1))
+    .toThrowErrorMatchingInlineSnapshot(`
+    "Failed to transform medium:
+      Unknown key(s) \\"extra\\"."
+  `);
+  expect(() => Type.transform(x.jsonValue, x.json, invalid2))
+    .toThrowErrorMatchingInlineSnapshot(`
+    "Failed to transform medium:
+      Unknown key(s) \\"extra\\"."
+  `);
+});

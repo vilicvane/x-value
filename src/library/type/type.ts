@@ -1,6 +1,7 @@
 /* eslint-disable @mufan/import-groups */
 
 import type {ElementOrArray, MediumTypesPackedType} from '../@internal';
+import {ExactContext} from '../@internal';
 import type {Medium} from '../medium';
 
 export type TypesInMediums = Record<XValue.UsingName, unknown>;
@@ -29,10 +30,57 @@ export interface TypeKindPartial<TKind extends string = string> {
   [__type_kind]: TKind;
 }
 
-export abstract class Type<TInMediums extends TypesInMediums = TypesInMediums> {
+export abstract class TypeLike<
+  TInMediums extends TypesInMediums = TypesInMediums,
+> {
   [__type_kind]!: string;
 
   [__type_in_mediums]!: TInMediums;
+
+  /** @internal */
+  abstract _decode(
+    medium: Medium,
+    unpacked: unknown,
+    path: TypePath,
+    exact: Exact,
+  ): [unknown, TypeIssue[]];
+
+  /** @internal */
+  abstract _encode(
+    medium: Medium,
+    value: unknown,
+    path: TypePath,
+    exact: Exact,
+    diagnose: boolean,
+  ): [unknown, TypeIssue[]];
+
+  /** @internal */
+  abstract _transform(
+    from: Medium,
+    to: Medium,
+    unpacked: unknown,
+    path: TypePath,
+    exact: Exact,
+  ): [unknown, TypeIssue[]];
+
+  /** @internal */
+  abstract _diagnose(value: unknown, path: TypePath, exact: Exact): TypeIssue[];
+}
+
+export abstract class Type<
+  TInMediums extends TypesInMediums = TypesInMediums,
+> extends TypeLike<TInMediums> {
+  readonly _exact: boolean | undefined;
+
+  constructor() {
+    super();
+  }
+
+  exact(exact = true): this {
+    return Object.create(this, {
+      _exact: {value: exact},
+    });
+  }
 
   refine<TNominalKey extends string | symbol = never, TRefinement = unknown>(
     constraints: ElementOrArray<TypeConstraint<TInMediums['value']>>,
@@ -61,7 +109,12 @@ export abstract class Type<TInMediums extends TypesInMediums = TypesInMediums> {
   ): TInMediums['value'];
   decode(medium: Medium, packed: unknown): unknown {
     let unpacked = medium.unpack(packed);
-    let [value, issues] = this._decode(medium, unpacked, []);
+    let [value, issues] = this._decode(
+      medium,
+      unpacked,
+      [],
+      this._exact ?? false,
+    );
 
     if (issues.length > 0) {
       throw new TypeConstraintError('Failed to decode from medium', issues);
@@ -75,7 +128,13 @@ export abstract class Type<TInMediums extends TypesInMediums = TypesInMediums> {
     value: TInMediums['value'],
   ): MediumTypesPackedType<TMediumTypes, TInMediums[TMediumName]>;
   encode(medium: Medium, value: unknown): unknown {
-    let [unpacked, issues] = this._encode(medium, value, [], true);
+    let [unpacked, issues] = this._encode(
+      medium,
+      value,
+      [],
+      this._exact ?? false,
+      true,
+    );
 
     if (issues.length > 0) {
       throw new TypeConstraintError('Failed to encode to medium', issues);
@@ -96,7 +155,13 @@ export abstract class Type<TInMediums extends TypesInMediums = TypesInMediums> {
   ): MediumTypesPackedType<TToMediumTypes, TInMediums[TToMediumName]>;
   transform(from: Medium, to: Medium, packed: unknown): unknown {
     let unpacked = from.unpack(packed);
-    let [transformedUnpacked, issues] = this._transform(from, to, unpacked, []);
+    let [transformedUnpacked, issues] = this._transform(
+      from,
+      to,
+      unpacked,
+      [],
+      this._exact ?? false,
+    );
 
     if (issues.length > 0) {
       throw new TypeConstraintError(`Failed to transform medium`, issues);
@@ -115,40 +180,71 @@ export abstract class Type<TInMediums extends TypesInMediums = TypesInMediums> {
     throw new TypeConstraintError('Value does not satisfy the type', issues);
   }
 
-  is(value: unknown): value is TInMediums['value'];
-  is(value: unknown): boolean {
+  is(value: unknown): value is TInMediums['value'] {
     return this.diagnose(value).length === 0;
   }
 
   diagnose(value: unknown): TypeIssue[] {
-    return this._diagnose(value, []);
+    return this._diagnose(value, [], this._exact ?? false);
   }
 
-  /** @internal */
-  abstract _decode(
-    medium: Medium,
-    unpacked: unknown,
-    path: TypePath,
-  ): [unknown, TypeIssue[]];
+  protected getExactContext(
+    exact: Exact,
+    wrapper: boolean,
+    neutralize = false,
+  ): [context: ExactContext | undefined, nested: Exact, inherited: boolean] {
+    let selfExact = this._exact;
 
-  /** @internal */
-  abstract _encode(
-    medium: Medium,
-    value: unknown,
-    path: TypePath,
-    diagnose: boolean,
-  ): [unknown, TypeIssue[]];
+    if (selfExact === false) {
+      if (typeof exact !== 'boolean') {
+        if (!wrapper) {
+          exact.activate();
+        }
 
-  /** @internal */
-  abstract _transform(
-    from: Medium,
-    to: Medium,
-    unpacked: unknown,
-    path: TypePath,
-  ): [unknown, TypeIssue[]];
+        exact.neutralize();
+      }
 
-  /** @internal */
-  abstract _diagnose(value: unknown, path: TypePath): TypeIssue[];
+      return [undefined, false, false];
+    }
+
+    if (typeof exact === 'boolean') {
+      if (exact || selfExact) {
+        let context = new ExactContext();
+
+        if (!wrapper) {
+          context.activate();
+        }
+
+        if (neutralize) {
+          context.neutralize();
+        }
+
+        return [context, wrapper ? context : true, false];
+      } else {
+        return [undefined, false, false];
+      }
+    } else {
+      if (!wrapper) {
+        exact.activate();
+      }
+
+      if (neutralize) {
+        exact.neutralize();
+      }
+
+      return [exact, wrapper ? exact : true, true];
+    }
+  }
+
+  protected getNonWrapperNestedExact(exact: Exact): Exact {
+    let selfExact = this._exact;
+
+    if (selfExact === false) {
+      return false;
+    }
+
+    return exact !== false || selfExact === true;
+  }
 }
 
 export type TypePath = (
@@ -194,6 +290,8 @@ ${this.issues
   .join('\n')}`;
   }
 }
+
+export type Exact = ExactContext | boolean;
 
 export type TypeOf<TType extends TypeInMediumsPartial> =
   TType[__type_in_mediums]['value'];

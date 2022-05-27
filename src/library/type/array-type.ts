@@ -2,6 +2,7 @@ import {toString} from '../@internal';
 import type {Medium} from '../medium';
 
 import type {
+  Exact,
   TypeInMediumsPartial,
   TypeIssue,
   TypePath,
@@ -24,9 +25,8 @@ export class ArrayType<TElementType extends TypeInMediumsPartial> extends Type<
     medium: Medium,
     unpacked: unknown,
     path: TypePath,
+    exact: Exact,
   ): [unknown, TypeIssue[]] {
-    // TODO: implicit conversion to array.
-
     if (!Array.isArray(unpacked)) {
       return [
         undefined,
@@ -43,6 +43,8 @@ export class ArrayType<TElementType extends TypeInMediumsPartial> extends Type<
 
     let ElementType = this.ElementType;
 
+    let nestedExact = this.getNonWrapperNestedExact(exact);
+
     let value: unknown[] = [];
     let issues: TypeIssue[] = [];
 
@@ -51,6 +53,7 @@ export class ArrayType<TElementType extends TypeInMediumsPartial> extends Type<
         medium,
         unpackedElement,
         [...path, index],
+        nestedExact,
       );
 
       value.push(element);
@@ -65,6 +68,7 @@ export class ArrayType<TElementType extends TypeInMediumsPartial> extends Type<
     medium: Medium,
     value: unknown,
     path: TypePath,
+    exact: Exact,
     diagnose: boolean,
   ): [unknown, TypeIssue[]] {
     if (diagnose && !Array.isArray(value)) {
@@ -83,6 +87,8 @@ export class ArrayType<TElementType extends TypeInMediumsPartial> extends Type<
 
     let ElementType = this.ElementType;
 
+    let nestedExact = diagnose ? this.getNonWrapperNestedExact(exact) : false;
+
     let unpacked: unknown[] = [];
     let issues: TypeIssue[] = [];
 
@@ -91,6 +97,7 @@ export class ArrayType<TElementType extends TypeInMediumsPartial> extends Type<
         medium,
         valueElement,
         [...path, index],
+        nestedExact,
         diagnose,
       );
 
@@ -107,9 +114,8 @@ export class ArrayType<TElementType extends TypeInMediumsPartial> extends Type<
     to: Medium,
     unpacked: unknown,
     path: TypePath,
+    exact: Exact,
   ): [unknown, TypeIssue[]] {
-    // TODO: implicit conversion to array.
-
     if (!Array.isArray(unpacked)) {
       return [
         undefined,
@@ -126,6 +132,8 @@ export class ArrayType<TElementType extends TypeInMediumsPartial> extends Type<
 
     let ElementType = this.ElementType;
 
+    let nestedExact = this.getNonWrapperNestedExact(exact);
+
     let value: unknown[] = [];
     let issues: TypeIssue[] = [];
 
@@ -135,6 +143,7 @@ export class ArrayType<TElementType extends TypeInMediumsPartial> extends Type<
         to,
         unpackedElement,
         [...path, index],
+        nestedExact,
       );
 
       value.push(element);
@@ -145,7 +154,7 @@ export class ArrayType<TElementType extends TypeInMediumsPartial> extends Type<
   }
 
   /** @internal */
-  _diagnose(value: unknown, path: TypePath): TypeIssue[] {
+  _diagnose(value: unknown, path: TypePath, exact: Exact): TypeIssue[] {
     if (!Array.isArray(value)) {
       return [
         {
@@ -157,8 +166,10 @@ export class ArrayType<TElementType extends TypeInMediumsPartial> extends Type<
 
     let ElementType = this.ElementType;
 
+    let nestedExact = this.getNonWrapperNestedExact(exact);
+
     return value.flatMap((element, index) =>
-      ElementType._diagnose(element, [...path, index]),
+      ElementType._diagnose(element, [...path, index], nestedExact),
     );
   }
 }

@@ -4,7 +4,7 @@ test('query string medium should work', () => {
   const Type = x.object({
     foo: x.string,
     bar: x.number,
-    flag: x.optional(x.boolean),
+    flag: x.boolean.optional(),
   });
 
   expect(Type.decode(x.queryString, 'foo=abc&bar=123&flag=true')).toEqual({

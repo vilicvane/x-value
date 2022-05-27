@@ -1,14 +1,16 @@
 import type {Medium} from '../medium';
 
 import type {
+  Exact,
+  Type,
   TypeInMediumsPartial,
   TypeIssue,
   TypePath,
   __type_in_mediums,
 } from './type';
-import {Type, __type_kind} from './type';
+import {TypeLike, __type_kind} from './type';
 
-export class OptionalType<TType extends TypeInMediumsPartial> extends Type<
+export class OptionalType<TType extends TypeInMediumsPartial> extends TypeLike<
   OptionalInMediums<TType>
 > {
   [__type_kind]!: 'optional';
@@ -23,11 +25,12 @@ export class OptionalType<TType extends TypeInMediumsPartial> extends Type<
     medium: Medium,
     unpacked: unknown,
     path: TypePath,
+    exact: Exact,
   ): [unknown, TypeIssue[]] {
     if (unpacked === undefined) {
       return [undefined, []];
     } else {
-      let [value, issues] = this.Type._decode(medium, unpacked, path);
+      let [value, issues] = this.Type._decode(medium, unpacked, path, exact);
       return [issues.length === 0 ? value : undefined, issues];
     }
   }
@@ -37,12 +40,19 @@ export class OptionalType<TType extends TypeInMediumsPartial> extends Type<
     medium: Medium,
     value: unknown,
     path: TypePath,
+    exact: Exact,
     diagnose: boolean,
   ): [unknown, TypeIssue[]] {
     if (value === undefined) {
       return [undefined, []];
     } else {
-      let [unpacked, issues] = this.Type._encode(medium, value, path, diagnose);
+      let [unpacked, issues] = this.Type._encode(
+        medium,
+        value,
+        path,
+        exact,
+        diagnose,
+      );
       return [issues.length === 0 ? unpacked : undefined, issues];
     }
   }
@@ -53,6 +63,7 @@ export class OptionalType<TType extends TypeInMediumsPartial> extends Type<
     to: Medium,
     unpacked: unknown,
     path: TypePath,
+    exact: Exact,
   ): [unknown, TypeIssue[]] {
     if (unpacked === undefined) {
       return [undefined, []];
@@ -62,21 +73,16 @@ export class OptionalType<TType extends TypeInMediumsPartial> extends Type<
         to,
         unpacked,
         path,
+        exact,
       );
       return [issues.length === 0 ? transformedUnpacked : undefined, issues];
     }
   }
 
   /** @internal */
-  _diagnose(value: unknown, path: TypePath): TypeIssue[] {
-    return value === undefined ? [] : this.Type._diagnose(value, path);
+  _diagnose(value: unknown, path: TypePath, exact: Exact): TypeIssue[] {
+    return value === undefined ? [] : this.Type._diagnose(value, path, exact);
   }
-}
-
-export function optional<TType extends TypeInMediumsPartial>(
-  Type: TType,
-): OptionalType<TType> {
-  return new OptionalType(Type);
 }
 
 type OptionalInMediums<TType extends TypeInMediumsPartial> = {

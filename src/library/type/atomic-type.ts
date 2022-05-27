@@ -1,7 +1,7 @@
 import {buildTypeIssue} from '../@internal';
 import type {Medium} from '../medium';
 
-import type {TypeConstraint, TypeIssue, TypePath} from './type';
+import type {Exact, TypeConstraint, TypeIssue, TypePath} from './type';
 import {Type, __type_kind} from './type';
 
 export class AtomicType<TSymbol extends symbol> extends Type<
@@ -19,6 +19,7 @@ export class AtomicType<TSymbol extends symbol> extends Type<
     medium: Medium,
     unpacked: unknown,
     path: TypePath,
+    exact: Exact,
   ): [unknown, TypeIssue[]] {
     let value: unknown;
 
@@ -28,7 +29,7 @@ export class AtomicType<TSymbol extends symbol> extends Type<
       return buildCodecErrorResult(error, path);
     }
 
-    let issues = this._diagnose(value, path);
+    let issues = this._diagnose(value, path, exact);
 
     return [issues.length === 0 ? value : undefined, issues];
   }
@@ -38,10 +39,11 @@ export class AtomicType<TSymbol extends symbol> extends Type<
     medium: Medium,
     value: unknown,
     path: TypePath,
+    exact: Exact,
     diagnose: boolean,
   ): [unknown, TypeIssue[]] {
     if (diagnose) {
-      let issues = this._diagnose(value, path);
+      let issues = this._diagnose(value, path, exact);
 
       if (issues.length > 0) {
         return [undefined, issues];
@@ -61,6 +63,7 @@ export class AtomicType<TSymbol extends symbol> extends Type<
     to: Medium,
     unpacked: unknown,
     path: TypePath,
+    exact: Exact,
   ): [unknown, TypeIssue[]] {
     let symbol = this.symbol;
 
@@ -72,7 +75,7 @@ export class AtomicType<TSymbol extends symbol> extends Type<
       return buildCodecErrorResult(error, path);
     }
 
-    let issues = this._diagnose(value, path);
+    let issues = this._diagnose(value, path, exact);
 
     if (issues.length > 0) {
       return [undefined, issues];
@@ -86,7 +89,7 @@ export class AtomicType<TSymbol extends symbol> extends Type<
   }
 
   /** @internal */
-  _diagnose(value: unknown, path: TypePath): TypeIssue[] {
+  _diagnose(value: unknown, path: TypePath, _exact: Exact): TypeIssue[] {
     let issues: TypeIssue[] = [];
 
     for (let constraint of this.constraints) {

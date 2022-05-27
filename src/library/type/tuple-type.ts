@@ -2,7 +2,7 @@ import type {TupleInMedium} from '../@internal';
 import {toString} from '../@internal';
 import type {Medium} from '../medium';
 
-import type {TypeInMediumsPartial, TypeIssue, TypePath} from './type';
+import type {Exact, TypeInMediumsPartial, TypeIssue, TypePath} from './type';
 import {Type, __type_kind} from './type';
 
 export class TupleType<
@@ -20,9 +20,8 @@ export class TupleType<
     medium: Medium,
     unpacked: unknown,
     path: TypePath,
+    exact: Exact,
   ): [unknown, TypeIssue[]] {
-    // TODO: implicit conversion to array.
-
     if (!Array.isArray(unpacked)) {
       return [
         undefined,
@@ -39,14 +38,18 @@ export class TupleType<
 
     let ElementTypeTuple = this.ElementTypeTuple;
 
+    let nestedExact = this.getNonWrapperNestedExact(exact);
+
     let value: unknown[] = [];
     let issues: TypeIssue[] = [];
 
     for (let [index, Element] of ElementTypeTuple.entries()) {
-      let [element, entryIssues] = Element._decode(medium, unpacked[index], [
-        ...path,
-        index,
-      ]);
+      let [element, entryIssues] = Element._decode(
+        medium,
+        unpacked[index],
+        [...path, index],
+        nestedExact,
+      );
 
       value.push(element);
       issues.push(...entryIssues);
@@ -60,6 +63,7 @@ export class TupleType<
     medium: Medium,
     value: unknown,
     path: TypePath,
+    exact: Exact,
     diagnose: boolean,
   ): [unknown, TypeIssue[]] {
     if (diagnose && !Array.isArray(value)) {
@@ -78,6 +82,8 @@ export class TupleType<
 
     let ElementTypeTuple = this.ElementTypeTuple;
 
+    let nestedExact = diagnose ? this.getNonWrapperNestedExact(exact) : false;
+
     let unpacked: unknown[] = [];
     let issues: TypeIssue[] = [];
 
@@ -86,6 +92,7 @@ export class TupleType<
         medium,
         (value as unknown[])[index],
         [...path, index],
+        nestedExact,
         diagnose,
       );
 
@@ -102,6 +109,7 @@ export class TupleType<
     to: Medium,
     unpacked: unknown,
     path: TypePath,
+    exact: Exact,
   ): [unknown, TypeIssue[]] {
     // TODO: implicit conversion to array.
 
@@ -121,6 +129,8 @@ export class TupleType<
 
     let ElementTypeTuple = this.ElementTypeTuple;
 
+    let nestedExact = this.getNonWrapperNestedExact(exact);
+
     let value: unknown[] = [];
     let issues: TypeIssue[] = [];
 
@@ -130,6 +140,7 @@ export class TupleType<
         to,
         unpacked[index],
         [...path, index],
+        nestedExact,
       );
 
       value.push(element);
@@ -140,7 +151,7 @@ export class TupleType<
   }
 
   /** @internal */
-  _diagnose(value: unknown, path: TypePath): TypeIssue[] {
+  _diagnose(value: unknown, path: TypePath, exact: Exact): TypeIssue[] {
     if (!Array.isArray(value)) {
       return [
         {
@@ -150,8 +161,10 @@ export class TupleType<
       ];
     }
 
+    let nestedExact = this.getNonWrapperNestedExact(exact);
+
     return this.ElementTypeTuple.flatMap((Element, index) =>
-      Element._diagnose(value[index], [...path, index]),
+      Element._diagnose(value[index], [...path, index], nestedExact),
     );
   }
 }
