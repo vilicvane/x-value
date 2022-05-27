@@ -4,51 +4,76 @@ import type {TypeOf} from '../library';
 test('tuple type should work', () => {
   const Tuple = x.tuple(x.string, x.number);
 
-  const value1: TypeOf<typeof Tuple> = ['abc', 123];
-  const value2: any = ['abc', 'def'];
-  const value3: any = 123;
+  const valid1: TypeOf<typeof Tuple> = ['abc', 123];
+  const invalid1: any = ['abc', 'def'];
+  const invalid2: any = 123;
+  const invalid3: any = ['abc', 123, true];
 
-  expect(Tuple.decode(x.jsonValue, value1)).toEqual(value1);
-  expect(() => Tuple.decode(x.jsonValue, value2))
+  expect(Tuple.diagnose(invalid3)).toMatchInlineSnapshot(`
+    Array [
+      Object {
+        "message": "Expecting value with 2 instead of 3 element(s).",
+        "path": Array [],
+      },
+    ]
+  `);
+  expect(() => Tuple.encode(x.json, invalid3))
+    .toThrowErrorMatchingInlineSnapshot(`
+    "Failed to encode to medium:
+      Expecting value with 2 instead of 3 element(s)."
+  `);
+  expect(() => Tuple.decode(x.jsonValue, invalid3))
+    .toThrowErrorMatchingInlineSnapshot(`
+    "Failed to decode from medium:
+      Expecting unpacked value with 2 instead of 3 element(s)."
+  `);
+  expect(() => Tuple.transform(x.jsonValue, x.json, invalid3))
+    .toThrowErrorMatchingInlineSnapshot(`
+    "Failed to transform medium:
+      Expecting unpacked value with 2 instead of 3 element(s)."
+  `);
+
+  expect(Tuple.decode(x.jsonValue, valid1)).toEqual(valid1);
+  expect(() => Tuple.decode(x.jsonValue, invalid1))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to decode from medium:
       [1] Expected number, getting [object String]."
   `);
-  expect(() => Tuple.decode(x.jsonValue, value3))
+  expect(() => Tuple.decode(x.jsonValue, invalid2))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to decode from medium:
       Expecting unpacked value to be an array, getting [object Number]."
   `);
 
-  expect(Tuple.encode(x.jsonValue, value1)).toEqual(value1);
-  expect(() => Tuple.encode(x.jsonValue, value2))
+  expect(Tuple.encode(x.jsonValue, valid1)).toEqual(valid1);
+  expect(() => Tuple.encode(x.jsonValue, invalid1))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to encode to medium:
       [1] Expected number, getting [object String]."
   `);
-  expect(() => Tuple.encode(x.jsonValue, value3))
+  expect(() => Tuple.encode(x.jsonValue, invalid2))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to encode to medium:
       Expecting value to be an array, getting [object Number]."
   `);
 
-  expect(Tuple.transform(x.jsonValue, x.json, value1)).toBe(
-    JSON.stringify(value1),
+  expect(Tuple.transform(x.jsonValue, x.json, valid1)).toBe(
+    JSON.stringify(valid1),
   );
-  expect(() => Tuple.transform(x.jsonValue, x.json, value2))
+  expect(() => Tuple.transform(x.jsonValue, x.json, invalid1))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to transform medium:
       [1] Expected number, getting [object String]."
   `);
-  expect(() => Tuple.transform(x.jsonValue, x.json, value3))
+  expect(() => Tuple.transform(x.jsonValue, x.json, invalid2))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to transform medium:
       Expecting unpacked value to be an array, getting [object Number]."
   `);
 
-  expect(Tuple.is(value1)).toBe(true);
-  expect(Tuple.is(value2)).toBe(false);
-  expect(Tuple.is(value3)).toBe(false);
+  expect(Tuple.is(valid1)).toBe(true);
+  expect(Tuple.is(invalid1)).toBe(false);
+  expect(Tuple.is(invalid2)).toBe(false);
 });
 
 test('exact with tuple type should work', () => {

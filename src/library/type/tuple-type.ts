@@ -38,6 +38,18 @@ export class TupleType<
 
     let ElementTypeTuple = this.ElementTypeTuple;
 
+    if (unpacked.length !== ElementTypeTuple.length) {
+      return [
+        undefined,
+        [
+          {
+            path,
+            message: `Expecting unpacked value with ${ElementTypeTuple.length} instead of ${unpacked.length} element(s).`,
+          },
+        ],
+      ];
+    }
+
     let nestedExact = this.getNonWrapperNestedExact(exact);
 
     let value: unknown[] = [];
@@ -81,6 +93,20 @@ export class TupleType<
     }
 
     let ElementTypeTuple = this.ElementTypeTuple;
+
+    if ((value as unknown[]).length !== ElementTypeTuple.length) {
+      return [
+        undefined,
+        [
+          {
+            path,
+            message: `Expecting value with ${
+              ElementTypeTuple.length
+            } instead of ${(value as unknown[]).length} element(s).`,
+          },
+        ],
+      ];
+    }
 
     let nestedExact = diagnose ? this.getNonWrapperNestedExact(exact) : false;
 
@@ -129,6 +155,18 @@ export class TupleType<
 
     let ElementTypeTuple = this.ElementTypeTuple;
 
+    if (unpacked.length !== ElementTypeTuple.length) {
+      return [
+        undefined,
+        [
+          {
+            path,
+            message: `Expecting unpacked value with ${ElementTypeTuple.length} instead of ${unpacked.length} element(s).`,
+          },
+        ],
+      ];
+    }
+
     let nestedExact = this.getNonWrapperNestedExact(exact);
 
     let value: unknown[] = [];
@@ -161,9 +199,20 @@ export class TupleType<
       ];
     }
 
+    let ElementTypeTuple = this.ElementTypeTuple;
+
+    if ((value as unknown[]).length !== ElementTypeTuple.length) {
+      return [
+        {
+          path,
+          message: `Expecting value with ${ElementTypeTuple.length} instead of ${value.length} element(s).`,
+        },
+      ];
+    }
+
     let nestedExact = this.getNonWrapperNestedExact(exact);
 
-    return this.ElementTypeTuple.flatMap((Element, index) =>
+    return ElementTypeTuple.flatMap((Element, index) =>
       Element._diagnose(value[index], [...path, index], nestedExact),
     );
   }
