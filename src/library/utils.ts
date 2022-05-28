@@ -7,9 +7,13 @@ import {boolean, number, string, unknown} from './types';
 
 export const UnknownRecord = record(string, unknown);
 
+export type UnknownRecord = TypeOf<typeof UnknownRecord>;
+
 export const Integer = number.refine<'integer'>(
   value => Number.isInteger(value) || `Expected integer, getting ${value}.`,
 );
+
+export type Integer = TypeOf<typeof Integer>;
 
 export interface IntegerRangeOptions {
   min?: number;
