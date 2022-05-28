@@ -16,7 +16,7 @@ export interface IntegerRangeOptions {
   max?: number;
 }
 
-export function integerRange<TNominalKey extends string | symbol>({
+export function integerRange<TNominalKey extends string | symbol = never>({
   min = -Infinity,
   max = Infinity,
 }: IntegerRangeOptions): RefinedType<typeof Integer, TNominalKey, unknown> {
@@ -40,7 +40,7 @@ export interface NumberRangeOptions {
   maxExclusive?: number;
 }
 
-export function numberRange<TNominalKey extends string | symbol>({
+export function numberRange<TNominalKey extends string | symbol = never>({
   minInclusive = -Infinity,
   minExclusive = -Infinity,
   maxInclusive = Infinity,

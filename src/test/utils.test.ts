@@ -1,7 +1,7 @@
 import type {AssertTrue, IsEqual} from 'tslang';
 
 import * as x from '../library';
-import type {TypeOf} from '../library';
+import type {Nominal, TypeOf} from '../library';
 import {Integer, integerRange, numberRange} from '../library';
 
 test('UnknownRecord type should work', () => {
@@ -32,14 +32,18 @@ test('Integer and integerRange should work', () => {
     ]
   `);
 
-  const rangeA = integerRange({min: 0, max: 2});
-  const rangeB = integerRange({min: -1});
-  const rangeC = integerRange({max: 3});
+  const RangeA = integerRange({min: 0, max: 2});
+  const RangeB = integerRange({min: -1});
+  const RangeC = integerRange({max: 3});
 
-  expect(rangeA.is(1)).toBe(true);
-  expect(rangeA.is(2)).toBe(true);
-  expect(rangeA.is(-1)).toBe(false);
-  expect(rangeA.diagnose(1.1)).toMatchInlineSnapshot(`
+  type Range = x.TypeOf<typeof RangeA>;
+
+  type _ = AssertTrue<IsEqual<Range, Nominal<'integer', number>>>;
+
+  expect(RangeA.is(1)).toBe(true);
+  expect(RangeA.is(2)).toBe(true);
+  expect(RangeA.is(-1)).toBe(false);
+  expect(RangeA.diagnose(1.1)).toMatchInlineSnapshot(`
     Array [
       Object {
         "message": "Expected integer, getting 1.1.",
@@ -47,7 +51,7 @@ test('Integer and integerRange should work', () => {
       },
     ]
   `);
-  expect(rangeA.diagnose(3)).toMatchInlineSnapshot(`
+  expect(RangeA.diagnose(3)).toMatchInlineSnapshot(`
     Array [
       Object {
         "message": "Expected integer <= 2, getting 3.",
@@ -56,19 +60,23 @@ test('Integer and integerRange should work', () => {
     ]
   `);
 
-  expect(rangeB.is(1000)).toBe(true);
-  expect(rangeB.is(-2)).toBe(false);
+  expect(RangeB.is(1000)).toBe(true);
+  expect(RangeB.is(-2)).toBe(false);
 
-  expect(rangeC.is(1000)).toBe(false);
-  expect(rangeC.is(-2)).toBe(true);
+  expect(RangeC.is(1000)).toBe(false);
+  expect(RangeC.is(-2)).toBe(true);
 });
 
 test('numberRange should work', () => {
-  const rangeA = numberRange({minInclusive: 1.1, maxExclusive: 2});
-  const rangeB = numberRange({minExclusive: 0, maxInclusive: 3});
+  const RangeA = numberRange({minInclusive: 1.1, maxExclusive: 2});
+  const RangeB = numberRange({minExclusive: 0, maxInclusive: 3});
 
-  expect(rangeA.is(1.1)).toBe(true);
-  expect(rangeA.diagnose(1)).toMatchInlineSnapshot(`
+  type Range = x.TypeOf<typeof RangeA>;
+
+  type _ = AssertTrue<IsEqual<Range, number>>;
+
+  expect(RangeA.is(1.1)).toBe(true);
+  expect(RangeA.diagnose(1)).toMatchInlineSnapshot(`
     Array [
       Object {
         "message": "Expected number >= 1.1, getting 1.",
@@ -76,7 +84,7 @@ test('numberRange should work', () => {
       },
     ]
   `);
-  expect(rangeA.diagnose(2)).toMatchInlineSnapshot(`
+  expect(RangeA.diagnose(2)).toMatchInlineSnapshot(`
     Array [
       Object {
         "message": "Expected number < 2, getting 2.",
@@ -85,9 +93,9 @@ test('numberRange should work', () => {
     ]
   `);
 
-  expect(rangeB.is(2.2)).toBe(true);
-  expect(rangeB.is(3)).toBe(true);
-  expect(rangeB.diagnose(-1)).toMatchInlineSnapshot(`
+  expect(RangeB.is(2.2)).toBe(true);
+  expect(RangeB.is(3)).toBe(true);
+  expect(RangeB.diagnose(-1)).toMatchInlineSnapshot(`
     Array [
       Object {
         "message": "Expected number > 0, getting -1.",
@@ -95,7 +103,7 @@ test('numberRange should work', () => {
       },
     ]
   `);
-  expect(rangeB.diagnose(0)).toMatchInlineSnapshot(`
+  expect(RangeB.diagnose(0)).toMatchInlineSnapshot(`
     Array [
       Object {
         "message": "Expected number > 0, getting 0.",
@@ -103,7 +111,7 @@ test('numberRange should work', () => {
       },
     ]
   `);
-  expect(rangeB.diagnose(4)).toMatchInlineSnapshot(`
+  expect(RangeB.diagnose(4)).toMatchInlineSnapshot(`
     Array [
       Object {
         "message": "Expected number <= 3, getting 4.",
