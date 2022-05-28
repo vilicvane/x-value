@@ -25,6 +25,13 @@ export class RefinedType<
     super();
   }
 
+  nominalize(
+    value: Denominalize<this[__type_in_mediums]['value']>,
+  ): this[__type_in_mediums]['value'];
+  nominalize(value: unknown): unknown {
+    return value;
+  }
+
   /** @internal */
   _decode(
     medium: Medium,

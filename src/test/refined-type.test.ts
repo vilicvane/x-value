@@ -477,3 +477,24 @@ test('transform exact refined type', () => {
       [\\"next\\"][\\"next\\"] Unknown key(s) \\"extra\\"."
   `);
 });
+
+test('nominalize', () => {
+  const Email = x.string.nominal<'email'>();
+  const LiveEmail = Email.nominal<'live-email'>();
+
+  const email = Email.nominalize('user@host');
+  const liveEmail = LiveEmail.nominalize('user@live');
+
+  type _ =
+    | AssertTrue<IsEqual<typeof email, Nominal<'email', string>>>
+    | AssertTrue<
+        IsEqual<typeof liveEmail, Nominal<'email' | 'live-email', string>>
+      >
+    | AssertTrue<IsEqual<Parameters<typeof Email['nominalize']>[0], string>>
+    | AssertTrue<
+        IsEqual<Parameters<typeof LiveEmail['nominalize']>[0], string>
+      >;
+
+  expect(email).toBe('user@host');
+  expect(liveEmail).toBe('user@live');
+});
