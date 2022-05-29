@@ -1,5 +1,5 @@
 import type {TupleInMedium} from '../@internal';
-import {ExactContext} from '../@internal';
+import {ExactContext, hasNonDeferrableTypeIssue} from '../@internal';
 import type {Medium} from '../medium';
 
 import type {Exact, TypeInMediumsPartial, TypeIssue, TypePath} from './type';
@@ -30,7 +30,7 @@ export class UnionType<
     path: TypePath,
     exact: Exact,
   ): [unknown, TypeIssue[]] {
-    let {managedContext, wrappedExact} = this.getExactContext(exact, 'managed');
+    let {wrappedExact} = this.getExactContext(exact, 'transparent');
 
     let maxIssuePathLength = -1;
     let outputIssues!: TypeIssue[];
@@ -46,22 +46,20 @@ export class UnionType<
         dedicatedExact,
       );
 
-      if (issues.length === 0) {
-        syncDedicatedExact(wrappedExact, dedicatedExact);
+      if (hasNonDeferrableTypeIssue(issues)) {
+        let pathLength = Math.max(...issues.map(issue => issue.path.length));
 
-        if (managedContext) {
-          issues.push(...managedContext.getIssues(unpacked, path));
+        if (pathLength > maxIssuePathLength) {
+          maxIssuePathLength = pathLength;
+          outputIssues = issues;
         }
 
-        return [issues.length === 0 ? value : undefined, issues];
+        continue;
       }
 
-      let pathLength = Math.max(...issues.map(issue => issue.path.length));
+      syncDedicatedExact(wrappedExact, dedicatedExact);
 
-      if (pathLength > maxIssuePathLength) {
-        maxIssuePathLength = pathLength;
-        outputIssues = issues;
-      }
+      return [value, issues];
     }
 
     return [
@@ -85,8 +83,8 @@ export class UnionType<
     exact: Exact,
     diagnose: boolean,
   ): [unknown, TypeIssue[]] {
-    let {managedContext, wrappedExact} = diagnose
-      ? this.getExactContext(exact, 'managed')
+    let {wrappedExact} = diagnose
+      ? this.getExactContext(exact, 'transparent')
       : DISABLED_EXACT_CONTEXT_RESULT;
 
     let maxIssuePathLength = -1;
@@ -104,22 +102,20 @@ export class UnionType<
         diagnose,
       );
 
-      if (issues.length === 0) {
-        syncDedicatedExact(wrappedExact, dedicatedExact);
+      if (hasNonDeferrableTypeIssue(issues)) {
+        let pathLength = Math.max(...issues.map(issue => issue.path.length));
 
-        if (managedContext) {
-          issues.push(...managedContext.getIssues(value, path));
+        if (pathLength > maxIssuePathLength) {
+          maxIssuePathLength = pathLength;
+          outputIssues = issues;
         }
 
-        return [issues.length === 0 ? unpacked : undefined, issues];
+        continue;
       }
 
-      let pathLength = Math.max(...issues.map(issue => issue.path.length));
+      syncDedicatedExact(wrappedExact, dedicatedExact);
 
-      if (pathLength > maxIssuePathLength) {
-        maxIssuePathLength = pathLength;
-        outputIssues = issues;
-      }
+      return [unpacked, issues];
     }
 
     // If diagnose is `false`, it will never reach here.
@@ -144,7 +140,7 @@ export class UnionType<
     path: TypePath,
     exact: Exact,
   ): [unknown, TypeIssue[]] {
-    let {managedContext, wrappedExact} = this.getExactContext(exact, 'managed');
+    let {wrappedExact} = this.getExactContext(exact, 'transparent');
 
     let maxIssuePathLength = -1;
     let outputIssues!: TypeIssue[];
@@ -161,22 +157,20 @@ export class UnionType<
         dedicatedExact,
       );
 
-      if (issues.length === 0) {
-        syncDedicatedExact(wrappedExact, dedicatedExact);
+      if (hasNonDeferrableTypeIssue(issues)) {
+        let pathLength = Math.max(...issues.map(issue => issue.path.length));
 
-        if (managedContext) {
-          issues.push(...managedContext.getIssues(unpacked, path));
+        if (pathLength > maxIssuePathLength) {
+          maxIssuePathLength = pathLength;
+          outputIssues = issues;
         }
 
-        return [issues.length === 0 ? transformedUnpacked : undefined, issues];
+        continue;
       }
 
-      let pathLength = Math.max(...issues.map(issue => issue.path.length));
+      syncDedicatedExact(wrappedExact, dedicatedExact);
 
-      if (pathLength > maxIssuePathLength) {
-        maxIssuePathLength = pathLength;
-        outputIssues = issues;
-      }
+      return [transformedUnpacked, issues];
     }
 
     return [
@@ -194,7 +188,7 @@ export class UnionType<
 
   /** @internal */
   _diagnose(value: unknown, path: TypePath, exact: Exact): TypeIssue[] {
-    let {managedContext, wrappedExact} = this.getExactContext(exact, 'managed');
+    let {wrappedExact} = this.getExactContext(exact, 'transparent');
 
     let maxIssuePathLength = -1;
     let outputIssues!: TypeIssue[];
@@ -205,22 +199,20 @@ export class UnionType<
 
       let issues = Type._diagnose(value, path, dedicatedExact);
 
-      if (issues.length === 0) {
-        syncDedicatedExact(wrappedExact, dedicatedExact);
+      if (hasNonDeferrableTypeIssue(issues)) {
+        let pathLength = Math.max(...issues.map(issue => issue.path.length));
 
-        if (managedContext) {
-          issues.push(...managedContext.getIssues(value, path));
+        if (pathLength > maxIssuePathLength) {
+          maxIssuePathLength = pathLength;
+          outputIssues = issues;
         }
 
-        return issues;
+        continue;
       }
 
-      let pathLength = Math.max(...issues.map(issue => issue.path.length));
+      syncDedicatedExact(wrappedExact, dedicatedExact);
 
-      if (pathLength > maxIssuePathLength) {
-        maxIssuePathLength = pathLength;
-        outputIssues = issues;
-      }
+      return issues;
     }
 
     return [

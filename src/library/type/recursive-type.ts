@@ -1,7 +1,7 @@
 import type {Medium} from '../medium';
 
 import type {Exact, TypeInMediumsPartial, TypeIssue, TypePath} from './type';
-import {DISABLED_EXACT_CONTEXT_RESULT, Type, __type_kind} from './type';
+import {Type, __type_kind} from './type';
 
 export class RecursiveType<TRecursive> extends Type<
   RecursiveInMediums<TRecursive>
@@ -26,9 +26,7 @@ export class RecursiveType<TRecursive> extends Type<
     path: TypePath,
     exact: Exact,
   ): [unknown, TypeIssue[]] {
-    let {wrappedExact} = this.getExactContext(exact, 'transparent');
-
-    return this.Type._decode(medium, unpacked, path, wrappedExact);
+    return this.Type._decode(medium, unpacked, path, exact);
   }
 
   /** @internal */
@@ -39,11 +37,7 @@ export class RecursiveType<TRecursive> extends Type<
     exact: Exact,
     diagnose: boolean,
   ): [unknown, TypeIssue[]] {
-    let {wrappedExact} = diagnose
-      ? this.getExactContext(exact, 'transparent')
-      : DISABLED_EXACT_CONTEXT_RESULT;
-
-    return this.Type._encode(medium, value, path, wrappedExact, diagnose);
+    return this.Type._encode(medium, value, path, exact, diagnose);
   }
 
   /** @internal */
@@ -54,16 +48,12 @@ export class RecursiveType<TRecursive> extends Type<
     path: TypePath,
     exact: Exact,
   ): [unknown, TypeIssue[]] {
-    let {wrappedExact} = this.getExactContext(exact, 'transparent');
-
-    return this.Type._transform(from, to, unpacked, path, wrappedExact);
+    return this.Type._transform(from, to, unpacked, path, exact);
   }
 
   /** @internal */
   _diagnose(value: unknown, path: TypePath, exact: Exact): TypeIssue[] {
-    let {wrappedExact} = this.getExactContext(exact, 'transparent');
-
-    return this.Type._diagnose(value, path, wrappedExact);
+    return this.Type._diagnose(value, path, exact);
   }
 }
 

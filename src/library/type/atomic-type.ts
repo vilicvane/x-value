@@ -1,4 +1,4 @@
-import {buildIssueByError} from '../@internal';
+import {buildIssueByError, hasNonDeferrableTypeIssue} from '../@internal';
 import type {Medium} from '../medium';
 
 import type {Exact, TypeConstraint, TypeIssue, TypePath} from './type';
@@ -31,7 +31,7 @@ export class AtomicType<TSymbol extends symbol> extends Type<
 
     let issues = this._diagnose(value, path, exact);
 
-    return [issues.length === 0 ? value : undefined, issues];
+    return [hasNonDeferrableTypeIssue(issues) ? undefined : value, issues];
   }
 
   /** @internal */
@@ -47,7 +47,7 @@ export class AtomicType<TSymbol extends symbol> extends Type<
     if (diagnose) {
       issues = this._diagnose(value, path, exact);
 
-      if (issues.length > 0) {
+      if (hasNonDeferrableTypeIssue(issues)) {
         return [undefined, issues];
       }
     } else {
@@ -83,7 +83,7 @@ export class AtomicType<TSymbol extends symbol> extends Type<
 
     let issues = this._diagnose(value, path, exact);
 
-    if (issues.length > 0) {
+    if (hasNonDeferrableTypeIssue(issues)) {
       return [undefined, issues];
     }
 

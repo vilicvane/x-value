@@ -185,6 +185,7 @@ test('exact with array type should work', () => {
   expect(Type.diagnose(value2)).toMatchInlineSnapshot(`
     Array [
       Object {
+        "deferrable": true,
         "message": "Unknown key(s) \\"bar\\".",
         "path": Array [
           1,
@@ -202,6 +203,97 @@ test('exact with array type should work', () => {
       [1] Unknown key(s) \\"bar\\"."
   `);
   expect(() => Type.transform(x.json, x.jsonValue, JSON.stringify(value2)))
+    .toThrowErrorMatchingInlineSnapshot(`
+    "Failed to transform medium:
+      [1] Unknown key(s) \\"bar\\"."
+  `);
+});
+
+test('managed exact with array type', () => {
+  const R = x
+    .array(
+      x.object({
+        foo: x.string,
+      }),
+    )
+    .refine(() => true)
+    .exact();
+
+  const U = x
+    .intersection(
+      x.array(
+        x.object({
+          foo: x.string,
+        }),
+      ),
+      x.object({}),
+    )
+    .exact();
+
+  const valid1 = [{foo: 'abc'}];
+  const invalid1 = [{foo: 'abc'}, {foo: 'def', bar: 123}];
+
+  expect(R.is(valid1)).toBe(true);
+  expect(R.encode(x.json, valid1)).toBe(JSON.stringify(valid1));
+  expect(R.decode(x.json, JSON.stringify(valid1))).toStrictEqual(valid1);
+  expect(
+    R.transform(x.json, x.jsonValue, JSON.stringify(valid1)),
+  ).toStrictEqual(valid1);
+
+  expect(U.is(valid1)).toBe(true);
+  expect(U.encode(x.json, valid1)).toBe(JSON.stringify(valid1));
+  expect(U.decode(x.json, JSON.stringify(valid1))).toStrictEqual(valid1);
+  expect(
+    U.transform(x.json, x.jsonValue, JSON.stringify(valid1)),
+  ).toStrictEqual(valid1);
+
+  expect(R.diagnose(invalid1)).toMatchInlineSnapshot(`
+    Array [
+      Object {
+        "deferrable": true,
+        "message": "Unknown key(s) \\"bar\\".",
+        "path": Array [
+          1,
+        ],
+      },
+    ]
+  `);
+  expect(() => R.encode(x.json, invalid1)).toThrowErrorMatchingInlineSnapshot(`
+    "Failed to encode to medium:
+      [1] Unknown key(s) \\"bar\\"."
+  `);
+  expect(() => R.decode(x.json, JSON.stringify(invalid1)))
+    .toThrowErrorMatchingInlineSnapshot(`
+    "Failed to decode from medium:
+      [1] Unknown key(s) \\"bar\\"."
+  `);
+  expect(() => R.transform(x.json, x.jsonValue, JSON.stringify(invalid1)))
+    .toThrowErrorMatchingInlineSnapshot(`
+    "Failed to transform medium:
+      [1] Unknown key(s) \\"bar\\"."
+  `);
+
+  expect(U.diagnose(invalid1)).toMatchInlineSnapshot(`
+    Array [
+      Object {
+        "deferrable": true,
+        "message": "Unknown key(s) \\"bar\\".",
+        "path": Array [
+          1,
+        ],
+      },
+    ]
+  `);
+  expect(() => U.encode(x.json, invalid1)).toThrowErrorMatchingInlineSnapshot(`
+    "Failed to encode to medium:
+      [1] Unknown key(s) \\"bar\\"."
+  `);
+  expect(() => U.decode(x.json, JSON.stringify(invalid1)))
+    .toThrowErrorMatchingInlineSnapshot(`
+    "Failed to decode from medium:
+      [1] Unknown key(s) \\"bar\\"."
+  `);
+  expect(() => U.transform(x.json, x.jsonValue, JSON.stringify(invalid1)))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to transform medium:
       [1] Unknown key(s) \\"bar\\"."
@@ -244,6 +336,7 @@ test('explicit non-exact array', () => {
   expect(O.diagnose(invalid1)).toMatchInlineSnapshot(`
     Array [
       Object {
+        "deferrable": true,
         "message": "Unknown key(s) \\"extra\\".",
         "path": Array [],
       },

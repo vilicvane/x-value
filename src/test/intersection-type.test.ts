@@ -205,6 +205,7 @@ test('exact with intersection type should work', () => {
   expect(O.diagnose(invalid1)).toMatchInlineSnapshot(`
     Array [
       Object {
+        "deferrable": true,
         "message": "Unknown key(s) \\"extra\\".",
         "path": Array [],
       },
@@ -213,6 +214,7 @@ test('exact with intersection type should work', () => {
   expect(O.diagnose(invalid2)).toMatchInlineSnapshot(`
     Array [
       Object {
+        "deferrable": true,
         "message": "Unknown key(s) \\"extra1\\", \\"extra2\\".",
         "path": Array [],
       },

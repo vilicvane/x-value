@@ -309,6 +309,7 @@ export type TypePath = (
 
 export interface TypeIssue {
   path: TypePath;
+  deferrable?: true;
   message: string;
 }
 

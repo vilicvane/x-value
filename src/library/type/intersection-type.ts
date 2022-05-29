@@ -1,5 +1,5 @@
 import type {TupleInMedium} from '../@internal';
-import {merge} from '../@internal';
+import {hasNonDeferrableTypeIssue, merge} from '../@internal';
 import type {Medium} from '../medium';
 
 import type {Exact, TypeInMediumsPartial, TypeIssue, TypePath} from './type';
@@ -48,10 +48,13 @@ export class IntersectionType<
     }
 
     if (managedContext) {
-      issues.push(...managedContext.getIssues(unpacked, path));
+      issues.push(...managedContext.getUnknownKeyIssues(unpacked, path));
     }
 
-    return [issues.length === 0 ? merge(partials) : undefined, issues];
+    return [
+      hasNonDeferrableTypeIssue(issues) ? undefined : merge(partials),
+      issues,
+    ];
   }
 
   /** @internal */
@@ -83,10 +86,13 @@ export class IntersectionType<
     }
 
     if (managedContext) {
-      issues.push(...managedContext.getIssues(value, path));
+      issues.push(...managedContext.getUnknownKeyIssues(value, path));
     }
 
-    return [issues.length === 0 ? merge(partials) : undefined, issues];
+    return [
+      hasNonDeferrableTypeIssue(issues) ? undefined : merge(partials),
+      issues,
+    ];
   }
 
   /** @internal */
@@ -116,10 +122,13 @@ export class IntersectionType<
     }
 
     if (managedContext) {
-      issues.push(...managedContext.getIssues(unpacked, path));
+      issues.push(...managedContext.getUnknownKeyIssues(unpacked, path));
     }
 
-    return [issues.length === 0 ? merge(partials) : undefined, issues];
+    return [
+      hasNonDeferrableTypeIssue(issues) ? undefined : merge(partials),
+      issues,
+    ];
   }
 
   /** @internal */
@@ -131,7 +140,7 @@ export class IntersectionType<
     );
 
     if (managedContext) {
-      issues.push(...managedContext.getIssues(value, path));
+      issues.push(...managedContext.getUnknownKeyIssues(value, path));
     }
 
     return issues;

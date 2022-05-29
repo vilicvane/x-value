@@ -109,6 +109,10 @@ export function buildIssueByError(
   };
 }
 
+export function hasNonDeferrableTypeIssue(issues: TypeIssue[]): boolean {
+  return issues.some(issue => !issue.deferrable);
+}
+
 export class ExactContext {
   touched = false;
   neutralized = false;
@@ -117,10 +121,6 @@ export class ExactContext {
 
   get keys(): string[] {
     return Array.from(this.keySet);
-  }
-
-  touch(): void {
-    this.touched = true;
   }
 
   neutralize(): void {
@@ -137,7 +137,10 @@ export class ExactContext {
     }
   }
 
-  getIssues(value: unknown, path: TypePath): TypeIssue[] {
+  getUnknownKeyIssues(
+    value: unknown,
+    path: TypePath,
+  ): (TypeIssue & {deferrable: true})[] {
     if (!this.touched || this.neutralized) {
       return [];
     }
@@ -154,6 +157,7 @@ export class ExactContext {
     return [
       {
         path,
+        deferrable: true,
         message: `Unknown key(s) ${unknownKeys
           .map(key => JSON.stringify(key))
           .join(', ')}.`,

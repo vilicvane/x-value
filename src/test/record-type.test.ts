@@ -307,6 +307,7 @@ test('exact with record type should work', () => {
   expect(O.diagnose(invalid1)).toMatchInlineSnapshot(`
     Array [
       Object {
+        "deferrable": true,
         "message": "Unknown key(s) \\"extra\\".",
         "path": Array [],
       },
@@ -315,6 +316,7 @@ test('exact with record type should work', () => {
   expect(O.diagnose(invalid2)).toMatchInlineSnapshot(`
     Array [
       Object {
+        "deferrable": true,
         "message": "Unknown key(s) \\"extra\\".",
         "path": Array [
           "bar",
@@ -326,6 +328,7 @@ test('exact with record type should work', () => {
   expect(O.diagnose(invalid3)).toMatchInlineSnapshot(`
     Array [
       Object {
+        "deferrable": true,
         "message": "Unknown key(s) \\"extra2\\".",
         "path": Array [
           "bar",
@@ -333,6 +336,167 @@ test('exact with record type should work', () => {
         ],
       },
       Object {
+        "deferrable": true,
+        "message": "Unknown key(s) \\"extra1\\".",
+        "path": Array [],
+      },
+    ]
+  `);
+  expect(() => O.encode(x.json, invalid1)).toThrowErrorMatchingInlineSnapshot(`
+    "Failed to encode to medium:
+      Unknown key(s) \\"extra\\"."
+  `);
+  expect(() => O.encode(x.json, invalid2)).toThrowErrorMatchingInlineSnapshot(`
+    "Failed to encode to medium:
+      [\\"bar\\"][\\"b\\"] Unknown key(s) \\"extra\\"."
+  `);
+  expect(() => O.encode(x.json, invalid3)).toThrowErrorMatchingInlineSnapshot(`
+    "Failed to encode to medium:
+      [\\"bar\\"][\\"b\\"] Unknown key(s) \\"extra2\\".
+      Unknown key(s) \\"extra1\\"."
+  `);
+  expect(() => O.decode(x.jsonValue, invalid1))
+    .toThrowErrorMatchingInlineSnapshot(`
+    "Failed to decode from medium:
+      Unknown key(s) \\"extra\\"."
+  `);
+  expect(() => O.decode(x.jsonValue, invalid2))
+    .toThrowErrorMatchingInlineSnapshot(`
+    "Failed to decode from medium:
+      [\\"bar\\"][\\"b\\"] Unknown key(s) \\"extra\\"."
+  `);
+  expect(() => O.decode(x.jsonValue, invalid3))
+    .toThrowErrorMatchingInlineSnapshot(`
+    "Failed to decode from medium:
+      [\\"bar\\"][\\"b\\"] Unknown key(s) \\"extra2\\".
+      Unknown key(s) \\"extra1\\"."
+  `);
+  expect(() => O.transform(x.jsonValue, x.json, invalid1))
+    .toThrowErrorMatchingInlineSnapshot(`
+    "Failed to transform medium:
+      Unknown key(s) \\"extra\\"."
+  `);
+  expect(() => O.transform(x.jsonValue, x.json, invalid2))
+    .toThrowErrorMatchingInlineSnapshot(`
+    "Failed to transform medium:
+      [\\"bar\\"][\\"b\\"] Unknown key(s) \\"extra\\"."
+  `);
+  expect(() => O.transform(x.jsonValue, x.json, invalid3))
+    .toThrowErrorMatchingInlineSnapshot(`
+    "Failed to transform medium:
+      [\\"bar\\"][\\"b\\"] Unknown key(s) \\"extra2\\".
+      Unknown key(s) \\"extra1\\"."
+  `);
+});
+
+test('managed exact with record type', () => {
+  const O = x
+    .union(
+      x.object({
+        foo: x.string,
+        bar: x.record(
+          x.string,
+          x.object({
+            oops: x.string,
+          }),
+        ),
+      }),
+      x.string,
+    )
+    .exact();
+
+  const valid1 = {
+    foo: 'abc',
+    bar: {
+      a: {
+        oops: 'a',
+      },
+      b: {
+        oops: 'a',
+      },
+    },
+  };
+
+  const invalid1 = {
+    foo: 'abc',
+    bar: {
+      a: {
+        oops: 'a',
+      },
+      b: {
+        oops: 'a',
+      },
+    },
+    extra: true,
+  };
+
+  const invalid2 = {
+    foo: 'abc',
+    bar: {
+      a: {
+        oops: 'a',
+      },
+      b: {
+        oops: 'a',
+        extra: true,
+      },
+    },
+  };
+
+  const invalid3 = {
+    foo: 'abc',
+    bar: {
+      a: {
+        oops: 'a',
+      },
+      b: {
+        oops: 'a',
+        extra2: true,
+      },
+    },
+    extra1: true,
+  };
+
+  expect(O.is(valid1)).toBe(true);
+  expect(O.encode(x.json, valid1)).toBe(JSON.stringify(valid1));
+  expect(O.decode(x.json, JSON.stringify(valid1))).toEqual(valid1);
+  expect(O.transform(x.json, x.jsonValue, JSON.stringify(valid1))).toEqual(
+    valid1,
+  );
+
+  expect(O.diagnose(invalid1)).toMatchInlineSnapshot(`
+    Array [
+      Object {
+        "deferrable": true,
+        "message": "Unknown key(s) \\"extra\\".",
+        "path": Array [],
+      },
+    ]
+  `);
+  expect(O.diagnose(invalid2)).toMatchInlineSnapshot(`
+    Array [
+      Object {
+        "deferrable": true,
+        "message": "Unknown key(s) \\"extra\\".",
+        "path": Array [
+          "bar",
+          "b",
+        ],
+      },
+    ]
+  `);
+  expect(O.diagnose(invalid3)).toMatchInlineSnapshot(`
+    Array [
+      Object {
+        "deferrable": true,
+        "message": "Unknown key(s) \\"extra2\\".",
+        "path": Array [
+          "bar",
+          "b",
+        ],
+      },
+      Object {
+        "deferrable": true,
         "message": "Unknown key(s) \\"extra1\\".",
         "path": Array [],
       },
@@ -427,14 +591,32 @@ test('exact intersection with record', () => {
   };
 
   expect(O.is(valid1)).toBe(true);
+  expect(O.encode(x.json, valid1)).toBe(JSON.stringify(valid1));
+  expect(O.decode(x.jsonValue, valid1)).toEqual(valid1);
+  expect(O.transform(x.jsonValue, x.json, valid1)).toBe(JSON.stringify(valid1));
 
   expect(O.diagnose(invalid1)).toMatchInlineSnapshot(`
     Array [
       Object {
+        "deferrable": true,
         "message": "Unknown key(s) \\"extra\\".",
         "path": Array [],
       },
     ]
+  `);
+  expect(() => O.encode(x.json, invalid1)).toThrowErrorMatchingInlineSnapshot(`
+    "Failed to encode to medium:
+      Unknown key(s) \\"extra\\"."
+  `);
+  expect(() => O.decode(x.jsonValue, invalid1))
+    .toThrowErrorMatchingInlineSnapshot(`
+    "Failed to decode from medium:
+      Unknown key(s) \\"extra\\"."
+  `);
+  expect(() => O.transform(x.jsonValue, x.json, invalid1))
+    .toThrowErrorMatchingInlineSnapshot(`
+    "Failed to transform medium:
+      Unknown key(s) \\"extra\\"."
   `);
 });
 
@@ -473,6 +655,7 @@ test('exact intersect + union with record type', () => {
   expect(Type.diagnose(invalid1)).toMatchInlineSnapshot(`
     Array [
       Object {
+        "deferrable": true,
         "message": "Unknown key(s) \\"extra\\".",
         "path": Array [],
       },

@@ -1,4 +1,4 @@
-import {toString} from '../@internal';
+import {hasNonDeferrableTypeIssue, toString} from '../@internal';
 import type {Medium} from '../medium';
 
 import {OptionalType} from './optional-type';
@@ -104,11 +104,13 @@ export class ObjectType<
     }
 
     if (managedContext) {
-      issues.push(...managedContext.getIssues(unpacked, path));
+      issues.push(...managedContext.getUnknownKeyIssues(unpacked, path));
     }
 
     return [
-      issues.length === 0 ? Object.fromEntries(entries) : undefined,
+      hasNonDeferrableTypeIssue(issues)
+        ? undefined
+        : Object.fromEntries(entries),
       issues,
     ];
   }
@@ -164,11 +166,13 @@ export class ObjectType<
     }
 
     if (managedContext) {
-      issues.push(...managedContext.getIssues(value, path));
+      issues.push(...managedContext.getUnknownKeyIssues(value, path));
     }
 
     return [
-      issues.length === 0 ? Object.fromEntries(entries) : undefined,
+      hasNonDeferrableTypeIssue(issues)
+        ? undefined
+        : Object.fromEntries(entries),
       issues,
     ];
   }
@@ -221,11 +225,13 @@ export class ObjectType<
     }
 
     if (managedContext) {
-      issues.push(...managedContext.getIssues(unpacked, path));
+      issues.push(...managedContext.getUnknownKeyIssues(unpacked, path));
     }
 
     return [
-      issues.length === 0 ? Object.fromEntries(entries) : undefined,
+      hasNonDeferrableTypeIssue(issues)
+        ? undefined
+        : Object.fromEntries(entries),
       issues,
     ];
   }
@@ -262,7 +268,7 @@ export class ObjectType<
     }
 
     if (managedContext) {
-      issues.push(...managedContext.getIssues(value, path));
+      issues.push(...managedContext.getUnknownKeyIssues(value, path));
     }
 
     return issues;

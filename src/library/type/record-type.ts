@@ -1,4 +1,4 @@
-import {toString} from '../@internal';
+import {hasNonDeferrableTypeIssue, toString} from '../@internal';
 import type {Medium} from '../medium';
 
 import type {
@@ -68,7 +68,9 @@ export class RecordType<
     }
 
     return [
-      issues.length === 0 ? buildRecord(entries, unpacked) : undefined,
+      hasNonDeferrableTypeIssue(issues)
+        ? undefined
+        : buildRecord(entries, unpacked),
       issues,
     ];
   }
@@ -124,7 +126,9 @@ export class RecordType<
     }
 
     return [
-      issues.length === 0 ? buildRecord(entries, value as object) : undefined,
+      hasNonDeferrableTypeIssue(issues)
+        ? undefined
+        : buildRecord(entries, value as object),
       issues,
     ];
   }
@@ -178,7 +182,9 @@ export class RecordType<
     }
 
     return [
-      issues.length === 0 ? buildRecord(entries, unpacked) : undefined,
+      hasNonDeferrableTypeIssue(issues)
+        ? undefined
+        : buildRecord(entries, unpacked),
       issues,
     ];
   }

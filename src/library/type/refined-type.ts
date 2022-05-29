@@ -1,5 +1,5 @@
 import type {RefinedMediumType} from '../@internal';
-import {buildIssueByError} from '../@internal';
+import {buildIssueByError, hasNonDeferrableTypeIssue} from '../@internal';
 import type {Medium} from '../medium';
 
 import type {
@@ -11,7 +11,7 @@ import type {
   TypesInMediums,
   __type_in_mediums,
 } from './type';
-import {DISABLED_EXACT_CONTEXT_RESULT, Type, __type_kind} from './type';
+import {Type, __type_kind} from './type';
 
 export class RefinedType<
   TType extends TypeInMediumsPartial,
@@ -39,26 +39,20 @@ export class RefinedType<
     path: TypePath,
     exact: Exact,
   ): [unknown, TypeIssue[]] {
-    let {managedContext, wrappedExact} = this.getExactContext(exact, 'managed');
+    let [value, issues] = this.Type._decode(medium, unpacked, path, exact);
 
-    let [value, issues] = this.Type._decode(
-      medium,
-      unpacked,
-      path,
-      wrappedExact,
-    );
-
-    if (issues.length > 0) {
+    if (hasNonDeferrableTypeIssue(issues)) {
       return [undefined, issues];
     }
 
-    issues = this.diagnoseConstraints(value, path);
+    let constraintIssues = this.diagnoseConstraints(value, path);
 
-    if (managedContext) {
-      issues.push(...managedContext.getIssues(unpacked, path));
-    }
+    issues.push(...constraintIssues);
 
-    return [issues.length === 0 ? value : undefined, issues];
+    return [
+      hasNonDeferrableTypeIssue(constraintIssues) ? undefined : value,
+      issues,
+    ];
   }
 
   /** @internal */
@@ -69,30 +63,24 @@ export class RefinedType<
     exact: Exact,
     diagnose: boolean,
   ): [unknown, TypeIssue[]] {
-    let {managedContext, wrappedExact} = diagnose
-      ? this.getExactContext(exact, 'managed')
-      : DISABLED_EXACT_CONTEXT_RESULT;
-
     let [unpacked, issues] = this.Type._encode(
       medium,
       value,
       path,
-      wrappedExact,
+      exact,
       diagnose,
     );
 
-    if (issues.length > 0) {
+    if (hasNonDeferrableTypeIssue(issues)) {
       return [undefined, issues];
     }
 
     if (diagnose) {
-      issues = this.diagnoseConstraints(value, path);
+      let constraintIssues = this.diagnoseConstraints(value, path);
 
-      if (managedContext) {
-        issues.push(...managedContext.getIssues(value, path));
-      }
+      issues.push(...constraintIssues);
 
-      if (issues.length > 0) {
+      if (hasNonDeferrableTypeIssue(constraintIssues)) {
         return [undefined, issues];
       }
     }
@@ -110,28 +98,24 @@ export class RefinedType<
   ): [unknown, TypeIssue[]] {
     let [value, issues] = this._decode(from, unpacked, path, exact);
 
-    if (issues.length > 0) {
+    if (hasNonDeferrableTypeIssue(issues)) {
       return [undefined, issues];
     }
 
-    return this._encode(to, value, path, false, false);
+    let [transformedUnpacked] = this._encode(to, value, path, false, false);
+
+    return [transformedUnpacked, issues];
   }
 
   /** @internal */
   _diagnose(value: unknown, path: TypePath, exact: Exact): TypeIssue[] {
-    let {managedContext, wrappedExact} = this.getExactContext(exact, 'managed');
+    let issues = this.Type._diagnose(value, path, exact);
 
-    let issues = this.Type._diagnose(value, path, wrappedExact);
-
-    if (issues.length > 0) {
+    if (hasNonDeferrableTypeIssue(issues)) {
       return issues;
     }
 
-    issues = this.diagnoseConstraints(value, path);
-
-    if (managedContext) {
-      issues.push(...managedContext.getIssues(value, path));
-    }
+    issues.push(...this.diagnoseConstraints(value, path));
 
     return issues;
   }

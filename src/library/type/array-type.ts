@@ -1,4 +1,4 @@
-import {toString} from '../@internal';
+import {hasNonDeferrableTypeIssue, toString} from '../@internal';
 import type {Medium} from '../medium';
 
 import type {
@@ -62,7 +62,7 @@ export class ArrayType<TElementType extends TypeInMediumsPartial> extends Type<
 
     context?.addKeys(Array.from(unpacked.keys(), key => key.toString()));
 
-    return [issues.length === 0 ? value : undefined, issues];
+    return [hasNonDeferrableTypeIssue(issues) ? undefined : value, issues];
   }
 
   /** @internal */
@@ -113,7 +113,7 @@ export class ArrayType<TElementType extends TypeInMediumsPartial> extends Type<
       Array.from((value as unknown[]).keys(), key => key.toString()),
     );
 
-    return [issues.length === 0 ? unpacked : undefined, issues];
+    return [hasNonDeferrableTypeIssue(issues) ? undefined : unpacked, issues];
   }
 
   /** @internal */
@@ -160,7 +160,7 @@ export class ArrayType<TElementType extends TypeInMediumsPartial> extends Type<
 
     context?.addKeys(Array.from(unpacked.keys(), key => key.toString()));
 
-    return [issues.length === 0 ? value : undefined, issues];
+    return [hasNonDeferrableTypeIssue(issues) ? undefined : value, issues];
   }
 
   /** @internal */

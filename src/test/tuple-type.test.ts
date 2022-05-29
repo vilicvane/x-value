@@ -116,6 +116,75 @@ test('exact with tuple type should work', () => {
   expect(Tuple.diagnose(invalid1)).toMatchInlineSnapshot(`
     Array [
       Object {
+        "deferrable": true,
+        "message": "Unknown key(s) \\"extra\\".",
+        "path": Array [
+          1,
+        ],
+      },
+    ]
+  `);
+  expect(() => Tuple.encode(x.json, invalid1))
+    .toThrowErrorMatchingInlineSnapshot(`
+    "Failed to encode to medium:
+      [1] Unknown key(s) \\"extra\\"."
+  `);
+  expect(() => Tuple.decode(x.jsonValue, invalid1))
+    .toThrowErrorMatchingInlineSnapshot(`
+    "Failed to decode from medium:
+      [1] Unknown key(s) \\"extra\\"."
+  `);
+  expect(() => Tuple.transform(x.jsonValue, x.json, invalid1))
+    .toThrowErrorMatchingInlineSnapshot(`
+    "Failed to transform medium:
+      [1] Unknown key(s) \\"extra\\"."
+  `);
+});
+
+test('exact + intersection with tuple type', () => {
+  const Tuple = x
+    .intersection(
+      x.tuple(
+        x.string,
+        x.object({
+          foo: x.string,
+          bar: x.number,
+        }),
+      ),
+      x.object({}),
+    )
+    .exact();
+
+  type Tuple = x.TypeOf<typeof Tuple>;
+
+  const valid1: Tuple = [
+    'hello',
+    {
+      foo: 'abc',
+      bar: 123,
+    },
+  ];
+
+  const invalid1: any = [
+    'hello',
+    {
+      foo: 'abc',
+      bar: 123,
+      extra: true,
+    },
+  ];
+
+  expect(Tuple.is(valid1)).toBe(true);
+  expect(Tuple.encode(x.jsonValue, valid1)).toEqual(valid1);
+  expect(Tuple.decode(x.jsonValue, valid1)).toEqual(valid1);
+  expect(Tuple.transform(x.jsonValue, x.json, valid1)).toBe(
+    JSON.stringify(valid1),
+  );
+
+  expect(Tuple.diagnose(invalid1)).toMatchInlineSnapshot(`
+    Array [
+      Object {
+        "deferrable": true,
         "message": "Unknown key(s) \\"extra\\".",
         "path": Array [
           1,

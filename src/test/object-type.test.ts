@@ -412,6 +412,7 @@ test('object shallow exact type should work', () => {
     .toMatchInlineSnapshot(`
     Array [
       Object {
+        "deferrable": true,
         "message": "Unknown key(s) \\"extra\\".",
         "path": Array [],
       },
@@ -523,6 +524,7 @@ test('object nested exact should work', () => {
   expect(O.diagnose(value3)).toMatchInlineSnapshot(`
     Array [
       Object {
+        "deferrable": true,
         "message": "Unknown key(s) \\"extra\\".",
         "path": Array [
           "bar",
@@ -533,6 +535,7 @@ test('object nested exact should work', () => {
   expect(O.diagnose(value4)).toMatchInlineSnapshot(`
     Array [
       Object {
+        "deferrable": true,
         "message": "Unknown key(s) \\"extra1\\", \\"extra2\\".",
         "path": Array [
           "bar",

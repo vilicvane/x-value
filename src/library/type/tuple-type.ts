@@ -1,5 +1,5 @@
 import type {TupleInMedium} from '../@internal';
-import {toString} from '../@internal';
+import {hasNonDeferrableTypeIssue, toString} from '../@internal';
 import type {Medium} from '../medium';
 
 import type {Exact, TypeInMediumsPartial, TypeIssue, TypePath} from './type';
@@ -71,7 +71,7 @@ export class TupleType<
       Array.from(ElementTypeTuple.keys(), key => key.toString()),
     );
 
-    return [issues.length === 0 ? value : undefined, issues];
+    return [hasNonDeferrableTypeIssue(issues) ? undefined : value, issues];
   }
 
   /** @internal */
@@ -136,7 +136,7 @@ export class TupleType<
       Array.from(ElementTypeTuple.keys(), key => key.toString()),
     );
 
-    return [issues.length === 0 ? unpacked : undefined, issues];
+    return [hasNonDeferrableTypeIssue(issues) ? undefined : unpacked, issues];
   }
 
   /** @internal */
@@ -197,7 +197,7 @@ export class TupleType<
       Array.from(ElementTypeTuple.keys(), key => key.toString()),
     );
 
-    return [issues.length === 0 ? value : undefined, issues];
+    return [hasNonDeferrableTypeIssue(issues) ? undefined : value, issues];
   }
 
   /** @internal */
