@@ -194,6 +194,7 @@ test('record type with union string key should work', () => {
   expect(() => Type.decode(x.jsonValue, value2))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to decode from medium:
+      [key:\\"invalid key\\"] The value satisfies none of the type in the union type.
       [key:\\"invalid key\\"] Expected string \\"foo\\", getting \\"invalid key\\"."
   `);
   expect(() => Type.decode(x.jsonValue, value3))
@@ -206,6 +207,7 @@ test('record type with union string key should work', () => {
   expect(() => Type.encode(x.jsonValue, value2))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to encode to medium:
+      [key:\\"invalid key\\"] The value satisfies none of the type in the union type.
       [key:\\"invalid key\\"] Expected string \\"foo\\", getting \\"invalid key\\"."
   `);
   expect(() => Type.encode(x.jsonValue, value3))
@@ -220,6 +222,7 @@ test('record type with union string key should work', () => {
   expect(() => Type.transform(x.jsonValue, x.json, value2))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to transform medium:
+      [key:\\"invalid key\\"] The value satisfies none of the type in the union type.
       [key:\\"invalid key\\"] Expected string \\"foo\\", getting \\"invalid key\\"."
   `);
   expect(() => Type.transform(x.jsonValue, x.json, value3))
@@ -304,6 +307,7 @@ test('exact with record type should work', () => {
   expect(O.diagnose(invalid1)).toMatchInlineSnapshot(`
     Array [
       Object {
+        "fatal": false,
         "message": "Unknown key(s) \\"extra\\".",
         "path": Array [],
       },
@@ -312,6 +316,7 @@ test('exact with record type should work', () => {
   expect(O.diagnose(invalid2)).toMatchInlineSnapshot(`
     Array [
       Object {
+        "fatal": false,
         "message": "Unknown key(s) \\"extra\\".",
         "path": Array [
           "bar",
@@ -323,6 +328,7 @@ test('exact with record type should work', () => {
   expect(O.diagnose(invalid3)).toMatchInlineSnapshot(`
     Array [
       Object {
+        "fatal": false,
         "message": "Unknown key(s) \\"extra2\\".",
         "path": Array [
           "bar",
@@ -330,6 +336,7 @@ test('exact with record type should work', () => {
         ],
       },
       Object {
+        "fatal": false,
         "message": "Unknown key(s) \\"extra1\\".",
         "path": Array [],
       },
@@ -428,6 +435,7 @@ test('exact intersection with record', () => {
   expect(O.diagnose(invalid1)).toMatchInlineSnapshot(`
     Array [
       Object {
+        "fatal": false,
         "message": "Unknown key(s) \\"extra\\".",
         "path": Array [],
       },
@@ -470,6 +478,7 @@ test('exact intersect + union with record type', () => {
   expect(Type.diagnose(invalid1)).toMatchInlineSnapshot(`
     Array [
       Object {
+        "fatal": false,
         "message": "Unknown key(s) \\"extra\\".",
         "path": Array [],
       },

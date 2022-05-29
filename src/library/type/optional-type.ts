@@ -27,12 +27,9 @@ export class OptionalType<TType extends TypeInMediumsPartial> extends TypeLike<
     path: TypePath,
     exact: Exact,
   ): [unknown, TypeIssue[]] {
-    if (unpacked === undefined) {
-      return [undefined, []];
-    } else {
-      let [value, issues] = this.Type._decode(medium, unpacked, path, exact);
-      return [issues.length === 0 ? value : undefined, issues];
-    }
+    return unpacked === undefined
+      ? [undefined, []]
+      : this.Type._decode(medium, unpacked, path, exact);
   }
 
   /** @internal */
@@ -43,18 +40,9 @@ export class OptionalType<TType extends TypeInMediumsPartial> extends TypeLike<
     exact: Exact,
     diagnose: boolean,
   ): [unknown, TypeIssue[]] {
-    if (value === undefined) {
-      return [undefined, []];
-    } else {
-      let [unpacked, issues] = this.Type._encode(
-        medium,
-        value,
-        path,
-        exact,
-        diagnose,
-      );
-      return [issues.length === 0 ? unpacked : undefined, issues];
-    }
+    return value === undefined
+      ? [undefined, []]
+      : this.Type._encode(medium, value, path, exact, diagnose);
   }
 
   /** @internal */
@@ -65,18 +53,9 @@ export class OptionalType<TType extends TypeInMediumsPartial> extends TypeLike<
     path: TypePath,
     exact: Exact,
   ): [unknown, TypeIssue[]] {
-    if (unpacked === undefined) {
-      return [undefined, []];
-    } else {
-      let [transformedUnpacked, issues] = this.Type._transform(
-        from,
-        to,
-        unpacked,
-        path,
-        exact,
-      );
-      return [issues.length === 0 ? transformedUnpacked : undefined, issues];
-    }
+    return unpacked === undefined
+      ? [undefined, []]
+      : this.Type._transform(from, to, unpacked, path, exact);
   }
 
   /** @internal */

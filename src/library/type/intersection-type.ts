@@ -1,5 +1,5 @@
 import type {TupleInMedium} from '../@internal';
-import {merge} from '../@internal';
+import {hasFatalIssue, merge} from '../@internal';
 import type {Medium} from '../medium';
 
 import type {Exact, TypeInMediumsPartial, TypeIssue, TypePath} from './type';
@@ -30,10 +30,7 @@ export class IntersectionType<
     path: TypePath,
     exact: Exact,
   ): [unknown, TypeIssue[]] {
-    let [exactContext, nestedExact, inherited] = this.getExactContext(
-      exact,
-      true,
-    );
+    let {managedContext, wrappedExact} = this.getExactContext(exact, 'managed');
 
     let partials: unknown[] = [];
     let issues: TypeIssue[] = [];
@@ -43,18 +40,18 @@ export class IntersectionType<
         medium,
         unpacked,
         path,
-        nestedExact,
+        wrappedExact,
       );
 
       partials.push(partial);
       issues.push(...partialIssues);
     }
 
-    if (exactContext && !inherited) {
-      issues.push(...exactContext.getIssues(unpacked, path));
+    if (managedContext) {
+      issues.push(...managedContext.getIssues(unpacked, path));
     }
 
-    return [issues.length === 0 ? merge(partials) : undefined, issues];
+    return [hasFatalIssue(issues) ? undefined : merge(partials), issues];
   }
 
   /** @internal */
@@ -65,9 +62,9 @@ export class IntersectionType<
     exact: Exact,
     diagnose: boolean,
   ): [unknown, TypeIssue[]] {
-    let [exactContext, nestedExact, inherited] = diagnose
-      ? this.getExactContext(exact, true)
-      : [undefined, false, false];
+    let {managedContext, wrappedExact} = diagnose
+      ? this.getExactContext(exact, 'managed')
+      : {managedContext: undefined, wrappedExact: false};
 
     let partials: unknown[] = [];
     let issues: TypeIssue[] = [];
@@ -77,7 +74,7 @@ export class IntersectionType<
         medium,
         value,
         path,
-        nestedExact,
+        wrappedExact,
         diagnose,
       );
 
@@ -85,11 +82,11 @@ export class IntersectionType<
       issues.push(...partialIssues);
     }
 
-    if (exactContext && !inherited) {
-      issues.push(...exactContext.getIssues(value, path));
+    if (managedContext) {
+      issues.push(...managedContext.getIssues(value, path));
     }
 
-    return [issues.length === 0 ? merge(partials) : undefined, issues];
+    return [hasFatalIssue(issues) ? undefined : merge(partials), issues];
   }
 
   /** @internal */
@@ -100,10 +97,7 @@ export class IntersectionType<
     path: TypePath,
     exact: Exact,
   ): [unknown, TypeIssue[]] {
-    let [exactContext, nestedExact, inherited] = this.getExactContext(
-      exact,
-      true,
-    );
+    let {managedContext, wrappedExact} = this.getExactContext(exact, 'managed');
 
     let partials: unknown[] = [];
     let issues: TypeIssue[] = [];
@@ -114,33 +108,30 @@ export class IntersectionType<
         to,
         unpacked,
         path,
-        nestedExact,
+        wrappedExact,
       );
 
       partials.push(partial);
       issues.push(...partialIssues);
     }
 
-    if (exactContext && !inherited) {
-      issues.push(...exactContext.getIssues(unpacked, path));
+    if (managedContext) {
+      issues.push(...managedContext.getIssues(unpacked, path));
     }
 
-    return [issues.length === 0 ? merge(partials) : undefined, issues];
+    return [hasFatalIssue(issues) ? undefined : merge(partials), issues];
   }
 
   /** @internal */
   _diagnose(value: unknown, path: TypePath, exact: Exact): TypeIssue[] {
-    let [exactContext, nestedExact, inherited] = this.getExactContext(
-      exact,
-      true,
-    );
+    let {managedContext, wrappedExact} = this.getExactContext(exact, 'managed');
 
     let issues = this.TypeTuple.flatMap(Type =>
-      Type._diagnose(value, path, nestedExact),
+      Type._diagnose(value, path, wrappedExact),
     );
 
-    if (exactContext && !inherited) {
-      issues.push(...exactContext.getIssues(value, path));
+    if (managedContext) {
+      issues.push(...managedContext.getIssues(value, path));
     }
 
     return issues;

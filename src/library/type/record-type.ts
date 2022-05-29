@@ -1,4 +1,4 @@
-import {toString} from '../@internal';
+import {hasFatalIssue, toString} from '../@internal';
 import type {Medium} from '../medium';
 
 import type {
@@ -34,6 +34,7 @@ export class RecordType<
         [
           {
             path,
+            fatal: true,
             message: `Expecting unpacked value to be a non-null object, getting ${toString.call(
               unpacked,
             )}.`,
@@ -45,7 +46,7 @@ export class RecordType<
     let Key = this.Key;
     let Value = this.Value;
 
-    let [, nestedExact] = this.getExactContext(exact, false, true);
+    let {nestedExact} = this.getExactContext(exact, false, true);
 
     let entries: [string | number, unknown][] = [];
     let issues: TypeIssue[] = [];
@@ -66,7 +67,7 @@ export class RecordType<
     }
 
     return [
-      issues.length === 0 ? buildRecord(entries, unpacked) : undefined,
+      hasFatalIssue(issues) ? undefined : buildRecord(entries, unpacked),
       issues,
     ];
   }
@@ -85,6 +86,7 @@ export class RecordType<
         [
           {
             path,
+            fatal: true,
             message: `Expecting value to be a non-null object, getting ${toString.call(
               value,
             )}.`,
@@ -96,9 +98,9 @@ export class RecordType<
     let Key = this.Key;
     let Value = this.Value;
 
-    let [, nestedExact] = diagnose
+    let {nestedExact} = diagnose
       ? this.getExactContext(exact, false, true)
-      : [undefined, false];
+      : {nestedExact: false};
 
     let entries: [string | number, unknown][] = [];
     let issues: TypeIssue[] = [];
@@ -120,7 +122,7 @@ export class RecordType<
     }
 
     return [
-      issues.length === 0 ? buildRecord(entries, value as object) : undefined,
+      hasFatalIssue(issues) ? undefined : buildRecord(entries, value as object),
       issues,
     ];
   }
@@ -139,6 +141,7 @@ export class RecordType<
         [
           {
             path,
+            fatal: true,
             message: `Expecting unpacked value to be a non-null object, getting ${toString.call(
               unpacked,
             )}.`,
@@ -150,7 +153,7 @@ export class RecordType<
     let Key = this.Key;
     let Value = this.Value;
 
-    let [, nestedExact] = this.getExactContext(exact, false, true);
+    let {nestedExact} = this.getExactContext(exact, false, true);
 
     let entries: [string | number, unknown][] = [];
     let issues: TypeIssue[] = [];
@@ -172,7 +175,7 @@ export class RecordType<
     }
 
     return [
-      issues.length === 0 ? buildRecord(entries, unpacked) : undefined,
+      hasFatalIssue(issues) ? undefined : buildRecord(entries, unpacked),
       issues,
     ];
   }
@@ -183,6 +186,7 @@ export class RecordType<
       return [
         {
           path,
+          fatal: true,
           message: `Expecting a non-null object, getting ${toString.call(
             value,
           )}.`,
@@ -193,7 +197,7 @@ export class RecordType<
     let Key = this.Key;
     let Value = this.Value;
 
-    let [, nestedExact] = this.getExactContext(exact, false, true);
+    let {nestedExact} = this.getExactContext(exact, false, true);
 
     return getRecordEntries(value).flatMap(([key, nestedValue]) => [
       ...Key._diagnose(key, [...path, {key}], nestedExact),

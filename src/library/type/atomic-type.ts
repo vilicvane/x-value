@@ -1,4 +1,7 @@
-import {buildTypeIssue} from '../@internal';
+import {
+  buildFatalIssueByError as buildFatalIssueFromError,
+  hasFatalIssue as hasFatalIssue,
+} from '../@internal';
 import type {Medium} from '../medium';
 
 import type {Exact, TypeConstraint, TypeIssue, TypePath} from './type';
@@ -26,12 +29,12 @@ export class AtomicType<TSymbol extends symbol> extends Type<
     try {
       value = medium.requireCodec(this.symbol).decode(unpacked);
     } catch (error) {
-      return buildCodecErrorResult(error, path);
+      return [undefined, [buildFatalIssueFromError(error, path)]];
     }
 
     let issues = this._diagnose(value, path, exact);
 
-    return [issues.length === 0 ? value : undefined, issues];
+    return [hasFatalIssue(issues) ? undefined : value, issues];
   }
 
   /** @internal */
@@ -42,18 +45,24 @@ export class AtomicType<TSymbol extends symbol> extends Type<
     exact: Exact,
     diagnose: boolean,
   ): [unknown, TypeIssue[]] {
-    if (diagnose) {
-      let issues = this._diagnose(value, path, exact);
+    let issues: TypeIssue[];
 
-      if (issues.length > 0) {
+    if (diagnose) {
+      issues = this._diagnose(value, path, exact);
+
+      if (hasFatalIssue(issues)) {
         return [undefined, issues];
       }
+    } else {
+      issues = [];
     }
 
     try {
-      return [medium.requireCodec(this.symbol).encode(value), []];
+      return [medium.requireCodec(this.symbol).encode(value), issues];
     } catch (error) {
-      return buildCodecErrorResult(error, path);
+      issues.push(buildFatalIssueFromError(error, path));
+
+      return [undefined, issues];
     }
   }
 
@@ -72,19 +81,21 @@ export class AtomicType<TSymbol extends symbol> extends Type<
     try {
       value = from.requireCodec(symbol).decode(unpacked);
     } catch (error) {
-      return buildCodecErrorResult(error, path);
+      return [undefined, [buildFatalIssueFromError(error, path)]];
     }
 
     let issues = this._diagnose(value, path, exact);
 
-    if (issues.length > 0) {
+    if (hasFatalIssue(issues)) {
       return [undefined, issues];
     }
 
     try {
       return [to.requireCodec(symbol).encode(value), issues];
     } catch (error) {
-      return buildCodecErrorResult(error, path);
+      issues.push(buildFatalIssueFromError(error, path));
+
+      return [undefined, issues];
     }
   }
 
@@ -101,6 +112,7 @@ export class AtomicType<TSymbol extends symbol> extends Type<
 
       issues.push({
         path,
+        fatal: true,
         message: typeof result === 'string' ? result : 'Unexpected value.',
       });
     }
@@ -117,17 +129,6 @@ export function atomic<TSymbol extends symbol>(
     symbol,
     Array.isArray(constraints) ? constraints : [constraints],
   );
-}
-
-function buildCodecErrorResult(
-  error: unknown,
-  path: TypePath,
-): [undefined, TypeIssue[]];
-function buildCodecErrorResult(
-  error: string | Error,
-  path: TypePath,
-): [undefined, TypeIssue[]] {
-  return [undefined, [buildTypeIssue(error, path)]];
 }
 
 type AtomicInMediums<TSymbol extends symbol> = {

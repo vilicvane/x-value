@@ -22,7 +22,7 @@ test('union type of atomic types should work with json medium', () => {
   expect(() => Type.encode(x.json, true as any))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to encode to medium:
-      The unpacked value satisfies none of the type in the union type.
+      The value satisfies none of the type in the union type.
       Expected string, getting [object Boolean]."
   `);
 
@@ -64,12 +64,12 @@ test('union type of mixed types should work with json medium', () => {
   expect(JSON.parse(Type.encode(x.json, value2))).toEqual(value2);
   expect(() => Type.encode(x.json, value3)).toThrowErrorMatchingInlineSnapshot(`
     "Failed to encode to medium:
-      The unpacked value satisfies none of the type in the union type.
+      The value satisfies none of the type in the union type.
       Expecting value to be a non-null object, getting [object Boolean]."
   `);
   expect(() => Type.encode(x.json, value4)).toThrowErrorMatchingInlineSnapshot(`
     "Failed to encode to medium:
-      The unpacked value satisfies none of the type in the union type.
+      The value satisfies none of the type in the union type.
       [\\"value\\"] Expected string, getting [object Number]."
   `);
 
@@ -170,6 +170,7 @@ test('exact with union type', () => {
   expect(Type.diagnose(invalid1)).toMatchInlineSnapshot(`
     Array [
       Object {
+        "fatal": false,
         "message": "Unknown key(s) \\"extra\\".",
         "path": Array [],
       },
@@ -178,6 +179,7 @@ test('exact with union type', () => {
   expect(Type.diagnose(invalid2)).toMatchInlineSnapshot(`
     Array [
       Object {
+        "fatal": false,
         "message": "Unknown key(s) \\"extra\\".",
         "path": Array [],
       },

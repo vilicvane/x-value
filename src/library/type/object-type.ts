@@ -1,4 +1,4 @@
-import {toString} from '../@internal';
+import {hasFatalIssue, toString} from '../@internal';
 import type {Medium} from '../medium';
 
 import {OptionalType} from './optional-type';
@@ -65,14 +65,13 @@ export class ObjectType<
     path: TypePath,
     exact: Exact,
   ): [unknown, TypeIssue[]] {
-    // TODO: implicit conversion to object?
-
     if (typeof unpacked !== 'object' || unpacked === null) {
       return [
         undefined,
         [
           {
             path,
+            fatal: true,
             message: `Expecting unpacked value to be a non-null object, getting ${toString.call(
               unpacked,
             )}.`,
@@ -81,9 +80,9 @@ export class ObjectType<
       ];
     }
 
-    let [exactContext, nestedExact, inherited] = this.getExactContext(
+    let {managedContext, wrappedExact, nestedExact} = this.getExactContext(
       exact,
-      false,
+      'managed',
     );
 
     let entries: [string, unknown][] = [];
@@ -101,16 +100,16 @@ export class ObjectType<
       issues.push(...entryIssues);
     }
 
-    if (exactContext) {
-      exactContext.addKeys(entries.map(([key]) => key));
+    if (wrappedExact) {
+      wrappedExact.addKeys(entries.map(([key]) => key));
+    }
 
-      if (!inherited) {
-        issues.push(...exactContext.getIssues(unpacked, path));
-      }
+    if (managedContext) {
+      issues.push(...managedContext.getIssues(unpacked, path));
     }
 
     return [
-      issues.length === 0 ? Object.fromEntries(entries) : undefined,
+      hasFatalIssue(issues) ? undefined : Object.fromEntries(entries),
       issues,
     ];
   }
@@ -129,6 +128,7 @@ export class ObjectType<
         [
           {
             path,
+            fatal: true,
             message: `Expecting value to be a non-null object, getting ${toString.call(
               value,
             )}.`,
@@ -137,9 +137,13 @@ export class ObjectType<
       ];
     }
 
-    let [exactContext, nestedExact, inherited] = diagnose
-      ? this.getExactContext(exact, false)
-      : [undefined, false, false];
+    let {managedContext, wrappedExact, nestedExact} = diagnose
+      ? this.getExactContext(exact, 'managed')
+      : {
+          managedContext: undefined,
+          wrappedExact: false as false,
+          nestedExact: false,
+        };
 
     let entries: [string, unknown][] = [];
     let issues: TypeIssue[] = [];
@@ -157,16 +161,16 @@ export class ObjectType<
       issues.push(...entryIssues);
     }
 
-    if (exactContext) {
-      exactContext.addKeys(entries.map(([key]) => key));
+    if (wrappedExact) {
+      wrappedExact.addKeys(entries.map(([key]) => key));
+    }
 
-      if (!inherited) {
-        issues.push(...exactContext.getIssues(value, path));
-      }
+    if (managedContext) {
+      issues.push(...managedContext.getIssues(value, path));
     }
 
     return [
-      issues.length === 0 ? Object.fromEntries(entries) : undefined,
+      hasFatalIssue(issues) ? undefined : Object.fromEntries(entries),
       issues,
     ];
   }
@@ -185,6 +189,7 @@ export class ObjectType<
         [
           {
             path,
+            fatal: true,
             message: `Expecting unpacked value to be a non-null object, getting ${toString.call(
               unpacked,
             )}.`,
@@ -193,9 +198,9 @@ export class ObjectType<
       ];
     }
 
-    let [exactContext, nestedExact, inherited] = this.getExactContext(
+    let {managedContext, wrappedExact, nestedExact} = this.getExactContext(
       exact,
-      false,
+      'managed',
     );
 
     let entries: [string, unknown][] = [];
@@ -214,16 +219,16 @@ export class ObjectType<
       issues.push(...entryIssues);
     }
 
-    if (exactContext) {
-      exactContext.addKeys(entries.map(([key]) => key));
+    if (wrappedExact) {
+      wrappedExact.addKeys(entries.map(([key]) => key));
+    }
 
-      if (!inherited) {
-        issues.push(...exactContext.getIssues(unpacked, path));
-      }
+    if (managedContext) {
+      issues.push(...managedContext.getIssues(unpacked, path));
     }
 
     return [
-      issues.length === 0 ? Object.fromEntries(entries) : undefined,
+      hasFatalIssue(issues) ? undefined : Object.fromEntries(entries),
       issues,
     ];
   }
@@ -234,6 +239,7 @@ export class ObjectType<
       return [
         {
           path,
+          fatal: true,
           message: `Expecting a non-null object, getting ${toString.call(
             value,
           )}.`,
@@ -241,9 +247,9 @@ export class ObjectType<
       ];
     }
 
-    let [exactContext, nestedExact, inherited] = this.getExactContext(
+    let {managedContext, wrappedExact, nestedExact} = this.getExactContext(
       exact,
-      false,
+      'managed',
     );
 
     let issues: TypeIssue[] = [];
@@ -255,12 +261,12 @@ export class ObjectType<
       );
     }
 
-    if (exactContext) {
-      exactContext.addKeys(entries.map(([key]) => key));
+    if (wrappedExact) {
+      wrappedExact.addKeys(entries.map(([key]) => key));
+    }
 
-      if (!inherited) {
-        issues.push(...exactContext.getIssues(value, path));
-      }
+    if (managedContext) {
+      issues.push(...managedContext.getIssues(value, path));
     }
 
     return issues;

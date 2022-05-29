@@ -98,19 +98,27 @@ export function merge(partials: unknown[]): unknown {
   return merged;
 }
 
-export function buildTypeIssue(error: unknown, path: TypePath): TypeIssue;
-export function buildTypeIssue(
+export function buildFatalIssueByError(
+  error: unknown,
+  path: TypePath,
+): TypeIssue;
+export function buildFatalIssueByError(
   error: string | Error,
   path: TypePath,
 ): TypeIssue {
   return {
     path,
+    fatal: true,
     message: typeof error === 'string' ? error : error.message,
   };
 }
 
+export function hasFatalIssue(issues: TypeIssue[]): boolean {
+  return issues.some(issue => issue.fatal);
+}
+
 export class ExactContext {
-  activated = false;
+  touched = false;
   neutralized = false;
 
   private keySet = new Set<string>();
@@ -119,8 +127,8 @@ export class ExactContext {
     return Array.from(this.keySet);
   }
 
-  activate(): void {
-    this.activated = true;
+  touch(): void {
+    this.touched = true;
   }
 
   neutralize(): void {
@@ -128,6 +136,8 @@ export class ExactContext {
   }
 
   addKeys(keys: string[]): void {
+    this.touched = true;
+
     let set = this.keySet;
 
     for (let key of keys) {
@@ -136,7 +146,7 @@ export class ExactContext {
   }
 
   getIssues(value: unknown, path: TypePath): TypeIssue[] {
-    if (!this.activated || this.neutralized) {
+    if (!this.touched || this.neutralized) {
       return [];
     }
 
@@ -152,6 +162,7 @@ export class ExactContext {
     return [
       {
         path,
+        fatal: false,
         message: `Unknown key(s) ${unknownKeys
           .map(key => JSON.stringify(key))
           .join(', ')}.`,

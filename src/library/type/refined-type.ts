@@ -1,5 +1,5 @@
 import type {RefinedMediumType} from '../@internal';
-import {buildTypeIssue} from '../@internal';
+import {buildFatalIssueByError, hasFatalIssue} from '../@internal';
 import type {Medium} from '../medium';
 
 import type {
@@ -39,27 +39,24 @@ export class RefinedType<
     path: TypePath,
     exact: Exact,
   ): [unknown, TypeIssue[]] {
-    let [exactContext, nestedExact, inherited] = this.getExactContext(
-      exact,
-      true,
-    );
+    let {wrappedExact} = this.getExactContext(exact, 'transparent');
 
     let [value, issues] = this.Type._decode(
       medium,
       unpacked,
       path,
-      nestedExact,
+      wrappedExact,
     );
 
-    if (issues.length === 0) {
-      issues = this.diagnoseConstraints(value, path);
+    if (hasFatalIssue(issues)) {
+      return [undefined, issues];
     }
 
-    if (exactContext && !inherited) {
-      issues.push(...exactContext.getIssues(unpacked, path));
-    }
+    let diagnoseIssues = this.diagnoseConstraints(value, path);
 
-    return [issues.length === 0 ? value : undefined, issues];
+    issues.push(...diagnoseIssues);
+
+    return [hasFatalIssue(diagnoseIssues) ? undefined : value, issues];
   }
 
   /** @internal */
@@ -70,31 +67,33 @@ export class RefinedType<
     exact: Exact,
     diagnose: boolean,
   ): [unknown, TypeIssue[]] {
-    let [exactContext, nestedExact, inherited] = diagnose
-      ? this.getExactContext(exact, true)
-      : [undefined, false, false];
+    let {wrappedExact} = diagnose
+      ? this.getExactContext(exact, 'transparent')
+      : {wrappedExact: false};
 
     let [unpacked, issues] = this.Type._encode(
       medium,
       value,
       path,
-      nestedExact,
+      wrappedExact,
       diagnose,
     );
 
-    if (issues.length > 0) {
+    if (hasFatalIssue(issues)) {
       return [undefined, issues];
     }
 
     if (diagnose) {
-      issues = this.diagnoseConstraints(value, path);
+      let diagnoseIssues = this.diagnoseConstraints(value, path);
 
-      if (exactContext && !inherited) {
-        issues.push(...exactContext.getIssues(value, path));
+      issues.push(...diagnoseIssues);
+
+      if (hasFatalIssue(diagnoseIssues)) {
+        return [undefined, issues];
       }
     }
 
-    return [issues.length === 0 ? unpacked : undefined, issues];
+    return [unpacked, issues];
   }
 
   /** @internal */
@@ -107,31 +106,39 @@ export class RefinedType<
   ): [unknown, TypeIssue[]] {
     let [value, issues] = this._decode(from, unpacked, path, exact);
 
-    if (issues.length > 0) {
+    if (hasFatalIssue(issues)) {
       return [undefined, issues];
     }
 
-    return this._encode(to, value, path, false, false);
+    let [transformedUnpacked, transformIssues] = this._encode(
+      to,
+      value,
+      path,
+      false,
+      false,
+    );
+
+    issues.push(...transformIssues);
+
+    return [
+      hasFatalIssue(transformIssues) ? undefined : transformedUnpacked,
+      issues,
+    ];
   }
 
   /** @internal */
   _diagnose(value: unknown, path: TypePath, exact: Exact): TypeIssue[] {
-    let [exactContext, nestedExact, inherited] = this.getExactContext(
-      exact,
-      true,
-    );
+    let {wrappedExact} = this.getExactContext(exact, 'transparent');
 
-    let issues = this.Type._diagnose(value, path, nestedExact);
+    let issues = this.Type._diagnose(value, path, wrappedExact);
 
-    if (issues.length > 0) {
+    if (hasFatalIssue(issues)) {
       return issues;
     }
 
-    issues = this.diagnoseConstraints(value, path);
+    let diagnoseIssues = this.diagnoseConstraints(value, path);
 
-    if (exactContext && !inherited) {
-      issues.push(...exactContext.getIssues(value, path));
-    }
+    issues.push(...diagnoseIssues);
 
     return issues;
   }
@@ -145,7 +152,7 @@ export class RefinedType<
       try {
         result = constraint(value) ?? true;
       } catch (error) {
-        issues.push(buildTypeIssue(error, path));
+        issues.push(buildFatalIssueByError(error, path));
         continue;
       }
 
@@ -155,6 +162,7 @@ export class RefinedType<
 
       issues.push({
         path,
+        fatal: true,
         message: typeof result === 'string' ? result : 'Unexpected value.',
       });
     }

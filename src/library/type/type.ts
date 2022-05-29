@@ -190,60 +190,110 @@ export abstract class Type<
 
   protected getExactContext(
     exact: Exact,
-    wrapper: boolean,
+    wrapper: 'managed',
+  ): {
+    /**
+     * Undefined if not exact or inherited (not managed by the current type).
+     */
+    managedContext: ExactContext | undefined;
+    wrappedExact: ExactContext | false;
+    nestedExact: Exact;
+  };
+  protected getExactContext(
+    exact: Exact,
+    wrapper: 'transparent',
+  ): {
+    managedContext: undefined;
+    wrappedExact: Exact;
+    nestedExact: Exact;
+  };
+  protected getExactContext(
+    exact: Exact,
+    wrapper: false,
+    neutralize?: boolean,
+  ): {
+    managedContext: undefined;
+    wrappedExact: false;
+    nestedExact: Exact;
+  };
+  protected getExactContext(
+    exact: Exact,
+    wrapper: 'managed' | 'transparent' | false,
     neutralize = false,
-  ): [context: ExactContext | undefined, nested: Exact, inherited: boolean] {
+  ): {
+    managedContext: ExactContext | undefined;
+    wrappedExact: Exact;
+    nestedExact: Exact;
+  } {
     let selfExact = this._exact;
 
     if (selfExact === false) {
       if (typeof exact !== 'boolean') {
         if (!wrapper) {
-          exact.activate();
+          exact.touch();
         }
 
         exact.neutralize();
       }
 
-      return [undefined, false, false];
+      return {
+        managedContext: undefined,
+        wrappedExact: false,
+        nestedExact: false,
+      };
     }
 
     if (typeof exact === 'boolean') {
       if (exact || selfExact) {
-        let context = new ExactContext();
+        if (wrapper === 'managed') {
+          let context = new ExactContext();
 
-        if (!wrapper) {
-          context.activate();
+          return {
+            managedContext: context,
+            wrappedExact: context,
+            nestedExact: true,
+          };
+        } else if (wrapper === 'transparent') {
+          return {
+            managedContext: undefined,
+            wrappedExact: true,
+            nestedExact: true,
+          };
+        } else {
+          return {
+            managedContext: undefined,
+            wrappedExact: false,
+            nestedExact: true,
+          };
         }
-
-        if (neutralize) {
-          context.neutralize();
-        }
-
-        return [context, wrapper ? context : true, false];
       } else {
-        return [undefined, false, false];
+        return {
+          managedContext: undefined,
+          wrappedExact: false,
+          nestedExact: false,
+        };
       }
     } else {
-      if (!wrapper) {
-        exact.activate();
+      if (wrapper) {
+        return {
+          managedContext: undefined,
+          wrappedExact: exact,
+          nestedExact: true,
+        };
+      } else {
+        exact.touch();
+
+        if (neutralize) {
+          exact.neutralize();
+        }
+
+        return {
+          managedContext: undefined,
+          wrappedExact: false,
+          nestedExact: true,
+        };
       }
-
-      if (neutralize) {
-        exact.neutralize();
-      }
-
-      return [exact, wrapper ? exact : true, true];
     }
-  }
-
-  protected getNonWrapperNestedExact(exact: Exact): Exact {
-    let selfExact = this._exact;
-
-    if (selfExact === false) {
-      return false;
-    }
-
-    return exact !== false || selfExact === true;
   }
 }
 
@@ -256,6 +306,7 @@ export type TypePath = (
 
 export interface TypeIssue {
   path: TypePath;
+  fatal: boolean;
   message: string;
 }
 

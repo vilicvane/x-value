@@ -26,23 +26,9 @@ export class RecursiveType<TRecursive> extends Type<
     path: TypePath,
     exact: Exact,
   ): [unknown, TypeIssue[]] {
-    let [exactContext, nestedExact, inherited] = this.getExactContext(
-      exact,
-      true,
-    );
+    let {wrappedExact} = this.getExactContext(exact, 'transparent');
 
-    let [value, issues] = this.Type._decode(
-      medium,
-      unpacked,
-      path,
-      nestedExact,
-    );
-
-    if (exactContext && !inherited) {
-      issues.push(...exactContext.getIssues(unpacked, path));
-    }
-
-    return [issues.length === 0 ? value : undefined, issues];
+    return this.Type._decode(medium, unpacked, path, wrappedExact);
   }
 
   /** @internal */
@@ -53,23 +39,11 @@ export class RecursiveType<TRecursive> extends Type<
     exact: Exact,
     diagnose: boolean,
   ): [unknown, TypeIssue[]] {
-    let [exactContext, nestedExact, inherited] = diagnose
-      ? this.getExactContext(exact, true)
-      : [undefined, false, false];
+    let {wrappedExact} = diagnose
+      ? this.getExactContext(exact, 'transparent')
+      : {wrappedExact: false};
 
-    let [unpacked, issues] = this.Type._encode(
-      medium,
-      value,
-      path,
-      nestedExact,
-      diagnose,
-    );
-
-    if (exactContext && !inherited) {
-      issues.push(...exactContext.getIssues(value, path));
-    }
-
-    return [issues.length === 0 ? unpacked : undefined, issues];
+    return this.Type._encode(medium, value, path, wrappedExact, diagnose);
   }
 
   /** @internal */
@@ -80,40 +54,16 @@ export class RecursiveType<TRecursive> extends Type<
     path: TypePath,
     exact: Exact,
   ): [unknown, TypeIssue[]] {
-    let [exactContext, nestedExact, inherited] = this.getExactContext(
-      exact,
-      true,
-    );
+    let {wrappedExact} = this.getExactContext(exact, 'transparent');
 
-    let [transformedUnpacked, issues] = this.Type._transform(
-      from,
-      to,
-      unpacked,
-      path,
-      nestedExact,
-    );
-
-    if (exactContext && !inherited) {
-      issues.push(...exactContext.getIssues(unpacked, path));
-    }
-
-    return [issues.length === 0 ? transformedUnpacked : undefined, issues];
+    return this.Type._transform(from, to, unpacked, path, wrappedExact);
   }
 
   /** @internal */
   _diagnose(value: unknown, path: TypePath, exact: Exact): TypeIssue[] {
-    let [exactContext, nestedExact, inherited] = this.getExactContext(
-      exact,
-      true,
-    );
+    let {wrappedExact} = this.getExactContext(exact, 'transparent');
 
-    let issues = this.Type._diagnose(value, path, nestedExact);
-
-    if (exactContext && !inherited) {
-      issues.push(...exactContext.getIssues(value, path));
-    }
-
-    return issues;
+    return this.Type._diagnose(value, path, wrappedExact);
   }
 }
 

@@ -1,5 +1,5 @@
 import type {TupleInMedium} from '../@internal';
-import {ExactContext} from '../@internal';
+import {ExactContext, hasFatalIssue} from '../@internal';
 import type {Medium} from '../medium';
 
 import type {Exact, TypeInMediumsPartial, TypeIssue, TypePath} from './type';
@@ -30,16 +30,14 @@ export class UnionType<
     path: TypePath,
     exact: Exact,
   ): [unknown, TypeIssue[]] {
-    let [exactContext, nestedExact, inherited] = this.getExactContext(
-      exact,
-      false,
-    );
+    let {wrappedExact} = this.getExactContext(exact, 'transparent');
 
     let maxIssuePathLength = -1;
     let outputIssues!: TypeIssue[];
 
     for (let Type of this.TypeTuple) {
-      let dedicatedExact = nestedExact ? new ExactContext() : false;
+      let dedicatedExact =
+        typeof wrappedExact === 'boolean' ? wrappedExact : new ExactContext();
 
       let [value, issues] = Type._decode(
         medium,
@@ -48,18 +46,10 @@ export class UnionType<
         dedicatedExact,
       );
 
-      if (issues.length === 0) {
-        issues.push(
-          ...syncDedicatedExactAndGetIssues(
-            exactContext,
-            dedicatedExact,
-            inherited,
-            unpacked,
-            path,
-          ),
-        );
+      if (!hasFatalIssue(issues)) {
+        syncDedicatedExact(wrappedExact, dedicatedExact);
 
-        return [issues.length > 0 ? undefined : value, issues];
+        return [value, issues];
       }
 
       let pathLength = Math.max(...issues.map(issue => issue.path.length));
@@ -75,6 +65,7 @@ export class UnionType<
       [
         {
           path,
+          fatal: true,
           message:
             'The unpacked value satisfies none of the type in the union type.',
         },
@@ -91,15 +82,16 @@ export class UnionType<
     exact: Exact,
     diagnose: boolean,
   ): [unknown, TypeIssue[]] {
-    let [exactContext, nestedExact, inherited] = diagnose
-      ? this.getExactContext(exact, false)
-      : [undefined, false, false];
+    let {wrappedExact} = diagnose
+      ? this.getExactContext(exact, 'transparent')
+      : {wrappedExact: false};
 
     let maxIssuePathLength = -1;
     let outputIssues!: TypeIssue[];
 
     for (let Type of this.TypeTuple) {
-      let dedicatedExact = nestedExact ? new ExactContext() : false;
+      let dedicatedExact =
+        typeof wrappedExact === 'boolean' ? wrappedExact : new ExactContext();
 
       let [unpacked, issues] = Type._encode(
         medium,
@@ -109,18 +101,10 @@ export class UnionType<
         diagnose,
       );
 
-      if (issues.length === 0) {
-        issues.push(
-          ...syncDedicatedExactAndGetIssues(
-            exactContext,
-            dedicatedExact,
-            inherited,
-            value,
-            path,
-          ),
-        );
+      if (!hasFatalIssue(issues)) {
+        syncDedicatedExact(wrappedExact, dedicatedExact);
 
-        return [issues.length > 0 ? undefined : unpacked, issues];
+        return [unpacked, issues];
       }
 
       let pathLength = Math.max(...issues.map(issue => issue.path.length));
@@ -138,8 +122,8 @@ export class UnionType<
       [
         {
           path,
-          message:
-            'The unpacked value satisfies none of the type in the union type.',
+          fatal: true,
+          message: 'The value satisfies none of the type in the union type.',
         },
         ...outputIssues,
       ],
@@ -154,16 +138,14 @@ export class UnionType<
     path: TypePath,
     exact: Exact,
   ): [unknown, TypeIssue[]] {
-    let [exactContext, nestedExact, inherited] = this.getExactContext(
-      exact,
-      false,
-    );
+    let {wrappedExact} = this.getExactContext(exact, 'transparent');
 
     let maxIssuePathLength = -1;
     let outputIssues!: TypeIssue[];
 
     for (let Type of this.TypeTuple) {
-      let dedicatedExact = nestedExact ? new ExactContext() : false;
+      let dedicatedExact =
+        typeof wrappedExact === 'boolean' ? wrappedExact : new ExactContext();
 
       let [transformedUnpacked, issues] = Type._transform(
         from,
@@ -173,18 +155,10 @@ export class UnionType<
         dedicatedExact,
       );
 
-      if (issues.length === 0) {
-        issues.push(
-          ...syncDedicatedExactAndGetIssues(
-            exactContext,
-            dedicatedExact,
-            inherited,
-            unpacked,
-            path,
-          ),
-        );
+      if (!hasFatalIssue(issues)) {
+        syncDedicatedExact(wrappedExact, dedicatedExact);
 
-        return [issues.length > 0 ? undefined : transformedUnpacked, issues];
+        return [transformedUnpacked, issues];
       }
 
       let pathLength = Math.max(...issues.map(issue => issue.path.length));
@@ -200,6 +174,7 @@ export class UnionType<
       [
         {
           path,
+          fatal: true,
           message:
             'The unpacked value satisfies none of the type in the union type.',
         },
@@ -210,29 +185,19 @@ export class UnionType<
 
   /** @internal */
   _diagnose(value: unknown, path: TypePath, exact: Exact): TypeIssue[] {
-    let [exactContext, nestedExact, inherited] = this.getExactContext(
-      exact,
-      false,
-    );
+    let {wrappedExact} = this.getExactContext(exact, 'transparent');
 
     let maxIssuePathLength = -1;
     let outputIssues!: TypeIssue[];
 
     for (let Type of this.TypeTuple) {
-      let dedicatedExact = nestedExact ? new ExactContext() : false;
+      let dedicatedExact =
+        typeof wrappedExact === 'boolean' ? wrappedExact : new ExactContext();
 
       let issues = Type._diagnose(value, path, dedicatedExact);
 
-      if (issues.length === 0) {
-        issues.push(
-          ...syncDedicatedExactAndGetIssues(
-            exactContext,
-            dedicatedExact,
-            inherited,
-            value,
-            path,
-          ),
-        );
+      if (!hasFatalIssue(issues)) {
+        syncDedicatedExact(wrappedExact, dedicatedExact);
 
         return issues;
       }
@@ -245,7 +210,14 @@ export class UnionType<
       }
     }
 
-    return outputIssues;
+    return [
+      {
+        path,
+        fatal: true,
+        message: 'The value satisfies none of the type in the union type.',
+      },
+      ...outputIssues,
+    ];
   }
 }
 
@@ -263,24 +235,17 @@ type UnionInMediums<TTypeTuple extends TypeInMediumsPartial[]> = {
   [TKey in XValue.UsingName]: TupleInMedium<TTypeTuple, TKey>[number];
 };
 
-function syncDedicatedExactAndGetIssues(
-  exactContext: ExactContext | undefined,
-  dedicatedExact: ExactContext | false,
-  inherited: boolean,
-  object: unknown,
-  path: TypePath,
-): TypeIssue[] {
-  if (exactContext && dedicatedExact && dedicatedExact.activated) {
-    if (dedicatedExact.activated) {
-      exactContext.addKeys(dedicatedExact.keys);
+function syncDedicatedExact(wrappedExact: Exact, dedicatedExact: Exact): void {
+  if (
+    typeof wrappedExact !== 'boolean' &&
+    typeof dedicatedExact !== 'boolean'
+  ) {
+    if (dedicatedExact.touched) {
+      wrappedExact.addKeys(dedicatedExact.keys);
     }
 
     if (dedicatedExact.neutralized) {
-      exactContext.neutralize();
+      wrappedExact.neutralize();
     }
-
-    return inherited ? [] : exactContext.getIssues(object, path);
   }
-
-  return [];
 }
