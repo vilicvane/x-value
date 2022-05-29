@@ -288,13 +288,11 @@ test('exact with refined type should work', () => {
   expect(O.diagnose(invalid1)).toMatchInlineSnapshot(`
     Array [
       Object {
-        "fatal": false,
-        "message": "Unknown key(s) \\"bar\\".",
+        "message": "Unexpected value.",
         "path": Array [],
       },
       Object {
-        "fatal": true,
-        "message": "Unexpected value.",
+        "message": "Unknown key(s) \\"bar\\".",
         "path": Array [],
       },
     ]
@@ -302,7 +300,6 @@ test('exact with refined type should work', () => {
   expect(O.diagnose(invalid2)).toMatchInlineSnapshot(`
     Array [
       Object {
-        "fatal": false,
         "message": "Unknown key(s) \\"bar\\".",
         "path": Array [],
       },
@@ -310,8 +307,8 @@ test('exact with refined type should work', () => {
   `);
   expect(() => O.encode(x.json, invalid1)).toThrowErrorMatchingInlineSnapshot(`
     "Failed to encode to medium:
-      Unknown key(s) \\"bar\\".
-      Unexpected value."
+      Unexpected value.
+      Unknown key(s) \\"bar\\"."
   `);
   expect(() => O.encode(x.json, invalid2)).toThrowErrorMatchingInlineSnapshot(`
     "Failed to encode to medium:
@@ -320,8 +317,8 @@ test('exact with refined type should work', () => {
   expect(() => O.decode(x.jsonValue, invalid1))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to decode from medium:
-      Unknown key(s) \\"bar\\".
-      Unexpected value."
+      Unexpected value.
+      Unknown key(s) \\"bar\\"."
   `);
   expect(() => O.decode(x.jsonValue, invalid2))
     .toThrowErrorMatchingInlineSnapshot(`
@@ -331,8 +328,8 @@ test('exact with refined type should work', () => {
   expect(() => O.transform(x.jsonValue, x.json, invalid1))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to transform medium:
-      Unknown key(s) \\"bar\\".
-      Unexpected value."
+      Unexpected value.
+      Unknown key(s) \\"bar\\"."
   `);
   expect(() => O.transform(x.jsonValue, x.json, invalid2))
     .toThrowErrorMatchingInlineSnapshot(`

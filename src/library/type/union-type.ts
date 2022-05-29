@@ -1,9 +1,9 @@
 import type {TupleInMedium} from '../@internal';
-import {ExactContext, hasFatalIssue} from '../@internal';
+import {ExactContext} from '../@internal';
 import type {Medium} from '../medium';
 
 import type {Exact, TypeInMediumsPartial, TypeIssue, TypePath} from './type';
-import {Type, __type_kind} from './type';
+import {DISABLED_EXACT_CONTEXT_RESULT, Type, __type_kind} from './type';
 
 export class UnionType<
   TTypeTuple extends [
@@ -30,7 +30,7 @@ export class UnionType<
     path: TypePath,
     exact: Exact,
   ): [unknown, TypeIssue[]] {
-    let {wrappedExact} = this.getExactContext(exact, 'transparent');
+    let {managedContext, wrappedExact} = this.getExactContext(exact, 'managed');
 
     let maxIssuePathLength = -1;
     let outputIssues!: TypeIssue[];
@@ -46,10 +46,14 @@ export class UnionType<
         dedicatedExact,
       );
 
-      if (!hasFatalIssue(issues)) {
+      if (issues.length === 0) {
         syncDedicatedExact(wrappedExact, dedicatedExact);
 
-        return [value, issues];
+        if (managedContext) {
+          issues.push(...managedContext.getIssues(unpacked, path));
+        }
+
+        return [issues.length === 0 ? value : undefined, issues];
       }
 
       let pathLength = Math.max(...issues.map(issue => issue.path.length));
@@ -65,7 +69,6 @@ export class UnionType<
       [
         {
           path,
-          fatal: true,
           message:
             'The unpacked value satisfies none of the type in the union type.',
         },
@@ -82,9 +85,9 @@ export class UnionType<
     exact: Exact,
     diagnose: boolean,
   ): [unknown, TypeIssue[]] {
-    let {wrappedExact} = diagnose
-      ? this.getExactContext(exact, 'transparent')
-      : {wrappedExact: false};
+    let {managedContext, wrappedExact} = diagnose
+      ? this.getExactContext(exact, 'managed')
+      : DISABLED_EXACT_CONTEXT_RESULT;
 
     let maxIssuePathLength = -1;
     let outputIssues!: TypeIssue[];
@@ -101,10 +104,14 @@ export class UnionType<
         diagnose,
       );
 
-      if (!hasFatalIssue(issues)) {
+      if (issues.length === 0) {
         syncDedicatedExact(wrappedExact, dedicatedExact);
 
-        return [unpacked, issues];
+        if (managedContext) {
+          issues.push(...managedContext.getIssues(value, path));
+        }
+
+        return [issues.length === 0 ? unpacked : undefined, issues];
       }
 
       let pathLength = Math.max(...issues.map(issue => issue.path.length));
@@ -122,7 +129,6 @@ export class UnionType<
       [
         {
           path,
-          fatal: true,
           message: 'The value satisfies none of the type in the union type.',
         },
         ...outputIssues,
@@ -138,7 +144,7 @@ export class UnionType<
     path: TypePath,
     exact: Exact,
   ): [unknown, TypeIssue[]] {
-    let {wrappedExact} = this.getExactContext(exact, 'transparent');
+    let {managedContext, wrappedExact} = this.getExactContext(exact, 'managed');
 
     let maxIssuePathLength = -1;
     let outputIssues!: TypeIssue[];
@@ -155,10 +161,14 @@ export class UnionType<
         dedicatedExact,
       );
 
-      if (!hasFatalIssue(issues)) {
+      if (issues.length === 0) {
         syncDedicatedExact(wrappedExact, dedicatedExact);
 
-        return [transformedUnpacked, issues];
+        if (managedContext) {
+          issues.push(...managedContext.getIssues(unpacked, path));
+        }
+
+        return [issues.length === 0 ? transformedUnpacked : undefined, issues];
       }
 
       let pathLength = Math.max(...issues.map(issue => issue.path.length));
@@ -174,7 +184,6 @@ export class UnionType<
       [
         {
           path,
-          fatal: true,
           message:
             'The unpacked value satisfies none of the type in the union type.',
         },
@@ -185,7 +194,7 @@ export class UnionType<
 
   /** @internal */
   _diagnose(value: unknown, path: TypePath, exact: Exact): TypeIssue[] {
-    let {wrappedExact} = this.getExactContext(exact, 'transparent');
+    let {managedContext, wrappedExact} = this.getExactContext(exact, 'managed');
 
     let maxIssuePathLength = -1;
     let outputIssues!: TypeIssue[];
@@ -196,8 +205,12 @@ export class UnionType<
 
       let issues = Type._diagnose(value, path, dedicatedExact);
 
-      if (!hasFatalIssue(issues)) {
+      if (issues.length === 0) {
         syncDedicatedExact(wrappedExact, dedicatedExact);
+
+        if (managedContext) {
+          issues.push(...managedContext.getIssues(value, path));
+        }
 
         return issues;
       }
@@ -213,7 +226,6 @@ export class UnionType<
     return [
       {
         path,
-        fatal: true,
         message: 'The value satisfies none of the type in the union type.',
       },
       ...outputIssues,

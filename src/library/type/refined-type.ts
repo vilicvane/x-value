@@ -1,5 +1,5 @@
 import type {RefinedMediumType} from '../@internal';
-import {buildFatalIssueByError, hasFatalIssue} from '../@internal';
+import {buildIssueByError} from '../@internal';
 import type {Medium} from '../medium';
 
 import type {
@@ -11,7 +11,7 @@ import type {
   TypesInMediums,
   __type_in_mediums,
 } from './type';
-import {Type, __type_kind} from './type';
+import {DISABLED_EXACT_CONTEXT_RESULT, Type, __type_kind} from './type';
 
 export class RefinedType<
   TType extends TypeInMediumsPartial,
@@ -39,7 +39,7 @@ export class RefinedType<
     path: TypePath,
     exact: Exact,
   ): [unknown, TypeIssue[]] {
-    let {wrappedExact} = this.getExactContext(exact, 'transparent');
+    let {managedContext, wrappedExact} = this.getExactContext(exact, 'managed');
 
     let [value, issues] = this.Type._decode(
       medium,
@@ -48,15 +48,17 @@ export class RefinedType<
       wrappedExact,
     );
 
-    if (hasFatalIssue(issues)) {
+    if (issues.length > 0) {
       return [undefined, issues];
     }
 
-    let diagnoseIssues = this.diagnoseConstraints(value, path);
+    issues = this.diagnoseConstraints(value, path);
 
-    issues.push(...diagnoseIssues);
+    if (managedContext) {
+      issues.push(...managedContext.getIssues(unpacked, path));
+    }
 
-    return [hasFatalIssue(diagnoseIssues) ? undefined : value, issues];
+    return [issues.length === 0 ? value : undefined, issues];
   }
 
   /** @internal */
@@ -67,9 +69,9 @@ export class RefinedType<
     exact: Exact,
     diagnose: boolean,
   ): [unknown, TypeIssue[]] {
-    let {wrappedExact} = diagnose
-      ? this.getExactContext(exact, 'transparent')
-      : {wrappedExact: false};
+    let {managedContext, wrappedExact} = diagnose
+      ? this.getExactContext(exact, 'managed')
+      : DISABLED_EXACT_CONTEXT_RESULT;
 
     let [unpacked, issues] = this.Type._encode(
       medium,
@@ -79,16 +81,18 @@ export class RefinedType<
       diagnose,
     );
 
-    if (hasFatalIssue(issues)) {
+    if (issues.length > 0) {
       return [undefined, issues];
     }
 
     if (diagnose) {
-      let diagnoseIssues = this.diagnoseConstraints(value, path);
+      issues = this.diagnoseConstraints(value, path);
 
-      issues.push(...diagnoseIssues);
+      if (managedContext) {
+        issues.push(...managedContext.getIssues(value, path));
+      }
 
-      if (hasFatalIssue(diagnoseIssues)) {
+      if (issues.length > 0) {
         return [undefined, issues];
       }
     }
@@ -106,39 +110,28 @@ export class RefinedType<
   ): [unknown, TypeIssue[]] {
     let [value, issues] = this._decode(from, unpacked, path, exact);
 
-    if (hasFatalIssue(issues)) {
+    if (issues.length > 0) {
       return [undefined, issues];
     }
 
-    let [transformedUnpacked, transformIssues] = this._encode(
-      to,
-      value,
-      path,
-      false,
-      false,
-    );
-
-    issues.push(...transformIssues);
-
-    return [
-      hasFatalIssue(transformIssues) ? undefined : transformedUnpacked,
-      issues,
-    ];
+    return this._encode(to, value, path, false, false);
   }
 
   /** @internal */
   _diagnose(value: unknown, path: TypePath, exact: Exact): TypeIssue[] {
-    let {wrappedExact} = this.getExactContext(exact, 'transparent');
+    let {managedContext, wrappedExact} = this.getExactContext(exact, 'managed');
 
     let issues = this.Type._diagnose(value, path, wrappedExact);
 
-    if (hasFatalIssue(issues)) {
+    if (issues.length > 0) {
       return issues;
     }
 
-    let diagnoseIssues = this.diagnoseConstraints(value, path);
+    issues = this.diagnoseConstraints(value, path);
 
-    issues.push(...diagnoseIssues);
+    if (managedContext) {
+      issues.push(...managedContext.getIssues(value, path));
+    }
 
     return issues;
   }
@@ -152,7 +145,7 @@ export class RefinedType<
       try {
         result = constraint(value) ?? true;
       } catch (error) {
-        issues.push(buildFatalIssueByError(error, path));
+        issues.push(buildIssueByError(error, path));
         continue;
       }
 
@@ -162,7 +155,6 @@ export class RefinedType<
 
       issues.push({
         path,
-        fatal: true,
         message: typeof result === 'string' ? result : 'Unexpected value.',
       });
     }

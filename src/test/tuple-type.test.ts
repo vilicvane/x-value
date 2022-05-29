@@ -12,7 +12,6 @@ test('tuple type should work', () => {
   expect(Tuple.diagnose(invalid3)).toMatchInlineSnapshot(`
     Array [
       Object {
-        "fatal": true,
         "message": "Expecting value with 2 instead of 3 element(s).",
         "path": Array [],
       },
@@ -117,7 +116,6 @@ test('exact with tuple type should work', () => {
   expect(Tuple.diagnose(invalid1)).toMatchInlineSnapshot(`
     Array [
       Object {
-        "fatal": false,
         "message": "Unknown key(s) \\"extra\\".",
         "path": Array [
           1,

@@ -412,7 +412,6 @@ test('object shallow exact type should work', () => {
     .toMatchInlineSnapshot(`
     Array [
       Object {
-        "fatal": false,
         "message": "Unknown key(s) \\"extra\\".",
         "path": Array [],
       },
@@ -524,7 +523,6 @@ test('object nested exact should work', () => {
   expect(O.diagnose(value3)).toMatchInlineSnapshot(`
     Array [
       Object {
-        "fatal": false,
         "message": "Unknown key(s) \\"extra\\".",
         "path": Array [
           "bar",
@@ -535,7 +533,6 @@ test('object nested exact should work', () => {
   expect(O.diagnose(value4)).toMatchInlineSnapshot(`
     Array [
       Object {
-        "fatal": false,
         "message": "Unknown key(s) \\"extra1\\", \\"extra2\\".",
         "path": Array [
           "bar",
@@ -603,7 +600,6 @@ test('explicit non-exact object with intersection', () => {
   expect(O.diagnose(invalid1)).toMatchInlineSnapshot(`
     Array [
       Object {
-        "fatal": true,
         "message": "Expected string, getting [object Undefined].",
         "path": Array [
           "foo",

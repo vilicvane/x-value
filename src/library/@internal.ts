@@ -98,23 +98,15 @@ export function merge(partials: unknown[]): unknown {
   return merged;
 }
 
-export function buildFatalIssueByError(
-  error: unknown,
-  path: TypePath,
-): TypeIssue;
-export function buildFatalIssueByError(
+export function buildIssueByError(error: unknown, path: TypePath): TypeIssue;
+export function buildIssueByError(
   error: string | Error,
   path: TypePath,
 ): TypeIssue {
   return {
     path,
-    fatal: true,
     message: typeof error === 'string' ? error : error.message,
   };
-}
-
-export function hasFatalIssue(issues: TypeIssue[]): boolean {
-  return issues.some(issue => issue.fatal);
 }
 
 export class ExactContext {
@@ -162,7 +154,6 @@ export class ExactContext {
     return [
       {
         path,
-        fatal: false,
         message: `Unknown key(s) ${unknownKeys
           .map(key => JSON.stringify(key))
           .join(', ')}.`,

@@ -9,4 +9,4 @@ bld/
 # Test Outputs
 /coverage/
 # Drafts
-/src/test/design.ts
+/test.js

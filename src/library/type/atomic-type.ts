@@ -1,7 +1,4 @@
-import {
-  buildFatalIssueByError as buildFatalIssueFromError,
-  hasFatalIssue as hasFatalIssue,
-} from '../@internal';
+import {buildIssueByError} from '../@internal';
 import type {Medium} from '../medium';
 
 import type {Exact, TypeConstraint, TypeIssue, TypePath} from './type';
@@ -29,12 +26,12 @@ export class AtomicType<TSymbol extends symbol> extends Type<
     try {
       value = medium.requireCodec(this.symbol).decode(unpacked);
     } catch (error) {
-      return [undefined, [buildFatalIssueFromError(error, path)]];
+      return [undefined, [buildIssueByError(error, path)]];
     }
 
     let issues = this._diagnose(value, path, exact);
 
-    return [hasFatalIssue(issues) ? undefined : value, issues];
+    return [issues.length === 0 ? value : undefined, issues];
   }
 
   /** @internal */
@@ -50,7 +47,7 @@ export class AtomicType<TSymbol extends symbol> extends Type<
     if (diagnose) {
       issues = this._diagnose(value, path, exact);
 
-      if (hasFatalIssue(issues)) {
+      if (issues.length > 0) {
         return [undefined, issues];
       }
     } else {
@@ -60,7 +57,7 @@ export class AtomicType<TSymbol extends symbol> extends Type<
     try {
       return [medium.requireCodec(this.symbol).encode(value), issues];
     } catch (error) {
-      issues.push(buildFatalIssueFromError(error, path));
+      issues.push(buildIssueByError(error, path));
 
       return [undefined, issues];
     }
@@ -81,19 +78,19 @@ export class AtomicType<TSymbol extends symbol> extends Type<
     try {
       value = from.requireCodec(symbol).decode(unpacked);
     } catch (error) {
-      return [undefined, [buildFatalIssueFromError(error, path)]];
+      return [undefined, [buildIssueByError(error, path)]];
     }
 
     let issues = this._diagnose(value, path, exact);
 
-    if (hasFatalIssue(issues)) {
+    if (issues.length > 0) {
       return [undefined, issues];
     }
 
     try {
       return [to.requireCodec(symbol).encode(value), issues];
     } catch (error) {
-      issues.push(buildFatalIssueFromError(error, path));
+      issues.push(buildIssueByError(error, path));
 
       return [undefined, issues];
     }
@@ -112,7 +109,6 @@ export class AtomicType<TSymbol extends symbol> extends Type<
 
       issues.push({
         path,
-        fatal: true,
         message: typeof result === 'string' ? result : 'Unexpected value.',
       });
     }

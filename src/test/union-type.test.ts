@@ -170,7 +170,6 @@ test('exact with union type', () => {
   expect(Type.diagnose(invalid1)).toMatchInlineSnapshot(`
     Array [
       Object {
-        "fatal": false,
         "message": "Unknown key(s) \\"extra\\".",
         "path": Array [],
       },
@@ -179,7 +178,6 @@ test('exact with union type', () => {
   expect(Type.diagnose(invalid2)).toMatchInlineSnapshot(`
     Array [
       Object {
-        "fatal": false,
         "message": "Unknown key(s) \\"extra\\".",
         "path": Array [],
       },

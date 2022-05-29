@@ -173,7 +173,6 @@ test('date atomic refinement sunday should work with extended json medium', () =
   expect(Sunday.diagnose(monday)).toMatchInlineSnapshot(`
     Array [
       Object {
-        "fatal": true,
         "message": "Unexpected value.",
         "path": Array [],
       },
@@ -220,7 +219,6 @@ test('atomic with constraints array should work', () => {
   expect(Type.diagnose(123)).toMatchInlineSnapshot(`
     Array [
       Object {
-        "fatal": true,
         "message": "Unexpected value.",
         "path": Array [],
       },

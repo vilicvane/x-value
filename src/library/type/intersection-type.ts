@@ -1,9 +1,9 @@
 import type {TupleInMedium} from '../@internal';
-import {hasFatalIssue, merge} from '../@internal';
+import {merge} from '../@internal';
 import type {Medium} from '../medium';
 
 import type {Exact, TypeInMediumsPartial, TypeIssue, TypePath} from './type';
-import {Type, __type_kind} from './type';
+import {DISABLED_EXACT_CONTEXT_RESULT, Type, __type_kind} from './type';
 
 export class IntersectionType<
   TTypeTuple extends [
@@ -51,7 +51,7 @@ export class IntersectionType<
       issues.push(...managedContext.getIssues(unpacked, path));
     }
 
-    return [hasFatalIssue(issues) ? undefined : merge(partials), issues];
+    return [issues.length === 0 ? merge(partials) : undefined, issues];
   }
 
   /** @internal */
@@ -64,7 +64,7 @@ export class IntersectionType<
   ): [unknown, TypeIssue[]] {
     let {managedContext, wrappedExact} = diagnose
       ? this.getExactContext(exact, 'managed')
-      : {managedContext: undefined, wrappedExact: false};
+      : DISABLED_EXACT_CONTEXT_RESULT;
 
     let partials: unknown[] = [];
     let issues: TypeIssue[] = [];
@@ -86,7 +86,7 @@ export class IntersectionType<
       issues.push(...managedContext.getIssues(value, path));
     }
 
-    return [hasFatalIssue(issues) ? undefined : merge(partials), issues];
+    return [issues.length === 0 ? merge(partials) : undefined, issues];
   }
 
   /** @internal */
@@ -119,7 +119,7 @@ export class IntersectionType<
       issues.push(...managedContext.getIssues(unpacked, path));
     }
 
-    return [hasFatalIssue(issues) ? undefined : merge(partials), issues];
+    return [issues.length === 0 ? merge(partials) : undefined, issues];
   }
 
   /** @internal */

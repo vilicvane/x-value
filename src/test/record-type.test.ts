@@ -307,7 +307,6 @@ test('exact with record type should work', () => {
   expect(O.diagnose(invalid1)).toMatchInlineSnapshot(`
     Array [
       Object {
-        "fatal": false,
         "message": "Unknown key(s) \\"extra\\".",
         "path": Array [],
       },
@@ -316,7 +315,6 @@ test('exact with record type should work', () => {
   expect(O.diagnose(invalid2)).toMatchInlineSnapshot(`
     Array [
       Object {
-        "fatal": false,
         "message": "Unknown key(s) \\"extra\\".",
         "path": Array [
           "bar",
@@ -328,7 +326,6 @@ test('exact with record type should work', () => {
   expect(O.diagnose(invalid3)).toMatchInlineSnapshot(`
     Array [
       Object {
-        "fatal": false,
         "message": "Unknown key(s) \\"extra2\\".",
         "path": Array [
           "bar",
@@ -336,7 +333,6 @@ test('exact with record type should work', () => {
         ],
       },
       Object {
-        "fatal": false,
         "message": "Unknown key(s) \\"extra1\\".",
         "path": Array [],
       },
@@ -435,7 +431,6 @@ test('exact intersection with record', () => {
   expect(O.diagnose(invalid1)).toMatchInlineSnapshot(`
     Array [
       Object {
-        "fatal": false,
         "message": "Unknown key(s) \\"extra\\".",
         "path": Array [],
       },
@@ -478,7 +473,6 @@ test('exact intersect + union with record type', () => {
   expect(Type.diagnose(invalid1)).toMatchInlineSnapshot(`
     Array [
       Object {
-        "fatal": false,
         "message": "Unknown key(s) \\"extra\\".",
         "path": Array [],
       },

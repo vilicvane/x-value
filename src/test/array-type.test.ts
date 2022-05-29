@@ -146,7 +146,6 @@ test('object array type should work with json medium', () => {
   expect(Type.diagnose(value3)).toMatchInlineSnapshot(`
     Array [
       Object {
-        "fatal": true,
         "message": "Expecting a non-null object, getting [object Number].",
         "path": Array [
           0,
@@ -157,7 +156,6 @@ test('object array type should work with json medium', () => {
   expect(Type.diagnose(value4)).toMatchInlineSnapshot(`
     Array [
       Object {
-        "fatal": true,
         "message": "Expecting an array, getting [object String].",
         "path": Array [],
       },
@@ -187,7 +185,6 @@ test('exact with array type should work', () => {
   expect(Type.diagnose(value2)).toMatchInlineSnapshot(`
     Array [
       Object {
-        "fatal": false,
         "message": "Unknown key(s) \\"bar\\".",
         "path": Array [
           1,
@@ -247,7 +244,6 @@ test('explicit non-exact array', () => {
   expect(O.diagnose(invalid1)).toMatchInlineSnapshot(`
     Array [
       Object {
-        "fatal": false,
         "message": "Unknown key(s) \\"extra\\".",
         "path": Array [],
       },
@@ -256,7 +252,6 @@ test('explicit non-exact array', () => {
   expect(O.diagnose(invalid2)).toMatchInlineSnapshot(`
     Array [
       Object {
-        "fatal": true,
         "message": "Expecting an array, getting [object String].",
         "path": Array [
           "foo",

@@ -1,7 +1,7 @@
 import type {Medium} from '../medium';
 
 import type {Exact, TypeInMediumsPartial, TypeIssue, TypePath} from './type';
-import {Type, __type_kind} from './type';
+import {DISABLED_EXACT_CONTEXT_RESULT, Type, __type_kind} from './type';
 
 export class RecursiveType<TRecursive> extends Type<
   RecursiveInMediums<TRecursive>
@@ -41,7 +41,7 @@ export class RecursiveType<TRecursive> extends Type<
   ): [unknown, TypeIssue[]] {
     let {wrappedExact} = diagnose
       ? this.getExactContext(exact, 'transparent')
-      : {wrappedExact: false};
+      : DISABLED_EXACT_CONTEXT_RESULT;
 
     return this.Type._encode(medium, value, path, wrappedExact, diagnose);
   }

@@ -137,7 +137,6 @@ test('exact with recursive type should work', () => {
   expect(R.diagnose(invalid1)).toMatchInlineSnapshot(`
     Array [
       Object {
-        "fatal": false,
         "message": "Unknown key(s) \\"extra\\".",
         "path": Array [],
       },
@@ -146,7 +145,6 @@ test('exact with recursive type should work', () => {
   expect(R.diagnose(invalid2)).toMatchInlineSnapshot(`
     Array [
       Object {
-        "fatal": false,
         "message": "Unknown key(s) \\"extra\\".",
         "path": Array [
           "children",

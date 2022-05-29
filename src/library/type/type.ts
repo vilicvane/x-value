@@ -67,6 +67,13 @@ export abstract class TypeLike<
   abstract _diagnose(value: unknown, path: TypePath, exact: Exact): TypeIssue[];
 }
 
+export const DISABLED_EXACT_CONTEXT_RESULT = {
+  context: undefined,
+  managedContext: undefined,
+  wrappedExact: false,
+  nestedExact: false,
+};
+
 export abstract class Type<
   TInMediums extends TypesInMediums = TypesInMediums,
 > extends TypeLike<TInMediums> {
@@ -192,6 +199,7 @@ export abstract class Type<
     exact: Exact,
     wrapper: 'managed',
   ): {
+    context: ExactContext | undefined;
     /**
      * Undefined if not exact or inherited (not managed by the current type).
      */
@@ -203,6 +211,7 @@ export abstract class Type<
     exact: Exact,
     wrapper: 'transparent',
   ): {
+    context: ExactContext | undefined;
     managedContext: undefined;
     wrappedExact: Exact;
     nestedExact: Exact;
@@ -210,8 +219,8 @@ export abstract class Type<
   protected getExactContext(
     exact: Exact,
     wrapper: false,
-    neutralize?: boolean,
   ): {
+    context: ExactContext | undefined;
     managedContext: undefined;
     wrappedExact: false;
     nestedExact: Exact;
@@ -219,48 +228,61 @@ export abstract class Type<
   protected getExactContext(
     exact: Exact,
     wrapper: 'managed' | 'transparent' | false,
-    neutralize = false,
   ): {
+    context: ExactContext | undefined;
     managedContext: ExactContext | undefined;
     wrappedExact: Exact;
     nestedExact: Exact;
   } {
+    let context = typeof exact === 'boolean' ? undefined : exact;
+
     let selfExact = this._exact;
 
     if (selfExact === false) {
-      if (typeof exact !== 'boolean') {
-        if (!wrapper) {
-          exact.touch();
-        }
-
-        exact.neutralize();
+      if (context) {
+        context.neutralize();
       }
 
-      return {
-        managedContext: undefined,
-        wrappedExact: false,
-        nestedExact: false,
-      };
+      return DISABLED_EXACT_CONTEXT_RESULT;
     }
 
-    if (typeof exact === 'boolean') {
-      if (exact || selfExact) {
+    if (context) {
+      if (wrapper) {
+        return {
+          context,
+          managedContext: undefined,
+          wrappedExact: exact,
+          nestedExact: true,
+        };
+      } else {
+        return {
+          context,
+          managedContext: undefined,
+          wrappedExact: false,
+          nestedExact: true,
+        };
+      }
+    } else {
+      if ((exact as boolean) || selfExact) {
         if (wrapper === 'managed') {
           let context = new ExactContext();
 
           return {
+            context,
             managedContext: context,
             wrappedExact: context,
             nestedExact: true,
           };
         } else if (wrapper === 'transparent') {
           return {
+            context,
             managedContext: undefined,
             wrappedExact: true,
             nestedExact: true,
           };
         } else {
           return {
+            context,
             managedContext: undefined,
             wrappedExact: false,
             nestedExact: true,
@@ -268,29 +290,10 @@ export abstract class Type<
         }
       } else {
         return {
+          context,
           managedContext: undefined,
           wrappedExact: false,
           nestedExact: false,
-        };
-      }
-    } else {
-      if (wrapper) {
-        return {
-          managedContext: undefined,
-          wrappedExact: exact,
-          nestedExact: true,
-        };
-      } else {
-        exact.touch();
-
-        if (neutralize) {
-          exact.neutralize();
-        }
-
-        return {
-          managedContext: undefined,
-          wrappedExact: false,
-          nestedExact: true,
         };
       }
     }
@@ -306,7 +309,6 @@ export type TypePath = (
 
 export interface TypeIssue {
   path: TypePath;
-  fatal: boolean;
   message: string;
 }
 

@@ -1,4 +1,4 @@
-import {hasFatalIssue, toString} from '../@internal';
+import {toString} from '../@internal';
 import type {Medium} from '../medium';
 
 import {OptionalType} from './optional-type';
@@ -71,7 +71,6 @@ export class ObjectType<
         [
           {
             path,
-            fatal: true,
             message: `Expecting unpacked value to be a non-null object, getting ${toString.call(
               unpacked,
             )}.`,
@@ -109,7 +108,7 @@ export class ObjectType<
     }
 
     return [
-      hasFatalIssue(issues) ? undefined : Object.fromEntries(entries),
+      issues.length === 0 ? Object.fromEntries(entries) : undefined,
       issues,
     ];
   }
@@ -128,7 +127,6 @@ export class ObjectType<
         [
           {
             path,
-            fatal: true,
             message: `Expecting value to be a non-null object, getting ${toString.call(
               value,
             )}.`,
@@ -170,7 +168,7 @@ export class ObjectType<
     }
 
     return [
-      hasFatalIssue(issues) ? undefined : Object.fromEntries(entries),
+      issues.length === 0 ? Object.fromEntries(entries) : undefined,
       issues,
     ];
   }
@@ -189,7 +187,6 @@ export class ObjectType<
         [
           {
             path,
-            fatal: true,
             message: `Expecting unpacked value to be a non-null object, getting ${toString.call(
               unpacked,
             )}.`,
@@ -228,7 +225,7 @@ export class ObjectType<
     }
 
     return [
-      hasFatalIssue(issues) ? undefined : Object.fromEntries(entries),
+      issues.length === 0 ? Object.fromEntries(entries) : undefined,
       issues,
     ];
   }
@@ -239,7 +236,6 @@ export class ObjectType<
       return [
         {
           path,
-          fatal: true,
           message: `Expecting a non-null object, getting ${toString.call(
             value,
           )}.`,
