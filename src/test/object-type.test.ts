@@ -611,3 +611,33 @@ test('explicit non-exact object with intersection', () => {
     ]
   `);
 });
+
+test('object extend', () => {
+  const O = x.object({
+    foo: x.string,
+    bar: x.number,
+  });
+
+  const SpecialString = x.string.nominal<'special'>();
+
+  const ExtendedO = O.extend({
+    foo: SpecialString,
+    extra: x.boolean,
+  });
+
+  type ExtendedO = x.TypeOf<typeof ExtendedO>;
+
+  type _ = AssertTrue<
+    IsEqual<
+      ExtendedO,
+      {
+        foo: x.Nominal<'special', string>;
+        bar: number;
+        extra: boolean;
+      }
+    >
+  >;
+
+  expect(ExtendedO.is({foo: 'abc', bar: 123})).toBe(false);
+  expect(ExtendedO.is({foo: 'abc', bar: 123, extra: true})).toBe(true);
+});

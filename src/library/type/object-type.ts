@@ -23,6 +23,21 @@ export class ObjectType<
     super();
   }
 
+  extend<TDefinitionExtension extends Record<string, TypeInMediumsPartial>>(
+    extension: TDefinitionExtension,
+  ): ObjectType<
+    Omit<TDefinition, keyof TDefinitionExtension> & TDefinitionExtension
+  > {
+    return Object.create(this, {
+      definition: {
+        value: {
+          ...this.definition,
+          ...extension,
+        },
+      },
+    });
+  }
+
   partial(): ObjectType<DefinitionPartial<TDefinition>> {
     let definition = Object.fromEntries(
       Object.entries(this.definition).map(([key, Type]) => [
