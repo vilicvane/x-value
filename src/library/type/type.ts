@@ -187,6 +187,11 @@ export abstract class Type<
     throw new TypeConstraintError('Value does not satisfy the type', issues);
   }
 
+  nominalize(value: DenominalizeDeep<TInMediums['value']>): TInMediums['value'];
+  nominalize(value: unknown): unknown {
+    return this.satisfies(value);
+  }
+
   is(value: unknown): value is TInMediums['value'] {
     return this.diagnose(value).length === 0;
   }
@@ -353,4 +358,5 @@ export type TypeOf<TType extends TypeInMediumsPartial> =
 // Make sure code circularly referenced accessing type.ts after exports ready.
 
 import {OptionalType} from './optional-type';
+import type {DenominalizeDeep} from './refined-type';
 import {RefinedType} from './refined-type';

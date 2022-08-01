@@ -25,13 +25,6 @@ export class RefinedType<
     super();
   }
 
-  nominalize(
-    value: Denominalize<this[__type_in_mediums]['value']>,
-  ): this[__type_in_mediums]['value'];
-  nominalize(value: unknown): unknown {
-    return value;
-  }
-
   /** @internal */
   _decode(
     medium: Medium,
@@ -174,6 +167,10 @@ export type Nominal<TNominalKey extends string | symbol, T = unknown> = T &
 export type Denominalize<T> = T extends {[__type]: infer TDenominalized}
   ? TDenominalized
   : T;
+
+export type DenominalizeDeep<T> = T extends {[__type]: infer TDenominalized}
+  ? TDenominalized
+  : {[TKey in keyof T]: DenominalizeDeep<T[TKey]>};
 
 type RefinedInMediums<
   TType extends TypeInMediumsPartial,
