@@ -24,7 +24,7 @@ export class ObjectType<
   }
 
   extend<TDefinitionExtension extends Record<string, TypeInMediumsPartial>>(
-    extension: TDefinitionExtension,
+    extension: ObjectType<TDefinitionExtension> | TDefinitionExtension,
   ): ObjectType<
     Omit<TDefinition, keyof TDefinitionExtension> & TDefinitionExtension
   > {
@@ -32,7 +32,9 @@ export class ObjectType<
       definition: {
         value: {
           ...this.definition,
-          ...extension,
+          ...(extension instanceof ObjectType
+            ? extension.definition
+            : extension),
         },
       },
     });

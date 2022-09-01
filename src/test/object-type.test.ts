@@ -620,24 +620,38 @@ test('object extend', () => {
 
   const SpecialString = x.string.nominal<'special'>();
 
-  const ExtendedO = O.extend({
+  const ExtendedO_1 = O.extend({
     foo: SpecialString,
     extra: x.boolean,
   });
 
-  type ExtendedO = x.TypeOf<typeof ExtendedO>;
+  type ExtendedO_1 = x.TypeOf<typeof ExtendedO_1>;
 
-  type _ = AssertTrue<
-    IsEqual<
-      ExtendedO,
-      {
-        foo: x.Nominal<'special', string>;
-        bar: number;
-        extra: boolean;
-      }
-    >
-  >;
+  const ExtendedO_2 = O.extend(
+    x.object({
+      foo: SpecialString,
+      extra: x.boolean,
+    }),
+  );
 
-  expect(ExtendedO.is({foo: 'abc', bar: 123})).toBe(false);
-  expect(ExtendedO.is({foo: 'abc', bar: 123, extra: true})).toBe(true);
+  type ExtendedO_2 = x.TypeOf<typeof ExtendedO_2>;
+
+  type _ =
+    | AssertTrue<
+        IsEqual<
+          ExtendedO_1,
+          {
+            foo: x.Nominal<'special', string>;
+            bar: number;
+            extra: boolean;
+          }
+        >
+      >
+    | AssertTrue<IsEqual<ExtendedO_1, ExtendedO_2>>;
+
+  expect(ExtendedO_1.is({foo: 'abc', bar: 123})).toBe(false);
+  expect(ExtendedO_1.is({foo: 'abc', bar: 123, extra: true})).toBe(true);
+
+  expect(ExtendedO_2.is({foo: 'abc', bar: 123})).toBe(false);
+  expect(ExtendedO_2.is({foo: 'abc', bar: 123, extra: true})).toBe(true);
 });
