@@ -51,7 +51,7 @@ export class ObjectType<
     return Object.create(this, {definition: {value: definition}});
   }
 
-  pick<TKeys extends string[]>(
+  pick<TKeys extends (keyof TDefinition)[]>(
     ...keys: TKeys
   ): ObjectType<Pick<TDefinition, TKeys[number]>> {
     let keySet = new Set(keys);
@@ -63,7 +63,7 @@ export class ObjectType<
     return Object.create(this, {definition: {value: definition}});
   }
 
-  omit<TKeys extends string[]>(
+  omit<TKeys extends (keyof TDefinition)[]>(
     ...keys: TKeys
   ): ObjectType<Omit<TDefinition, TKeys[number]>> {
     let keySet = new Set(keys);
