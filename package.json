@@ -16,7 +16,7 @@
   },
   "scripts": {
     "build": "rimraf ./bld && tsc --build",
-    "lint": "run-in-every eslint-project --parallel --echo -- eslint --config {configFileName} .",
+    "lint": "run-in-every eslint-project --parallel --echo -- eslint --config {configFileName} --no-error-on-unmatched-pattern .",
     "lint-prettier": "prettier --check .",
     "test": "yarn lint-prettier && yarn build && yarn lint"
   },
@@ -24,12 +24,12 @@
     "tslib": "^2.4.0"
   },
   "devDependencies": {
-    "@mufan/code": "^0.2.13",
-    "@mufan/eslint-plugin": "^0.1.67",
-    "eslint": "^8.16.0",
-    "prettier": "^2.6.2",
+    "@mufan/code": "^0.2.15",
+    "@mufan/eslint-plugin": "^0.1.69",
+    "eslint": "^8.23.0",
+    "prettier": "^2.7.1",
     "rimraf": "^3.0.2",
     "run-in-every": "^0.2.0",
-    "typescript": "^4.7.2"
+    "typescript": "^4.8.2"
   }
 }
