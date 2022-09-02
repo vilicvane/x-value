@@ -6,6 +6,7 @@ yarn-error.log
 npm-debug.log
 # TypeScript Build Artifacts
 bld/
+*.tsbuildinfo
 # Test Outputs
 /coverage/
 # Drafts
