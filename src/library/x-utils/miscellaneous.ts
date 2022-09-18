@@ -24,7 +24,7 @@ export function literal(
 ): RefinedType<TypeInMediumsPartial, never, unknown> {
   switch (typeof literal) {
     case 'string':
-      return string.refine(value =>
+      return string.refined(value =>
         refinement(
           value === literal,
           value,
@@ -35,7 +35,7 @@ export function literal(
         ),
       );
     case 'number':
-      return number.refine(value =>
+      return number.refined(value =>
         refinement(
           value === literal,
           value,
@@ -43,7 +43,7 @@ export function literal(
         ),
       );
     case 'boolean':
-      return boolean.refine(value =>
+      return boolean.refined(value =>
         refinement(
           value === literal,
           value,

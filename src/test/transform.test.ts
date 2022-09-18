@@ -109,7 +109,7 @@ test('transform should work with refined type', () => {
     .object({
       foo: x.string,
     })
-    .refine(value => x.refinement(value.foo === 'abc', value));
+    .refined(value => x.refinement(value.foo === 'abc', value));
 
   const value = {foo: 'abc'};
 

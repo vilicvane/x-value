@@ -2,7 +2,7 @@ import type {AssertTrue, IsEqual} from 'tslang';
 
 import * as x from '../library';
 
-const Sunday = x.Date.refine<'sunday'>(date =>
+const Sunday = x.Date.refined<'sunday'>(date =>
   x.refinement(date.getDay() === 0, date),
 );
 

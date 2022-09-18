@@ -73,15 +73,15 @@ type JSONOops = x.MediumTypeOf<typeof Oops, 'json'>;
 Refine type:
 
 ```ts
-const Email = x.string.refine(value =>
+const Email = x.string.refined(value =>
   x.refinement(value.includes('@'), value),
 );
 
 // Or with refined or nominal type:
-const Email = x.string.refine<never, `${string}@${string}`>(value =>
+const Email = x.string.refined<never, `${string}@${string}`>(value =>
   x.refinement(value.includes('@'), value),
 );
-const Email = x.string.refine<'email'>(value =>
+const Email = x.string.refined<'email'>(value =>
   x.refinement(value.includes('@'), value),
 );
 

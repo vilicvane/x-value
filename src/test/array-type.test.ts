@@ -222,7 +222,7 @@ test('managed exact with array type', () => {
         foo: x.string,
       }),
     )
-    .refine(value => value)
+    .refined(value => value)
     .exact();
 
   const U = x

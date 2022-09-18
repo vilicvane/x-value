@@ -89,7 +89,7 @@ export abstract class Type<
     });
   }
 
-  refine<TNominalKey extends string | symbol = never, TRefinement = unknown>(
+  refined<TNominalKey extends string | symbol = never, TRefinement = unknown>(
     refinements: ElementOrArray<Refinement<TInMediums['value']>>,
   ): RefinedType<this, TNominalKey, TRefinement> {
     return new RefinedType(

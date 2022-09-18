@@ -2,7 +2,7 @@ import type {RefinedType, TypeOf} from '../type';
 import {number} from '../types';
 import {refinement} from '../utils';
 
-export const Integer = number.refine<'integer'>(value =>
+export const Integer = number.refined<'integer'>(value =>
   refinement(
     Number.isInteger(value),
     value,
@@ -21,7 +21,7 @@ export function integerRange<TNominalKey extends string | symbol = never>({
   min = -Infinity,
   max = Infinity,
 }: IntegerRangeOptions): RefinedType<typeof Integer, TNominalKey, unknown> {
-  return Integer.refine(value => {
+  return Integer.refined(value => {
     if (value < min) {
       throw `Expected integer >= ${min}, getting ${value}.`;
     }
@@ -47,7 +47,7 @@ export function numberRange<TNominalKey extends string | symbol = never>({
   maxInclusive = Infinity,
   maxExclusive = Infinity,
 }: NumberRangeOptions): RefinedType<typeof number, TNominalKey, unknown> {
-  return number.refine(value => {
+  return number.refined(value => {
     if (value < minInclusive) {
       throw `Expected number >= ${minInclusive}, getting ${value}.`;
     }

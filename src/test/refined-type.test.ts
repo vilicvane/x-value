@@ -7,7 +7,7 @@ import {Identifier, mediumA} from './@usage';
 let unknownValue: unknown;
 
 test('atomic refinement should work', () => {
-  const NonEmptyString = x.string.refine(value =>
+  const NonEmptyString = x.string.refined(value =>
     x.refinement(value !== '', value, 'Empty'),
   );
 
@@ -31,7 +31,7 @@ test('atomic refinement should work', () => {
       Expected string, getting [object Number]."
   `);
 
-  const Email = x.string.refine<'email'>(value =>
+  const Email = x.string.refined<'email'>(value =>
     x.refinement(value.includes('@'), value),
   );
 
@@ -52,7 +52,7 @@ test('atomic refinement should work', () => {
 
   type EncodedEmailInJSONValue = typeof encodedEmailInJSONValue;
 
-  const LiveEmail = Email.refine<'live-email'>([
+  const LiveEmail = Email.refined<'live-email'>([
     value => x.refinement(value.endsWith('@live'), value),
   ]);
 
@@ -103,7 +103,7 @@ test('atomic refinement should work', () => {
 test('array refinement should work', () => {
   const Triple = x
     .array(x.string)
-    .refine<never, {length: 3}>(value =>
+    .refined<never, {length: 3}>(value =>
       x.refinement(value.length === 3, value),
     );
 
@@ -126,7 +126,7 @@ test('array refinement should work', () => {
 test('object refinement should work', () => {
   const O = x
     .object({foo: x.string, bar: x.number})
-    .refine<never, {foo: 'abc'}>(value =>
+    .refined<never, {foo: 'abc'}>(value =>
       x.refinement(value.foo === 'abc', value),
     );
 
@@ -148,7 +148,7 @@ test('object refinement should work', () => {
 test('nullable refinement should work', () => {
   const O = x
     .union(x.string, x.undefined)
-    .refine<'includes #'>(value =>
+    .refined<'includes #'>(value =>
       x.refinement(value === undefined || value.includes('#'), value),
     );
 
@@ -170,7 +170,7 @@ test('nullable refinement should work', () => {
 test('record refinement should work', () => {
   const O = x
     .record(x.string, x.number)
-    .refine<'not empty'>(value =>
+    .refined<'not empty'>(value =>
       x.refinement(Object.keys(value).length > 0, value),
     );
 
@@ -193,7 +193,7 @@ test('record refinement should work', () => {
 test('tuple refinement should work', () => {
   const O = x
     .tuple(x.string, x.number)
-    .refine<'string is abc and number is 123'>(([a, b]) =>
+    .refined<'string is abc and number is 123'>(([a, b]) =>
       x.refinement(a === 'abc' && b === 123, [a, b]),
     );
 
@@ -218,7 +218,7 @@ test('tuple refinement should work', () => {
 test('intersection refinement should work', () => {
   const O = x
     .intersection(x.object({foo: x.string}), x.object({bar: x.number}))
-    .refine<'foo is abc'>(value => x.refinement(value.foo === 'abc', value));
+    .refined<'foo is abc'>(value => x.refinement(value.foo === 'abc', value));
 
   type O = x.TypeOf<typeof O>;
 
@@ -239,7 +239,7 @@ test('intersection refinement should work', () => {
 test('union refinement should work', () => {
   const O = x
     .union(x.object({foo: x.string}), x.object({bar: x.number}))
-    .refine<'foo is abc or bar is 123'>(value =>
+    .refined<'foo is abc or bar is 123'>(value =>
       x.refinement(
         ('foo' in value && value.foo === 'abc') ||
           ('bar' in value && value.bar === 123),
@@ -273,7 +273,7 @@ test('exact with refined type should work', () => {
     .object({
       foo: x.string,
     })
-    .refine(value => x.refinement(value.foo.startsWith('#'), value))
+    .refined(value => x.refinement(value.foo.startsWith('#'), value))
     .exact();
 
   const valid1 = {
@@ -353,27 +353,27 @@ test('exact with refined type should work', () => {
 test('transform exact refined type', () => {
   const T1 = x
     .union(x.object({foo: x.string}), x.object({bar: x.number}))
-    .refine(value => value)
+    .refined(value => value)
     .exact();
 
   const T2 = x
     .array(x.object({foo: x.string}))
-    .refine(value => value)
+    .refined(value => value)
     .exact();
 
   const T3 = x
     .intersection(x.object({foo: x.string}), x.object({bar: x.number}))
-    .refine(value => value)
+    .refined(value => value)
     .exact();
 
   const T4 = x
     .record(x.string, x.object({bar: x.number}))
-    .refine(value => value)
+    .refined(value => value)
     .exact();
 
   const T5 = x
     .tuple(x.string, x.object({bar: x.number}))
-    .refine(value => value)
+    .refined(value => value)
     .exact();
 
   interface T6 {
@@ -382,7 +382,7 @@ test('transform exact refined type', () => {
 
   const T6 = x
     .recursive<T6>(T6 => x.object({next: T6.optional()}))
-    .refine(value => value)
+    .refined(value => value)
     .exact();
 
   const valid1 = {
@@ -512,7 +512,7 @@ test('nominalize', () => {
 });
 
 test('refinement transform', () => {
-  const TrimmedNonEmptyString = x.string.refine(value => {
+  const TrimmedNonEmptyString = x.string.refined(value => {
     value = value.trim();
     return x.refinement(value.length > 0, value);
   });
