@@ -28,9 +28,10 @@ export function literal(
         refinement(
           value === literal,
           value,
-          `Expected string ${JSON.stringify(literal)}, getting ${JSON.stringify(
-            value,
-          )}.`,
+          () =>
+            `Expected string ${JSON.stringify(
+              literal,
+            )}, getting ${JSON.stringify(value)}.`,
         ),
       );
     case 'number':
@@ -38,7 +39,7 @@ export function literal(
         refinement(
           value === literal,
           value,
-          `Expected number ${literal}, getting ${value}.`,
+          () => `Expected number ${literal}, getting ${value}.`,
         ),
       );
     case 'boolean':
@@ -46,7 +47,7 @@ export function literal(
         refinement(
           value === literal,
           value,
-          `Expected boolean ${literal}, getting ${value}.`,
+          () => `Expected boolean ${literal}, getting ${value}.`,
         ),
       );
     default:

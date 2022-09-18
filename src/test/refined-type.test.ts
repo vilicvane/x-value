@@ -515,3 +515,20 @@ test('nominalize', () => {
   expect(email).toBe('user@host');
   expect(liveEmail).toBe('user@live');
 });
+
+test('refinement transform', () => {
+  const TrimmedNonEmptyString = x.string.refine(value => {
+    value = value.trim();
+    return x.refinement(value.length > 0, value);
+  });
+
+  expect(() => TrimmedNonEmptyString.encode(x.jsonValue, ' abc '))
+    .toThrowErrorMatchingInlineSnapshot(`
+    "Failed to encode to medium:
+      Expecting encoding value to be stable after refinements."
+  `);
+  expect(TrimmedNonEmptyString.decode(x.jsonValue, ' def ')).toBe('def');
+  expect(
+    TrimmedNonEmptyString.transform(x.jsonValue, x.ecmascript, ' ghi '),
+  ).toBe('ghi');
+});

@@ -6,7 +6,7 @@ export const Integer = number.refine<'integer'>(value =>
   refinement(
     Number.isInteger(value),
     value,
-    `Expected integer, getting ${value}.`,
+    () => `Expected integer, getting ${value}.`,
   ),
 );
 

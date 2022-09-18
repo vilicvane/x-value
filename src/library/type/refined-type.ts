@@ -70,9 +70,19 @@ export class RefinedType<
     }
 
     if (diagnose) {
-      const [, refinementIssues] = this.processRefinements(value, path);
+      const [refinedValue, refinementIssues] = this.processRefinements(
+        value,
+        path,
+      );
 
       issues.push(...refinementIssues);
+
+      if (refinedValue !== value) {
+        issues.push({
+          path,
+          message: 'Expecting encoding value to be stable after refinements.',
+        });
+      }
 
       if (hasNonDeferrableTypeIssue(refinementIssues)) {
         return [undefined, issues];
