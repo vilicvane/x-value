@@ -14,11 +14,9 @@ import {Identifier, mediumA} from './@usage';
 let unknownValue: unknown;
 
 test('atomic refinement should work', () => {
-  const NonEmptyString = x.string.refine(value => {
-    if (value.length === 0) {
-      throw new TypeError('Empty');
-    }
-  });
+  const NonEmptyString = x.string.refine(value =>
+    x.refinement(value !== '', value, 'Empty'),
+  );
 
   type NonEmptyString = TypeOf<typeof NonEmptyString>;
 
@@ -40,7 +38,9 @@ test('atomic refinement should work', () => {
       Expected string, getting [object Number]."
   `);
 
-  const Email = x.string.refine<'email'>(value => value.includes('@'));
+  const Email = x.string.refine<'email'>(value =>
+    x.refinement(value.includes('@'), value),
+  );
 
   type Email = TypeOf<typeof Email>;
   type EmailInJSONValue = MediumTypeOf<typeof Email, 'json-value'>;
@@ -60,7 +60,7 @@ test('atomic refinement should work', () => {
   type EncodedEmailInJSONValue = typeof encodedEmailInJSONValue;
 
   const LiveEmail = Email.refine<'live-email'>([
-    value => value.endsWith('@live'),
+    value => x.refinement(value.endsWith('@live'), value),
   ]);
 
   type LiveEmail = TypeOf<typeof LiveEmail>;
@@ -110,7 +110,9 @@ test('atomic refinement should work', () => {
 test('array refinement should work', () => {
   const Triple = x
     .array(x.string)
-    .refine<never, {length: 3}>(value => value.length === 3);
+    .refine<never, {length: 3}>(value =>
+      x.refinement(value.length === 3, value),
+    );
 
   type Triple = TypeOf<typeof Triple>;
   type TripleInJSONValue = MediumTypeOf<typeof Triple, 'json-value'>;
@@ -131,7 +133,9 @@ test('array refinement should work', () => {
 test('object refinement should work', () => {
   const O = x
     .object({foo: x.string, bar: x.number})
-    .refine<never, {foo: 'abc'}>(value => value.foo === 'abc');
+    .refine<never, {foo: 'abc'}>(value =>
+      x.refinement(value.foo === 'abc', value),
+    );
 
   type O = TypeOf<typeof O>;
 
@@ -151,7 +155,9 @@ test('object refinement should work', () => {
 test('nullable refinement should work', () => {
   const O = x
     .union(x.string, x.undefined)
-    .refine<'includes #'>(value => value === undefined || value.includes('#'));
+    .refine<'includes #'>(value =>
+      x.refinement(value === undefined || value.includes('#'), value),
+    );
 
   type O = TypeOf<typeof O>;
 
@@ -171,7 +177,9 @@ test('nullable refinement should work', () => {
 test('record refinement should work', () => {
   const O = x
     .record(x.string, x.number)
-    .refine<'not empty'>(value => Object.keys(value).length > 0);
+    .refine<'not empty'>(value =>
+      x.refinement(Object.keys(value).length > 0, value),
+    );
 
   type O = TypeOf<typeof O>;
 
@@ -190,8 +198,8 @@ test('record refinement should work', () => {
 test('tuple refinement should work', () => {
   const O = x
     .tuple(x.string, x.number)
-    .refine<'string is abc and number is 123'>(
-      ([a, b]) => a === 'abc' && b === 123,
+    .refine<'string is abc and number is 123'>(([a, b]) =>
+      x.refinement(a === 'abc' && b === 123, [a, b]),
     );
 
   type O = TypeOf<typeof O>;
@@ -215,7 +223,7 @@ test('tuple refinement should work', () => {
 test('intersection refinement should work', () => {
   const O = x
     .intersection(x.object({foo: x.string}), x.object({bar: x.number}))
-    .refine<'foo is abc'>(value => value.foo === 'abc');
+    .refine<'foo is abc'>(value => x.refinement(value.foo === 'abc', value));
 
   type O = TypeOf<typeof O>;
 
@@ -236,10 +244,12 @@ test('intersection refinement should work', () => {
 test('union refinement should work', () => {
   const O = x
     .union(x.object({foo: x.string}), x.object({bar: x.number}))
-    .refine<'foo is abc or bar is 123'>(
-      value =>
+    .refine<'foo is abc or bar is 123'>(value =>
+      x.refinement(
         ('foo' in value && value.foo === 'abc') ||
-        ('bar' in value && value.bar === 123),
+          ('bar' in value && value.bar === 123),
+        value,
+      ),
     );
 
   type O = TypeOf<typeof O>;
@@ -268,7 +278,7 @@ test('exact with refined type should work', () => {
     .object({
       foo: x.string,
     })
-    .refine(value => value.foo.startsWith('#'))
+    .refine(value => x.refinement(value.foo.startsWith('#'), value))
     .exact();
 
   const valid1 = {
@@ -348,27 +358,27 @@ test('exact with refined type should work', () => {
 test('transform exact refined type', () => {
   const T1 = x
     .union(x.object({foo: x.string}), x.object({bar: x.number}))
-    .refine(() => true)
+    .refine(value => value)
     .exact();
 
   const T2 = x
     .array(x.object({foo: x.string}))
-    .refine(() => true)
+    .refine(value => value)
     .exact();
 
   const T3 = x
     .intersection(x.object({foo: x.string}), x.object({bar: x.number}))
-    .refine(() => true)
+    .refine(value => value)
     .exact();
 
   const T4 = x
     .record(x.string, x.object({bar: x.number}))
-    .refine(() => true)
+    .refine(value => value)
     .exact();
 
   const T5 = x
     .tuple(x.string, x.object({bar: x.number}))
-    .refine(() => true)
+    .refine(value => value)
     .exact();
 
   interface T6 {
@@ -377,7 +387,7 @@ test('transform exact refined type', () => {
 
   const T6 = x
     .recursive<T6>(T6 => x.object({next: T6.optional()}))
-    .refine(() => true)
+    .refine(value => value)
     .exact();
 
   const valid1 = {

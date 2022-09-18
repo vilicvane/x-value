@@ -4,7 +4,6 @@ import type {Medium} from '../medium';
 
 import type {
   Exact,
-  TypeConstraint,
   TypeInMediumsPartial,
   TypeIssue,
   TypePath,
@@ -20,8 +19,8 @@ export class RefinedType<
 > extends Type<RefinedInMediums<TType, TNominalKey, TRefinement>> {
   [__type_kind]!: 'refined';
 
-  constructor(Type: TType, constraints: TypeConstraint[]);
-  constructor(readonly Type: Type, readonly constraints: TypeConstraint[]) {
+  constructor(Type: TType, refinements: Refinement[]);
+  constructor(readonly Type: Type, readonly refinements: Refinement[]) {
     super();
   }
 
@@ -38,12 +37,14 @@ export class RefinedType<
       return [undefined, issues];
     }
 
-    let constraintIssues = this.diagnoseConstraints(value, path);
+    let refinementIssues: TypeIssue[];
 
-    issues.push(...constraintIssues);
+    [value, refinementIssues] = this.processRefinements(value, path);
+
+    issues.push(...refinementIssues);
 
     return [
-      hasNonDeferrableTypeIssue(constraintIssues) ? undefined : value,
+      hasNonDeferrableTypeIssue(refinementIssues) ? undefined : value,
       issues,
     ];
   }
@@ -69,11 +70,11 @@ export class RefinedType<
     }
 
     if (diagnose) {
-      let constraintIssues = this.diagnoseConstraints(value, path);
+      let [, refinementIssues] = this.processRefinements(value, path);
 
-      issues.push(...constraintIssues);
+      issues.push(...refinementIssues);
 
-      if (hasNonDeferrableTypeIssue(constraintIssues)) {
+      if (hasNonDeferrableTypeIssue(refinementIssues)) {
         return [undefined, issues];
       }
     }
@@ -108,37 +109,32 @@ export class RefinedType<
       return issues;
     }
 
-    issues.push(...this.diagnoseConstraints(value, path));
+    let [, refinementIssues] = this.processRefinements(value, path);
+
+    issues.push(...refinementIssues);
 
     return issues;
   }
 
-  private diagnoseConstraints(value: unknown, path: TypePath): TypeIssue[] {
+  private processRefinements(
+    value: unknown,
+    path: TypePath,
+  ): [unknown, TypeIssue[]] {
     let issues: TypeIssue[] = [];
 
-    for (let constraint of this.constraints) {
-      let result: boolean | string;
-
+    for (let refinement of this.refinements) {
       try {
-        result = constraint(value) ?? true;
+        value = refinement(value);
       } catch (error) {
         issues.push(buildIssueByError(error, path));
-        continue;
       }
-
-      if (result === true) {
-        continue;
-      }
-
-      issues.push({
-        path,
-        message: typeof result === 'string' ? result : 'Unexpected value.',
-      });
     }
 
-    return issues;
+    return [value, issues];
   }
 }
+
+export type Refinement<T = unknown> = (value: T) => T;
 
 /**
  * DECLARATION ONLY.

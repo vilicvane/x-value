@@ -4,7 +4,9 @@ import * as x from '../library';
 import type {MediumTypeOf, TypeOf} from '../library';
 import {TypeConstraintError, atomic, stringTypeSymbol} from '../library';
 
-const Sunday = x.Date.refine<'sunday'>(date => date.getDay() === 0);
+const Sunday = x.Date.refine<'sunday'>(date =>
+  x.refinement(date.getDay() === 0, date),
+);
 
 type Sunday = TypeOf<typeof Sunday>;
 
@@ -213,7 +215,9 @@ test('date atomic refinement sunday should work with extended json value medium'
 });
 
 test('atomic with constraints array should work', () => {
-  const Type = atomic(stringTypeSymbol, [value => typeof value === 'string']);
+  const Type = atomic(stringTypeSymbol, [
+    value => x.constraint(typeof value === 'string'),
+  ]);
 
   expect(Type.diagnose('')).toEqual([]);
   expect(Type.diagnose(123)).toMatchInlineSnapshot(`

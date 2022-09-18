@@ -4,6 +4,7 @@ import type {NominalPartial} from '../@internal';
 import type {TypeInMediumsPartial, TypeOf, __nominal, __type} from '../type';
 import {RefinedType, record} from '../type';
 import {boolean, number, string, unknown} from '../types';
+import {refinement} from '../utils';
 
 export type TransformNominal<TFrom, T> = TFrom extends NominalPartial
   ? T & Record<__type, T> & Record<__nominal, TFrom[__nominal]>
@@ -23,22 +24,30 @@ export function literal(
 ): RefinedType<TypeInMediumsPartial, never, unknown> {
   switch (typeof literal) {
     case 'string':
-      return string.refine(
-        value =>
-          value === literal ||
+      return string.refine(value =>
+        refinement(
+          value === literal,
+          value,
           `Expected string ${JSON.stringify(literal)}, getting ${JSON.stringify(
             value,
           )}.`,
+        ),
       );
     case 'number':
-      return number.refine(
-        value =>
-          value === literal || `Expected number ${literal}, getting ${value}.`,
+      return number.refine(value =>
+        refinement(
+          value === literal,
+          value,
+          `Expected number ${literal}, getting ${value}.`,
+        ),
       );
     case 'boolean':
-      return boolean.refine(
-        value =>
-          value === literal || `Expected boolean ${literal}, getting ${value}.`,
+      return boolean.refine(value =>
+        refinement(
+          value === literal,
+          value,
+          `Expected boolean ${literal}, getting ${value}.`,
+        ),
       );
     default:
       throw new TypeError('Unsupported literal value');
@@ -54,7 +63,9 @@ export function equal(
   comparison: unknown,
   Type = unknown,
 ): RefinedType<TypeInMediumsPartial, never, unknown> {
-  return new RefinedType(Type, [value => isEqual(value, comparison)]);
+  return new RefinedType(Type, [
+    value => refinement(isEqual(value, comparison), value),
+  ]);
 }
 
 export const UnknownRecord = record(string, unknown);

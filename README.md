@@ -73,13 +73,17 @@ type JSONOops = x.MediumTypeOf<typeof Oops, 'json'>;
 Refine type:
 
 ```ts
-const Email = x.string.refine(value => value.includes('@'));
+const Email = x.string.refine(value =>
+  x.refinement(value.includes('@'), value),
+);
 
 // Or with refined or nominal type:
 const Email = x.string.refine<never, `${string}@${string}`>(value =>
-  value.includes('@'),
+  x.refinement(value.includes('@'), value),
 );
-const Email = x.string.refine<'email'>(value => value.includes('@'));
+const Email = x.string.refine<'email'>(value =>
+  x.refinement(value.includes('@'), value),
+);
 
 // Or just nominal type without extra constraints:
 const Email = x.string.nominal<'email'>();
@@ -199,7 +203,7 @@ const newAtomicTypeSymbol = Symbol();
 
 // 3. Create the new atomic type with constraint.
 const NewAtomic = x.atomic(newAtomicTypeSymbol, value =>
-  Buffer.isBuffer(value),
+  x.constraint(Buffer.isBuffer(value)),
 );
 
 declare global {

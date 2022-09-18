@@ -33,9 +33,8 @@ declare global {
 
 export const identifierTypeSymbol = Symbol();
 
-export const Identifier = x.atomic(
-  identifierTypeSymbol,
-  value => typeof value === 'string',
+export const Identifier = x.atomic(identifierTypeSymbol, value =>
+  x.constraint(typeof value === 'string'),
 );
 
 export interface IdentifierInMediumA extends Buffer {

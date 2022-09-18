@@ -1,7 +1,7 @@
 import {buildIssueByError, hasNonDeferrableTypeIssue} from '../@internal';
 import type {Medium} from '../medium';
 
-import type {Exact, TypeConstraint, TypeIssue, TypePath} from './type';
+import type {Exact, TypeIssue, TypePath} from './type';
 import {Type, __type_kind} from './type';
 
 export class AtomicType<TSymbol extends symbol> extends Type<
@@ -9,8 +9,11 @@ export class AtomicType<TSymbol extends symbol> extends Type<
 > {
   [__type_kind]!: 'atomic';
 
-  constructor(symbol: TSymbol, constraints: TypeConstraint[]);
-  constructor(readonly symbol: symbol, readonly constraints: TypeConstraint[]) {
+  constructor(symbol: TSymbol, constraints: AtomicTypeConstraint[]);
+  constructor(
+    readonly symbol: symbol,
+    readonly constraints: AtomicTypeConstraint[],
+  ) {
     super();
   }
 
@@ -101,16 +104,11 @@ export class AtomicType<TSymbol extends symbol> extends Type<
     let issues: TypeIssue[] = [];
 
     for (let constraint of this.constraints) {
-      let result = constraint(value);
-
-      if (result === true) {
-        continue;
+      try {
+        constraint(value);
+      } catch (error) {
+        issues.push(buildIssueByError(error, path));
       }
-
-      issues.push({
-        path,
-        message: typeof result === 'string' ? result : 'Unexpected value.',
-      });
     }
 
     return issues;
@@ -119,13 +117,15 @@ export class AtomicType<TSymbol extends symbol> extends Type<
 
 export function atomic<TSymbol extends symbol>(
   symbol: TSymbol,
-  constraints: TypeConstraint | TypeConstraint[],
+  constraints: AtomicTypeConstraint | AtomicTypeConstraint[],
 ): AtomicType<TSymbol> {
   return new AtomicType(
     symbol,
     Array.isArray(constraints) ? constraints : [constraints],
   );
 }
+
+export type AtomicTypeConstraint = (value: unknown) => void;
 
 type AtomicInMediums<TSymbol extends symbol> = {
   [TMediumName in XValue.UsingName]: AtomicInMedium<

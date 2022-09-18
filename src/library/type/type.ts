@@ -90,11 +90,11 @@ export abstract class Type<
   }
 
   refine<TNominalKey extends string | symbol = never, TRefinement = unknown>(
-    constraints: ElementOrArray<TypeConstraint<TInMediums['value']>>,
+    refinements: ElementOrArray<Refinement<TInMediums['value']>>,
   ): RefinedType<this, TNominalKey, TRefinement> {
     return new RefinedType(
       this,
-      Array.isArray(constraints) ? constraints : [constraints],
+      Array.isArray(refinements) ? refinements : [refinements],
     );
   }
 
@@ -318,8 +318,6 @@ export interface TypeIssue {
   message: string;
 }
 
-export type TypeConstraint<T = unknown> = (value: T) => string | boolean | void;
-
 export class TypeConstraintError extends TypeError {
   constructor(private _message: string, readonly issues: TypeIssue[]) {
     super();
@@ -358,5 +356,5 @@ export type TypeOf<TType extends TypeInMediumsPartial> =
 // Make sure code circularly referenced accessing type.ts after exports ready.
 
 import {OptionalType} from './optional-type';
-import type {DenominalizeDeep} from './refined-type';
+import type {DenominalizeDeep, Refinement} from './refined-type';
 import {RefinedType} from './refined-type';

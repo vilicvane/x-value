@@ -1,8 +1,13 @@
 import type {RefinedType, TypeOf} from '../type';
 import {number} from '../types';
+import {refinement} from '../utils';
 
-export const Integer = number.refine<'integer'>(
-  value => Number.isInteger(value) || `Expected integer, getting ${value}.`,
+export const Integer = number.refine<'integer'>(value =>
+  refinement(
+    Number.isInteger(value),
+    value,
+    `Expected integer, getting ${value}.`,
+  ),
 );
 
 export type Integer = TypeOf<typeof Integer>;
@@ -18,14 +23,14 @@ export function integerRange<TNominalKey extends string | symbol = never>({
 }: IntegerRangeOptions): RefinedType<typeof Integer, TNominalKey, unknown> {
   return Integer.refine(value => {
     if (value < min) {
-      return `Expected integer >= ${min}, getting ${value}.`;
+      throw `Expected integer >= ${min}, getting ${value}.`;
     }
 
     if (value > max) {
-      return `Expected integer <= ${max}, getting ${value}.`;
+      throw `Expected integer <= ${max}, getting ${value}.`;
     }
 
-    return true;
+    return value;
   });
 }
 
@@ -44,21 +49,21 @@ export function numberRange<TNominalKey extends string | symbol = never>({
 }: NumberRangeOptions): RefinedType<typeof number, TNominalKey, unknown> {
   return number.refine(value => {
     if (value < minInclusive) {
-      return `Expected number >= ${minInclusive}, getting ${value}.`;
+      throw `Expected number >= ${minInclusive}, getting ${value}.`;
     }
 
     if (value <= minExclusive) {
-      return `Expected number > ${minExclusive}, getting ${value}.`;
+      throw `Expected number > ${minExclusive}, getting ${value}.`;
     }
 
     if (value > maxInclusive) {
-      return `Expected number <= ${maxInclusive}, getting ${value}.`;
+      throw `Expected number <= ${maxInclusive}, getting ${value}.`;
     }
 
     if (value >= maxExclusive) {
-      return `Expected number < ${maxExclusive}, getting ${value}.`;
+      throw `Expected number < ${maxExclusive}, getting ${value}.`;
     }
 
-    return true;
+    return value;
   });
 }

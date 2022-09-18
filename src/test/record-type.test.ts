@@ -131,8 +131,8 @@ test('record type with number key should work', () => {
 });
 
 test('record type with nominal string key should work', () => {
-  const Email = x.string.refine<string & {_nominal: 'email'}>(
-    value => value.includes('@') || 'Expected an email address.',
+  const Email = x.string.refine<string & {_nominal: 'email'}>(value =>
+    x.refinement(value.includes('@'), value, 'Expected an email address.'),
   );
 
   const Type = x.record(Email, x.string);
@@ -170,8 +170,8 @@ test('record type with nominal string key should work', () => {
 });
 
 test('record type with union string key should work', () => {
-  const Email = x.string.refine<string & {_nominal: 'email'}>(
-    value => value.includes('@') || 'Expected an email address.',
+  const Email = x.string.refine<string & {_nominal: 'email'}>(value =>
+    x.refinement(value.includes('@'), value, 'Expected an email address.'),
   );
 
   const Type = x.record(x.union(x.literal('foo'), Email), x.string);

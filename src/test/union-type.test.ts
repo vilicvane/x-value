@@ -31,6 +31,17 @@ test('union type of atomic types should work with json medium', () => {
   expect(Type.is(true)).toBe(false);
 });
 
+test('union type property with undefined', () => {
+  const Type = x.object({
+    value: x.union(x.string, x.undefined),
+  });
+
+  type Type = TypeOf<typeof Type>;
+
+  let _value_1: Type = {value: 'abc'};
+  let _value_2: Type = {value: undefined};
+});
+
 test('union type of mixed types should work with json medium', () => {
   const Type = x.union(
     x.object({
