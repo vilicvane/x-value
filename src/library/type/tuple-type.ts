@@ -36,7 +36,7 @@ export class TupleType<
       ];
     }
 
-    let ElementTypeTuple = this.ElementTypeTuple;
+    const ElementTypeTuple = this.ElementTypeTuple;
 
     if (unpacked.length !== ElementTypeTuple.length) {
       return [
@@ -50,13 +50,13 @@ export class TupleType<
       ];
     }
 
-    let {context, nestedExact} = this.getExactContext(exact, false);
+    const {context, nestedExact} = this.getExactContext(exact, false);
 
-    let value: unknown[] = [];
-    let issues: TypeIssue[] = [];
+    const value: unknown[] = [];
+    const issues: TypeIssue[] = [];
 
-    for (let [index, Element] of ElementTypeTuple.entries()) {
-      let [element, entryIssues] = Element._decode(
+    for (const [index, Element] of ElementTypeTuple.entries()) {
+      const [element, entryIssues] = Element._decode(
         medium,
         unpacked[index],
         [...path, index],
@@ -96,7 +96,7 @@ export class TupleType<
       ];
     }
 
-    let ElementTypeTuple = this.ElementTypeTuple;
+    const ElementTypeTuple = this.ElementTypeTuple;
 
     if ((value as unknown[]).length !== ElementTypeTuple.length) {
       return [
@@ -112,15 +112,15 @@ export class TupleType<
       ];
     }
 
-    let {context, nestedExact} = diagnose
+    const {context, nestedExact} = diagnose
       ? this.getExactContext(exact, false)
       : DISABLED_EXACT_CONTEXT_RESULT;
 
-    let unpacked: unknown[] = [];
-    let issues: TypeIssue[] = [];
+    const unpacked: unknown[] = [];
+    const issues: TypeIssue[] = [];
 
-    for (let [index, Element] of ElementTypeTuple.entries()) {
-      let [unpackedElement, entryIssues] = Element._encode(
+    for (const [index, Element] of ElementTypeTuple.entries()) {
+      const [unpackedElement, entryIssues] = Element._encode(
         medium,
         (value as unknown[])[index],
         [...path, index],
@@ -161,7 +161,7 @@ export class TupleType<
       ];
     }
 
-    let ElementTypeTuple = this.ElementTypeTuple;
+    const ElementTypeTuple = this.ElementTypeTuple;
 
     if (unpacked.length !== ElementTypeTuple.length) {
       return [
@@ -175,13 +175,13 @@ export class TupleType<
       ];
     }
 
-    let {context, nestedExact} = this.getExactContext(exact, false);
+    const {context, nestedExact} = this.getExactContext(exact, false);
 
-    let value: unknown[] = [];
-    let issues: TypeIssue[] = [];
+    const value: unknown[] = [];
+    const issues: TypeIssue[] = [];
 
-    for (let [index, Element] of ElementTypeTuple.entries()) {
-      let [element, entryIssues] = Element._transform(
+    for (const [index, Element] of ElementTypeTuple.entries()) {
+      const [element, entryIssues] = Element._transform(
         from,
         to,
         unpacked[index],
@@ -211,7 +211,7 @@ export class TupleType<
       ];
     }
 
-    let ElementTypeTuple = this.ElementTypeTuple;
+    const ElementTypeTuple = this.ElementTypeTuple;
 
     if ((value as unknown[]).length !== ElementTypeTuple.length) {
       return [
@@ -222,9 +222,9 @@ export class TupleType<
       ];
     }
 
-    let {context, nestedExact} = this.getExactContext(exact, false);
+    const {context, nestedExact} = this.getExactContext(exact, false);
 
-    let issues = ElementTypeTuple.flatMap((Element, index) =>
+    const issues = ElementTypeTuple.flatMap((Element, index) =>
       Element._diagnose(value[index], [...path, index], nestedExact),
     );
 

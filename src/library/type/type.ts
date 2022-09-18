@@ -115,8 +115,8 @@ export abstract class Type<
     packed: MediumTypesPackedType<TMediumTypes, TInMediums[TMediumName]>,
   ): TInMediums['value'];
   decode(medium: Medium, packed: unknown): unknown {
-    let unpacked = medium.unpack(packed);
-    let [value, issues] = this._decode(
+    const unpacked = medium.unpack(packed);
+    const [value, issues] = this._decode(
       medium,
       unpacked,
       [],
@@ -135,7 +135,7 @@ export abstract class Type<
     value: TInMediums['value'],
   ): MediumTypesPackedType<TMediumTypes, TInMediums[TMediumName]>;
   encode(medium: Medium, value: unknown): unknown {
-    let [unpacked, issues] = this._encode(
+    const [unpacked, issues] = this._encode(
       medium,
       value,
       [],
@@ -161,8 +161,8 @@ export abstract class Type<
     value: MediumTypesPackedType<TFromMediumTypes, TInMediums[TFromMediumName]>,
   ): MediumTypesPackedType<TToMediumTypes, TInMediums[TToMediumName]>;
   transform(from: Medium, to: Medium, packed: unknown): unknown {
-    let unpacked = from.unpack(packed);
-    let [transformedUnpacked, issues] = this._transform(
+    const unpacked = from.unpack(packed);
+    const [transformedUnpacked, issues] = this._transform(
       from,
       to,
       unpacked,
@@ -178,7 +178,7 @@ export abstract class Type<
   }
 
   satisfies(value: unknown): TInMediums['value'] {
-    let issues = this.diagnose(value);
+    const issues = this.diagnose(value);
 
     if (issues.length === 0) {
       return value;
@@ -239,9 +239,9 @@ export abstract class Type<
     wrappedExact: Exact;
     nestedExact: Exact;
   } {
-    let context = typeof exact === 'boolean' ? undefined : exact;
+    const context = typeof exact === 'boolean' ? undefined : exact;
 
-    let selfExact = this._exact;
+    const selfExact = this._exact;
 
     if (selfExact === false) {
       if (context) {
@@ -270,7 +270,7 @@ export abstract class Type<
     } else {
       if ((exact as boolean) || selfExact) {
         if (wrapper === 'managed') {
-          let context = new ExactContext();
+          const context = new ExactContext();
 
           return {
             context,

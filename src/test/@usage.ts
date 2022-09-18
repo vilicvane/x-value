@@ -94,7 +94,7 @@ export const mediumB = x.jsonValue.extend<UsingMediumB>('medium-b', {
           throw new TypeError();
         }
 
-        let buffer = Buffer.alloc(2);
+        const buffer = Buffer.alloc(2);
 
         buffer.writeUInt16BE(value);
 

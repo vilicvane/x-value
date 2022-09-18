@@ -1,7 +1,7 @@
 import {Medium} from '../library';
 
 test('medium requireCodec should throw on unknown symbol', () => {
-  let medium = new Medium('Random', {
+  const medium = new Medium('Random', {
     codecs: {},
   });
 

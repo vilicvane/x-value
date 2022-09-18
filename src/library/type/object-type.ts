@@ -41,7 +41,7 @@ export class ObjectType<
   }
 
   partial(): ObjectType<DefinitionPartial<TDefinition>> {
-    let definition = Object.fromEntries(
+    const definition = Object.fromEntries(
       Object.entries(this.definition).map(([key, Type]) => [
         key,
         Type instanceof OptionalType ? Type : new OptionalType(Type),
@@ -54,9 +54,9 @@ export class ObjectType<
   pick<TKeys extends (keyof TDefinition)[]>(
     ...keys: TKeys
   ): ObjectType<Pick<TDefinition, TKeys[number]>> {
-    let keySet = new Set(keys);
+    const keySet = new Set(keys);
 
-    let definition = Object.fromEntries(
+    const definition = Object.fromEntries(
       Object.entries(this.definition).filter(([key]) => keySet.has(key)),
     );
 
@@ -66,9 +66,9 @@ export class ObjectType<
   omit<TKeys extends (keyof TDefinition)[]>(
     ...keys: TKeys
   ): ObjectType<Omit<TDefinition, TKeys[number]>> {
-    let keySet = new Set(keys);
+    const keySet = new Set(keys);
 
-    let definition = Object.fromEntries(
+    const definition = Object.fromEntries(
       Object.entries(this.definition).filter(([key]) => !keySet.has(key)),
     );
 
@@ -96,16 +96,16 @@ export class ObjectType<
       ];
     }
 
-    let {managedContext, wrappedExact, nestedExact} = this.getExactContext(
+    const {managedContext, wrappedExact, nestedExact} = this.getExactContext(
       exact,
       'managed',
     );
 
-    let entries: [string, unknown][] = [];
-    let issues: TypeIssue[] = [];
+    const entries: [string, unknown][] = [];
+    const issues: TypeIssue[] = [];
 
-    for (let [key, Type] of Object.entries(this.definition)) {
-      let [value, entryIssues] = Type._decode(
+    for (const [key, Type] of Object.entries(this.definition)) {
+      const [value, entryIssues] = Type._decode(
         medium,
         (unpacked as any)[key],
         [...path, key],
@@ -154,7 +154,7 @@ export class ObjectType<
       ];
     }
 
-    let {managedContext, wrappedExact, nestedExact} = diagnose
+    const {managedContext, wrappedExact, nestedExact} = diagnose
       ? this.getExactContext(exact, 'managed')
       : {
           managedContext: undefined,
@@ -162,11 +162,11 @@ export class ObjectType<
           nestedExact: false,
         };
 
-    let entries: [string, unknown][] = [];
-    let issues: TypeIssue[] = [];
+    const entries: [string, unknown][] = [];
+    const issues: TypeIssue[] = [];
 
-    for (let [key, Type] of Object.entries(this.definition)) {
-      let [unpacked, entryIssues] = Type._encode(
+    for (const [key, Type] of Object.entries(this.definition)) {
+      const [unpacked, entryIssues] = Type._encode(
         medium,
         (value as any)[key],
         [...path, key],
@@ -216,16 +216,16 @@ export class ObjectType<
       ];
     }
 
-    let {managedContext, wrappedExact, nestedExact} = this.getExactContext(
+    const {managedContext, wrappedExact, nestedExact} = this.getExactContext(
       exact,
       'managed',
     );
 
-    let entries: [string, unknown][] = [];
-    let issues: TypeIssue[] = [];
+    const entries: [string, unknown][] = [];
+    const issues: TypeIssue[] = [];
 
-    for (let [key, Type] of Object.entries(this.definition)) {
-      let [transformedUnpacked, entryIssues] = Type._transform(
+    for (const [key, Type] of Object.entries(this.definition)) {
+      const [transformedUnpacked, entryIssues] = Type._transform(
         from,
         to,
         (unpacked as any)[key],
@@ -266,15 +266,15 @@ export class ObjectType<
       ];
     }
 
-    let {managedContext, wrappedExact, nestedExact} = this.getExactContext(
+    const {managedContext, wrappedExact, nestedExact} = this.getExactContext(
       exact,
       'managed',
     );
 
-    let issues: TypeIssue[] = [];
-    let entries = Object.entries(this.definition);
+    const issues: TypeIssue[] = [];
+    const entries = Object.entries(this.definition);
 
-    for (let [key, Type] of entries) {
+    for (const [key, Type] of entries) {
       issues.push(
         ...Type._diagnose((value as any)[key], [...path, key], nestedExact),
       );

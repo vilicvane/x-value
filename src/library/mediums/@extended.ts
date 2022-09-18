@@ -36,7 +36,7 @@ export const EXTENDED_CODECS: MediumAtomicCodecs<ExtendedTypes> = {
         );
       }
 
-      let date = new Date(value);
+      const date = new Date(value);
 
       if (isNaN(date.getTime())) {
         throw new TypeError('Invalid date value');
@@ -58,7 +58,7 @@ export const EXTENDED_CODECS: MediumAtomicCodecs<ExtendedTypes> = {
         );
       }
 
-      let groups = REGEXP_LITERAL_REGEX.exec(value);
+      const groups = REGEXP_LITERAL_REGEX.exec(value);
 
       if (!groups) {
         throw new TypeError('Invalid regular expression literal');

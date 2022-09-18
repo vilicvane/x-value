@@ -30,16 +30,16 @@ export class UnionType<
     path: TypePath,
     exact: Exact,
   ): [unknown, TypeIssue[]] {
-    let {wrappedExact} = this.getExactContext(exact, 'transparent');
+    const {wrappedExact} = this.getExactContext(exact, 'transparent');
 
     let maxIssuePathLength = -1;
     let outputIssues!: TypeIssue[];
 
-    for (let Type of this.TypeTuple) {
-      let dedicatedExact =
+    for (const Type of this.TypeTuple) {
+      const dedicatedExact =
         typeof wrappedExact === 'boolean' ? wrappedExact : new ExactContext();
 
-      let [value, issues] = Type._decode(
+      const [value, issues] = Type._decode(
         medium,
         unpacked,
         path,
@@ -47,7 +47,7 @@ export class UnionType<
       );
 
       if (hasNonDeferrableTypeIssue(issues)) {
-        let pathLength = Math.max(...issues.map(issue => issue.path.length));
+        const pathLength = Math.max(...issues.map(issue => issue.path.length));
 
         if (pathLength > maxIssuePathLength) {
           maxIssuePathLength = pathLength;
@@ -83,18 +83,18 @@ export class UnionType<
     exact: Exact,
     diagnose: boolean,
   ): [unknown, TypeIssue[]] {
-    let {wrappedExact} = diagnose
+    const {wrappedExact} = diagnose
       ? this.getExactContext(exact, 'transparent')
       : DISABLED_EXACT_CONTEXT_RESULT;
 
     let maxIssuePathLength = -1;
     let outputIssues!: TypeIssue[];
 
-    for (let Type of this.TypeTuple) {
-      let dedicatedExact =
+    for (const Type of this.TypeTuple) {
+      const dedicatedExact =
         typeof wrappedExact === 'boolean' ? wrappedExact : new ExactContext();
 
-      let [unpacked, issues] = Type._encode(
+      const [unpacked, issues] = Type._encode(
         medium,
         value,
         path,
@@ -103,7 +103,7 @@ export class UnionType<
       );
 
       if (hasNonDeferrableTypeIssue(issues)) {
-        let pathLength = Math.max(...issues.map(issue => issue.path.length));
+        const pathLength = Math.max(...issues.map(issue => issue.path.length));
 
         if (pathLength > maxIssuePathLength) {
           maxIssuePathLength = pathLength;
@@ -140,16 +140,16 @@ export class UnionType<
     path: TypePath,
     exact: Exact,
   ): [unknown, TypeIssue[]] {
-    let {wrappedExact} = this.getExactContext(exact, 'transparent');
+    const {wrappedExact} = this.getExactContext(exact, 'transparent');
 
     let maxIssuePathLength = -1;
     let outputIssues!: TypeIssue[];
 
-    for (let Type of this.TypeTuple) {
-      let dedicatedExact =
+    for (const Type of this.TypeTuple) {
+      const dedicatedExact =
         typeof wrappedExact === 'boolean' ? wrappedExact : new ExactContext();
 
-      let [transformedUnpacked, issues] = Type._transform(
+      const [transformedUnpacked, issues] = Type._transform(
         from,
         to,
         unpacked,
@@ -158,7 +158,7 @@ export class UnionType<
       );
 
       if (hasNonDeferrableTypeIssue(issues)) {
-        let pathLength = Math.max(...issues.map(issue => issue.path.length));
+        const pathLength = Math.max(...issues.map(issue => issue.path.length));
 
         if (pathLength > maxIssuePathLength) {
           maxIssuePathLength = pathLength;
@@ -188,19 +188,19 @@ export class UnionType<
 
   /** @internal */
   _diagnose(value: unknown, path: TypePath, exact: Exact): TypeIssue[] {
-    let {wrappedExact} = this.getExactContext(exact, 'transparent');
+    const {wrappedExact} = this.getExactContext(exact, 'transparent');
 
     let maxIssuePathLength = -1;
     let outputIssues!: TypeIssue[];
 
-    for (let Type of this.TypeTuple) {
-      let dedicatedExact =
+    for (const Type of this.TypeTuple) {
+      const dedicatedExact =
         typeof wrappedExact === 'boolean' ? wrappedExact : new ExactContext();
 
-      let issues = Type._diagnose(value, path, dedicatedExact);
+      const issues = Type._diagnose(value, path, dedicatedExact);
 
       if (hasNonDeferrableTypeIssue(issues)) {
-        let pathLength = Math.max(...issues.map(issue => issue.path.length));
+        const pathLength = Math.max(...issues.map(issue => issue.path.length));
 
         if (pathLength > maxIssuePathLength) {
           maxIssuePathLength = pathLength;

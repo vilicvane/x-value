@@ -30,13 +30,16 @@ export class IntersectionType<
     path: TypePath,
     exact: Exact,
   ): [unknown, TypeIssue[]] {
-    let {managedContext, wrappedExact} = this.getExactContext(exact, 'managed');
+    const {managedContext, wrappedExact} = this.getExactContext(
+      exact,
+      'managed',
+    );
 
-    let partials: unknown[] = [];
-    let issues: TypeIssue[] = [];
+    const partials: unknown[] = [];
+    const issues: TypeIssue[] = [];
 
-    for (let Type of this.TypeTuple) {
-      let [partial, partialIssues] = Type._decode(
+    for (const Type of this.TypeTuple) {
+      const [partial, partialIssues] = Type._decode(
         medium,
         unpacked,
         path,
@@ -65,15 +68,15 @@ export class IntersectionType<
     exact: Exact,
     diagnose: boolean,
   ): [unknown, TypeIssue[]] {
-    let {managedContext, wrappedExact} = diagnose
+    const {managedContext, wrappedExact} = diagnose
       ? this.getExactContext(exact, 'managed')
       : DISABLED_EXACT_CONTEXT_RESULT;
 
-    let partials: unknown[] = [];
-    let issues: TypeIssue[] = [];
+    const partials: unknown[] = [];
+    const issues: TypeIssue[] = [];
 
-    for (let Type of this.TypeTuple) {
-      let [partial, partialIssues] = Type._encode(
+    for (const Type of this.TypeTuple) {
+      const [partial, partialIssues] = Type._encode(
         medium,
         value,
         path,
@@ -103,13 +106,16 @@ export class IntersectionType<
     path: TypePath,
     exact: Exact,
   ): [unknown, TypeIssue[]] {
-    let {managedContext, wrappedExact} = this.getExactContext(exact, 'managed');
+    const {managedContext, wrappedExact} = this.getExactContext(
+      exact,
+      'managed',
+    );
 
-    let partials: unknown[] = [];
-    let issues: TypeIssue[] = [];
+    const partials: unknown[] = [];
+    const issues: TypeIssue[] = [];
 
-    for (let Type of this.TypeTuple) {
-      let [partial, partialIssues] = Type._transform(
+    for (const Type of this.TypeTuple) {
+      const [partial, partialIssues] = Type._transform(
         from,
         to,
         unpacked,
@@ -133,9 +139,12 @@ export class IntersectionType<
 
   /** @internal */
   _diagnose(value: unknown, path: TypePath, exact: Exact): TypeIssue[] {
-    let {managedContext, wrappedExact} = this.getExactContext(exact, 'managed');
+    const {managedContext, wrappedExact} = this.getExactContext(
+      exact,
+      'managed',
+    );
 
-    let issues = this.TypeTuple.flatMap(Type =>
+    const issues = this.TypeTuple.flatMap(Type =>
       Type._diagnose(value, path, wrappedExact),
     );
 

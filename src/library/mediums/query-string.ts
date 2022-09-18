@@ -38,7 +38,7 @@ export const queryString = medium<UsingQueryStringMedium>('query-string', {
       decode(value) {
         value = String(value);
 
-        let numberValue = Number(value);
+        const numberValue = Number(value);
 
         if (!isNaN(numberValue)) {
           return numberValue !== 0;

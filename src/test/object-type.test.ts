@@ -389,9 +389,9 @@ test('object shallow exact type should work', () => {
 
   type O = TypeOf<typeof O>;
 
-  let value1 = {foo: 'abc', bar: 123};
+  const value1 = {foo: 'abc', bar: 123};
 
-  let value2 = {foo: 'abc', bar: 123, x: true, y: {}};
+  const value2 = {foo: 'abc', bar: 123, x: true, y: {}};
 
   expect(O.is(value1)).toBe(true);
   expect(() => O.encode(x.json, value2)).toThrowErrorMatchingInlineSnapshot(`

@@ -136,7 +136,7 @@ test('date atomic type should error decoding json medium', () => {
 });
 
 test('date atomic type should work with extended json medium', () => {
-  let date = new Date();
+  const date = new Date();
 
   expect(x.Date.decode(x.extendedJSON, JSON.stringify(date)).getTime()).toBe(
     date.getTime(),
@@ -152,8 +152,8 @@ test('date atomic type should work with extended json medium', () => {
 });
 
 test('date atomic refinement sunday should work with extended json medium', () => {
-  let sunday = new Date('2022-3-27');
-  let monday = new Date('2022-3-28');
+  const sunday = new Date('2022-3-27');
+  const monday = new Date('2022-3-28');
 
   expect(Sunday.decode(x.extendedJSON, JSON.stringify(sunday)).getTime()).toBe(
     sunday.getTime(),
@@ -190,8 +190,8 @@ test('date atomic refinement sunday should work with extended json medium', () =
 });
 
 test('date atomic refinement sunday should work with extended json value medium', () => {
-  let sunday = new Date('2022-3-27') as TypeOf<typeof Sunday>;
-  let monday = new Date('2022-3-28');
+  const sunday = new Date('2022-3-27') as TypeOf<typeof Sunday>;
+  const monday = new Date('2022-3-28');
 
   expect(
     Sunday.decode(

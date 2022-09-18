@@ -41,15 +41,15 @@ export class ArrayType<TElementType extends TypeInMediumsPartial> extends Type<
       ];
     }
 
-    let ElementType = this.ElementType;
+    const ElementType = this.ElementType;
 
-    let {context, nestedExact} = this.getExactContext(exact, false);
+    const {context, nestedExact} = this.getExactContext(exact, false);
 
-    let value: unknown[] = [];
-    let issues: TypeIssue[] = [];
+    const value: unknown[] = [];
+    const issues: TypeIssue[] = [];
 
-    for (let [index, unpackedElement] of unpacked.entries()) {
-      let [element, entryIssues] = ElementType._decode(
+    for (const [index, unpackedElement] of unpacked.entries()) {
+      const [element, entryIssues] = ElementType._decode(
         medium,
         unpackedElement,
         [...path, index],
@@ -87,17 +87,17 @@ export class ArrayType<TElementType extends TypeInMediumsPartial> extends Type<
       ];
     }
 
-    let ElementType = this.ElementType;
+    const ElementType = this.ElementType;
 
-    let {context, nestedExact} = diagnose
+    const {context, nestedExact} = diagnose
       ? this.getExactContext(exact, false)
       : DISABLED_EXACT_CONTEXT_RESULT;
 
-    let unpacked: unknown[] = [];
-    let issues: TypeIssue[] = [];
+    const unpacked: unknown[] = [];
+    const issues: TypeIssue[] = [];
 
-    for (let [index, valueElement] of (value as unknown[]).entries()) {
-      let [unpackedElement, entryIssues] = ElementType._encode(
+    for (const [index, valueElement] of (value as unknown[]).entries()) {
+      const [unpackedElement, entryIssues] = ElementType._encode(
         medium,
         valueElement,
         [...path, index],
@@ -138,15 +138,15 @@ export class ArrayType<TElementType extends TypeInMediumsPartial> extends Type<
       ];
     }
 
-    let ElementType = this.ElementType;
+    const ElementType = this.ElementType;
 
-    let {context, nestedExact} = this.getExactContext(exact, false);
+    const {context, nestedExact} = this.getExactContext(exact, false);
 
-    let value: unknown[] = [];
-    let issues: TypeIssue[] = [];
+    const value: unknown[] = [];
+    const issues: TypeIssue[] = [];
 
-    for (let [index, unpackedElement] of unpacked.entries()) {
-      let [element, entryIssues] = ElementType._transform(
+    for (const [index, unpackedElement] of unpacked.entries()) {
+      const [element, entryIssues] = ElementType._transform(
         from,
         to,
         unpackedElement,
@@ -174,11 +174,11 @@ export class ArrayType<TElementType extends TypeInMediumsPartial> extends Type<
       ];
     }
 
-    let ElementType = this.ElementType;
+    const ElementType = this.ElementType;
 
-    let {context, nestedExact} = this.getExactContext(exact, false);
+    const {context, nestedExact} = this.getExactContext(exact, false);
 
-    let issues = value.flatMap((element, index) =>
+    const issues = value.flatMap((element, index) =>
       ElementType._diagnose(element, [...path, index], nestedExact),
     );
 

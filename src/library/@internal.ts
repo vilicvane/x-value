@@ -50,7 +50,7 @@ export type NominalPartial = Record<__nominal, unknown>;
 export function merge(partials: unknown[]): unknown {
   let pendingMergeKeyToValues: Map<string | number, unknown[]> | undefined;
 
-  let merged = partials.reduce((merged, partial) => {
+  const merged = partials.reduce((merged, partial) => {
     if (merged === partial) {
       return merged;
     }
@@ -65,7 +65,7 @@ export function merge(partials: unknown[]): unknown {
         throw new TypeError();
       }
 
-      for (let [key, value] of Object.entries(partial)) {
+      for (const [key, value] of Object.entries(partial)) {
         let pendingMergeValues: unknown[] | undefined;
 
         if (pendingMergeKeyToValues) {
@@ -90,7 +90,7 @@ export function merge(partials: unknown[]): unknown {
   });
 
   if (pendingMergeKeyToValues) {
-    for (let [key, values] of pendingMergeKeyToValues) {
+    for (const [key, values] of pendingMergeKeyToValues) {
       (merged as any)[key] = merge(values);
     }
   }
@@ -130,9 +130,9 @@ export class ExactContext {
   addKeys(keys: string[]): void {
     this.touched = true;
 
-    let set = this.keySet;
+    const set = this.keySet;
 
-    for (let key of keys) {
+    for (const key of keys) {
       set.add(key);
     }
   }
@@ -145,8 +145,8 @@ export class ExactContext {
       return [];
     }
 
-    let keySet = this.keySet;
-    let unknownKeys = Object.keys(value as object).filter(
+    const keySet = this.keySet;
+    const unknownKeys = Object.keys(value as object).filter(
       key => !keySet.has(key),
     );
 

@@ -5,8 +5,8 @@ import {TypeConstraintError} from '../library';
 test('union type of atomic types should work with json medium', () => {
   const Type = x.union(x.string, x.number);
 
-  let value1: TypeOf<typeof Type> = 'abc';
-  let value2: TypeOf<typeof Type> = 123;
+  const value1: TypeOf<typeof Type> = 'abc';
+  const value2: TypeOf<typeof Type> = 123;
 
   expect(Type.decode(x.json, JSON.stringify(value1))).toEqual(value1);
   expect(Type.decode(x.json, JSON.stringify(value2))).toEqual(value2);
@@ -38,8 +38,8 @@ test('union type property with undefined', () => {
 
   type Type = TypeOf<typeof Type>;
 
-  let _value_1: Type = {value: 'abc'};
-  let _value_2: Type = {value: undefined};
+  const _value_1: Type = {value: 'abc'};
+  const _value_2: Type = {value: undefined};
 });
 
 test('union type of mixed types should work with json medium', () => {
@@ -51,13 +51,13 @@ test('union type of mixed types should work with json medium', () => {
     x.number,
   );
 
-  let value1: TypeOf<typeof Type> = {
+  const value1: TypeOf<typeof Type> = {
     type: 'text',
     value: '123',
   };
-  let value2: TypeOf<typeof Type> = 123;
-  let value3: any = true;
-  let value4: any = {
+  const value2: TypeOf<typeof Type> = 123;
+  const value3: any = true;
+  const value4: any = {
     type: 'text',
     value: 123,
   };
@@ -99,13 +99,13 @@ test('union type of mixed types should work with json value medium', () => {
     x.number,
   );
 
-  let value1: TypeOf<typeof Type> = {
+  const value1: TypeOf<typeof Type> = {
     type: 'text',
     value: '123',
   };
-  let value2: TypeOf<typeof Type> = 123;
-  let value3: any = true;
-  let value4: any = {
+  const value2: TypeOf<typeof Type> = 123;
+  const value3: any = true;
+  const value4: any = {
     type: 'text',
     value: 123,
   };

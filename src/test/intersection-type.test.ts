@@ -11,8 +11,8 @@ test('intersection type results in never should work with json medium', () => {
 
   type _ = AssertTrue<IsEqual<Type, never>>;
 
-  let value1 = 'abc';
-  let value2 = 123;
+  const value1 = 'abc';
+  const value2 = 123;
 
   expect(() => Type.decode(x.json, JSON.stringify(value1)))
     .toThrowErrorMatchingInlineSnapshot(`
@@ -58,14 +58,14 @@ test('intersection type should work with json value medium', () => {
     >
   >;
 
-  let value1: Type = {
+  const value1: Type = {
     foo: 'abc',
     bar: 123,
   };
-  let value2 = {
+  const value2 = {
     foo: 'abc',
   };
-  let value3 = {
+  const value3 = {
     foo: 'abc',
     bar: 'def',
   };
@@ -109,14 +109,14 @@ test('intersection type should work with json medium', () => {
     }),
   );
 
-  let value1: TypeOf<typeof Type> = {
+  const value1: TypeOf<typeof Type> = {
     foo: 'abc',
     bar: 123,
   };
-  let value2 = {
+  const value2 = {
     foo: 'abc',
   };
-  let value3 = {
+  const value3 = {
     foo: 'abc',
     bar: 'def',
   };

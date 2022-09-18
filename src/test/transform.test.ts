@@ -19,9 +19,9 @@ test('transform medium A to medium B and back', () => {
     ),
   });
 
-  let idBuffer = Buffer.from([0x12, 0x34]);
+  const idBuffer = Buffer.from([0x12, 0x34]);
 
-  let common: Omit<TypeOf<typeof Type>, 'id'> = {
+  const common: Omit<TypeOf<typeof Type>, 'id'> = {
     name: 'common',
     data: [
       {
@@ -38,29 +38,29 @@ test('transform medium A to medium B and back', () => {
     ],
   };
 
-  let a: MediumTypeOf<typeof Type, 'medium-a'> = {
+  const a: MediumTypeOf<typeof Type, 'medium-a'> = {
     id: idBuffer,
     ...common,
   };
 
-  let b: MediumTypeOf<typeof Type, 'medium-b'> = {
+  const b: MediumTypeOf<typeof Type, 'medium-b'> = {
     id: idBuffer.readUint16BE(),
     ...common,
   };
 
-  let c = {
+  const c = {
     id: idBuffer,
     ...common,
     data: 123,
   };
 
-  let d = {
+  const d = {
     id: idBuffer,
     ...common,
     data: [123, {x: true, y: 'abc'}],
   };
 
-  let value: TypeOf<typeof Type> = {
+  const value: TypeOf<typeof Type> = {
     id: idBuffer.toString('hex'),
     ...common,
   };
@@ -112,7 +112,7 @@ test('transform should work with refined type', () => {
     })
     .refine(value => x.refinement(value.foo === 'abc', value));
 
-  let value = {foo: 'abc'};
+  const value = {foo: 'abc'};
 
   expect(O.transform(x.json, x.jsonValue, JSON.stringify(value))).toEqual(
     value,

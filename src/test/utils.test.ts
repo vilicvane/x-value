@@ -10,7 +10,7 @@ test('UnknownRecord type should work', () => {
   expect(x.UnknownRecord.is([])).toBe(true);
   expect(x.UnknownRecord.is(() => {})).toBe(false);
 
-  let value = {hello: ['world', '!']};
+  const value = {hello: ['world', '!']};
 
   expect(x.UnknownRecord.decode(x.json, JSON.stringify(value))).toEqual({
     hello: ['world', '!'],

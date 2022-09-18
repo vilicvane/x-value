@@ -32,7 +32,7 @@ export class AtomicType<TSymbol extends symbol> extends Type<
       return [undefined, [buildIssueByError(error, path)]];
     }
 
-    let issues = this._diagnose(value, path, exact);
+    const issues = this._diagnose(value, path, exact);
 
     return [hasNonDeferrableTypeIssue(issues) ? undefined : value, issues];
   }
@@ -74,7 +74,7 @@ export class AtomicType<TSymbol extends symbol> extends Type<
     path: TypePath,
     exact: Exact,
   ): [unknown, TypeIssue[]] {
-    let symbol = this.symbol;
+    const symbol = this.symbol;
 
     let value: unknown;
 
@@ -84,7 +84,7 @@ export class AtomicType<TSymbol extends symbol> extends Type<
       return [undefined, [buildIssueByError(error, path)]];
     }
 
-    let issues = this._diagnose(value, path, exact);
+    const issues = this._diagnose(value, path, exact);
 
     if (hasNonDeferrableTypeIssue(issues)) {
       return [undefined, issues];
@@ -101,9 +101,9 @@ export class AtomicType<TSymbol extends symbol> extends Type<
 
   /** @internal */
   _diagnose(value: unknown, path: TypePath, _exact: Exact): TypeIssue[] {
-    let issues: TypeIssue[] = [];
+    const issues: TypeIssue[] = [];
 
-    for (let constraint of this.constraints) {
+    for (const constraint of this.constraints) {
       try {
         constraint(value);
       } catch (error) {

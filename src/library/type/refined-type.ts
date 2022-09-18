@@ -57,7 +57,7 @@ export class RefinedType<
     exact: Exact,
     diagnose: boolean,
   ): [unknown, TypeIssue[]] {
-    let [unpacked, issues] = this.Type._encode(
+    const [unpacked, issues] = this.Type._encode(
       medium,
       value,
       path,
@@ -70,7 +70,7 @@ export class RefinedType<
     }
 
     if (diagnose) {
-      let [, refinementIssues] = this.processRefinements(value, path);
+      const [, refinementIssues] = this.processRefinements(value, path);
 
       issues.push(...refinementIssues);
 
@@ -90,26 +90,26 @@ export class RefinedType<
     path: TypePath,
     exact: Exact,
   ): [unknown, TypeIssue[]] {
-    let [value, issues] = this._decode(from, unpacked, path, exact);
+    const [value, issues] = this._decode(from, unpacked, path, exact);
 
     if (hasNonDeferrableTypeIssue(issues)) {
       return [undefined, issues];
     }
 
-    let [transformedUnpacked] = this._encode(to, value, path, false, false);
+    const [transformedUnpacked] = this._encode(to, value, path, false, false);
 
     return [transformedUnpacked, issues];
   }
 
   /** @internal */
   _diagnose(value: unknown, path: TypePath, exact: Exact): TypeIssue[] {
-    let issues = this.Type._diagnose(value, path, exact);
+    const issues = this.Type._diagnose(value, path, exact);
 
     if (hasNonDeferrableTypeIssue(issues)) {
       return issues;
     }
 
-    let [, refinementIssues] = this.processRefinements(value, path);
+    const [, refinementIssues] = this.processRefinements(value, path);
 
     issues.push(...refinementIssues);
 
@@ -120,9 +120,9 @@ export class RefinedType<
     value: unknown,
     path: TypePath,
   ): [unknown, TypeIssue[]] {
-    let issues: TypeIssue[] = [];
+    const issues: TypeIssue[] = [];
 
-    for (let refinement of this.refinements) {
+    for (const refinement of this.refinements) {
       try {
         value = refinement(value);
       } catch (error) {

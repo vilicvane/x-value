@@ -76,9 +76,9 @@ export class Medium<
     symbol: TSymbol,
   ): MediumAtomicCodec<TTypes, TSymbol>;
   requireCodec(symbol: symbol): __MediumAtomicCodec {
-    let codecs = this.codecs;
+    const codecs = this.codecs;
 
-    let codec =
+    const codec =
       (codecs as Record<symbol, __MediumAtomicCodec>)[symbol] ??
       codecs[atomicTypeSymbol];
 

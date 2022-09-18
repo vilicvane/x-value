@@ -42,18 +42,18 @@ export class RecordType<
       ];
     }
 
-    let Key = this.Key;
-    let Value = this.Value;
+    const Key = this.Key;
+    const Value = this.Value;
 
-    let {context, nestedExact} = this.getExactContext(exact, false);
+    const {context, nestedExact} = this.getExactContext(exact, false);
 
     context?.neutralize();
 
-    let entries: [string | number, unknown][] = [];
-    let issues: TypeIssue[] = [];
+    const entries: [string | number, unknown][] = [];
+    const issues: TypeIssue[] = [];
 
-    for (let [key, unpackedValue] of getRecordEntries(unpacked)) {
-      let [value, valueIssues] = Value._decode(
+    for (const [key, unpackedValue] of getRecordEntries(unpacked)) {
+      const [value, valueIssues] = Value._decode(
         medium,
         unpackedValue,
         [...path, key],
@@ -97,20 +97,20 @@ export class RecordType<
       ];
     }
 
-    let Key = this.Key;
-    let Value = this.Value;
+    const Key = this.Key;
+    const Value = this.Value;
 
-    let {context, nestedExact} = diagnose
+    const {context, nestedExact} = diagnose
       ? this.getExactContext(exact, false)
       : DISABLED_EXACT_CONTEXT_RESULT;
 
     context?.neutralize();
 
-    let entries: [string | number, unknown][] = [];
-    let issues: TypeIssue[] = [];
+    const entries: [string | number, unknown][] = [];
+    const issues: TypeIssue[] = [];
 
-    for (let [key, nestedValue] of getRecordEntries(value as object)) {
-      let [unpacked, valueIssues] = Value._encode(
+    for (const [key, nestedValue] of getRecordEntries(value as object)) {
+      const [unpacked, valueIssues] = Value._encode(
         medium,
         nestedValue,
         [...path, key],
@@ -155,18 +155,18 @@ export class RecordType<
       ];
     }
 
-    let Key = this.Key;
-    let Value = this.Value;
+    const Key = this.Key;
+    const Value = this.Value;
 
-    let {context, nestedExact} = this.getExactContext(exact, false);
+    const {context, nestedExact} = this.getExactContext(exact, false);
 
     context?.neutralize();
 
-    let entries: [string | number, unknown][] = [];
-    let issues: TypeIssue[] = [];
+    const entries: [string | number, unknown][] = [];
+    const issues: TypeIssue[] = [];
 
-    for (let [key, unpackedValue] of getRecordEntries(unpacked)) {
-      let [transformedUnpacked, valueIssues] = Value._transform(
+    for (const [key, unpackedValue] of getRecordEntries(unpacked)) {
+      const [transformedUnpacked, valueIssues] = Value._transform(
         from,
         to,
         unpackedValue,
@@ -202,10 +202,10 @@ export class RecordType<
       ];
     }
 
-    let Key = this.Key;
-    let Value = this.Value;
+    const Key = this.Key;
+    const Value = this.Value;
 
-    let {context, nestedExact} = this.getExactContext(exact, false);
+    const {context, nestedExact} = this.getExactContext(exact, false);
 
     context?.neutralize();
 
@@ -246,9 +246,9 @@ function buildRecord(
   source: object,
 ): Record<string, unknown> | unknown[] {
   if (Array.isArray(source)) {
-    let array: unknown[] = [];
+    const array: unknown[] = [];
 
-    for (let [index, value] of entries) {
+    for (const [index, value] of entries) {
       array[index as number] = value;
     }
 
