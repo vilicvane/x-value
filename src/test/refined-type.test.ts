@@ -526,4 +526,13 @@ test('refinement transform', () => {
   expect(
     TrimmedNonEmptyString.transform(x.jsonValue, x.ecmascript, ' ghi '),
   ).toBe('ghi');
+  expect(TrimmedNonEmptyString.is(' abc ')).toBe(true);
+  expect(TrimmedNonEmptyString.diagnose(' ')).toMatchInlineSnapshot(`
+    Array [
+      Object {
+        "message": "Unexpected value.",
+        "path": Array [],
+      },
+    ]
+  `);
 });
