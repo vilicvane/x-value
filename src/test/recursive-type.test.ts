@@ -1,7 +1,6 @@
 import type {AssertTrue, IsEqual} from 'tslang';
 
 import * as x from '../library';
-import type {TypeOf} from '../library';
 
 test('recursive type should work', () => {
   interface RecursiveR {
@@ -17,7 +16,7 @@ test('recursive type should work', () => {
     }),
   );
 
-  type R = TypeOf<typeof R>;
+  type R = x.TypeOf<typeof R>;
 
   const a: R = {
     type: 'node',

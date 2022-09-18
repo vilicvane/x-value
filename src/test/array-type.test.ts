@@ -1,12 +1,10 @@
 import * as x from '../library';
-import type {TypeOf} from '../library';
-import {TypeConstraintError} from '../library';
 
 test('simple array type should work with json medium', () => {
   const Type = x.array(x.string);
 
-  const value1: TypeOf<typeof Type> = ['abc', 'def'];
-  const value2: TypeOf<typeof Type> = [];
+  const value1: x.TypeOf<typeof Type> = ['abc', 'def'];
+  const value2: x.TypeOf<typeof Type> = [];
   const value3 = [123];
   const value4 = 'oops';
 
@@ -18,23 +16,27 @@ test('simple array type should work with json medium', () => {
       [0] Expected string, getting [object Number]."
   `);
   expect(() => Type.decode(x.json, JSON.stringify(value4))).toThrow(
-    TypeConstraintError,
+    x.TypeConstraintError,
   );
 
   expect(Type.encode(x.json, value1)).toEqual(JSON.stringify(value1));
   expect(Type.encode(x.json, value2)).toEqual(JSON.stringify(value2));
-  expect(() => Type.encode(x.json, value3 as any)).toThrow(TypeConstraintError);
-  expect(() => Type.encode(x.json, value4 as any)).toThrow(TypeConstraintError);
+  expect(() => Type.encode(x.json, value3 as any)).toThrow(
+    x.TypeConstraintError,
+  );
+  expect(() => Type.encode(x.json, value4 as any)).toThrow(
+    x.TypeConstraintError,
+  );
 });
 
 test('simple array type should work with extended json medium', () => {
   const Type = x.array(x.Date);
 
-  const value1: TypeOf<typeof Type> = [
+  const value1: x.TypeOf<typeof Type> = [
     new Date('2022-3-31'),
     new Date('2022-4-1'),
   ];
-  const value2: TypeOf<typeof Type> = [];
+  const value2: x.TypeOf<typeof Type> = [];
   const value3 = [123];
   const value4 = 'oops';
 
@@ -52,21 +54,21 @@ test('simple array type should work with extended json medium', () => {
   expect(Type.encode(x.extendedJSON, value1)).toEqual(JSON.stringify(value1));
   expect(Type.encode(x.extendedJSON, value2)).toEqual(JSON.stringify(value2));
   expect(() => Type.encode(x.extendedJSON, value3 as any)).toThrow(
-    TypeConstraintError,
+    x.TypeConstraintError,
   );
   expect(() => Type.encode(x.extendedJSON, value4 as any)).toThrow(
-    TypeConstraintError,
+    x.TypeConstraintError,
   );
 });
 
 test('simple array type should work with extended json value medium', () => {
   const Type = x.array(x.Date);
 
-  const value1: TypeOf<typeof Type> = [
+  const value1: x.TypeOf<typeof Type> = [
     new Date('2022-3-31'),
     new Date('2022-4-1'),
   ];
-  const value2: TypeOf<typeof Type> = [];
+  const value2: x.TypeOf<typeof Type> = [];
   const value3 = [123];
   const value4 = 'oops';
 
@@ -86,7 +88,7 @@ test('simple array type should work with extended json value medium', () => {
     TypeError,
   );
   expect(() => Type.decode(x.extendedJSONValue, value4 as any)).toThrow(
-    TypeConstraintError,
+    x.TypeConstraintError,
   );
 
   expect(Type.encode(x.extendedJSONValue, value1)).toEqual(
@@ -96,10 +98,10 @@ test('simple array type should work with extended json value medium', () => {
     JSON.parse(JSON.stringify(value2)),
   );
   expect(() => Type.encode(x.extendedJSONValue, value3 as any)).toThrow(
-    TypeConstraintError,
+    x.TypeConstraintError,
   );
   expect(() => Type.encode(x.extendedJSONValue, value4 as any)).toThrow(
-    TypeConstraintError,
+    x.TypeConstraintError,
   );
 });
 
@@ -111,7 +113,7 @@ test('object array type should work with json medium', () => {
     }),
   );
 
-  const value1: TypeOf<typeof Type> = [
+  const value1: x.TypeOf<typeof Type> = [
     {
       foo: 'abc',
       bar: 123,
@@ -121,7 +123,7 @@ test('object array type should work with json medium', () => {
       bar: 456,
     },
   ];
-  const value2: TypeOf<typeof Type> = [];
+  const value2: x.TypeOf<typeof Type> = [];
   const value3 = [123];
   const value4 = 'oops';
 
@@ -133,13 +135,17 @@ test('object array type should work with json medium', () => {
       [0] Expecting unpacked value to be a non-null object, getting [object Number]."
   `);
   expect(() => Type.decode(x.json, JSON.stringify(value4))).toThrow(
-    TypeConstraintError,
+    x.TypeConstraintError,
   );
 
   expect(Type.encode(x.json, value1)).toEqual(JSON.stringify(value1));
   expect(Type.encode(x.json, value2)).toEqual(JSON.stringify(value2));
-  expect(() => Type.encode(x.json, value3 as any)).toThrow(TypeConstraintError);
-  expect(() => Type.encode(x.json, value4 as any)).toThrow(TypeConstraintError);
+  expect(() => Type.encode(x.json, value3 as any)).toThrow(
+    x.TypeConstraintError,
+  );
+  expect(() => Type.encode(x.json, value4 as any)).toThrow(
+    x.TypeConstraintError,
+  );
 
   expect(Type.diagnose(value1)).toEqual([]);
   expect(Type.diagnose(value2)).toEqual([]);

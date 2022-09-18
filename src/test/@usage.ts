@@ -1,16 +1,4 @@
 import * as x from '../library';
-import type {
-  ECMAScriptTypes,
-  JSONValueTypes,
-  TransformNominal,
-  UsingECMAScriptMedium,
-  UsingExtendedJSONMedium,
-  UsingExtendedJSONValueMedium,
-  UsingExtendedQueryStringMedium,
-  UsingJSONMedium,
-  UsingJSONValueMedium,
-  UsingQueryStringMedium,
-} from '../library';
 
 declare global {
   namespace XValue {
@@ -19,13 +7,13 @@ declare global {
     }
 
     interface Using
-      extends UsingJSONMedium,
-        UsingExtendedJSONMedium,
-        UsingJSONValueMedium,
-        UsingExtendedJSONValueMedium,
-        UsingQueryStringMedium,
-        UsingExtendedQueryStringMedium,
-        UsingECMAScriptMedium,
+      extends x.UsingJSONMedium,
+        x.UsingExtendedJSONMedium,
+        x.UsingJSONValueMedium,
+        x.UsingExtendedJSONValueMedium,
+        x.UsingQueryStringMedium,
+        x.UsingExtendedQueryStringMedium,
+        x.UsingECMAScriptMedium,
         UsingMediumA,
         UsingMediumB {}
   }
@@ -38,10 +26,10 @@ export const Identifier = x.atomic(identifierTypeSymbol, value =>
 );
 
 export interface IdentifierInMediumA extends Buffer {
-  toString(encoding: 'hex'): TransformNominal<this, string>;
+  toString(encoding: 'hex'): x.TransformNominal<this, string>;
 }
 
-export interface MediumATypes extends ECMAScriptTypes {
+export interface MediumATypes extends x.ECMAScriptTypes {
   [identifierTypeSymbol]: IdentifierInMediumA;
 }
 
@@ -49,7 +37,7 @@ export interface UsingMediumA {
   'medium-a': MediumATypes;
 }
 
-export interface MediumBTypes extends JSONValueTypes {
+export interface MediumBTypes extends x.JSONValueTypes {
   [identifierTypeSymbol]: number;
 }
 

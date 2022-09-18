@@ -1,14 +1,12 @@
 import type {AssertTrue, IsEqual} from 'tslang';
 
 import * as x from '../library';
-import type {MediumTypeOf, TypeOf} from '../library';
-import {TypeConstraintError, atomic, stringTypeSymbol} from '../library';
 
 const Sunday = x.Date.refine<'sunday'>(date =>
   x.refinement(date.getDay() === 0, date),
 );
 
-type Sunday = TypeOf<typeof Sunday>;
+type Sunday = x.TypeOf<typeof Sunday>;
 
 test('pre-defined atomic types should decode/encode ecmascript medium', () => {
   expect(x.unknown.decode(x.ecmascript, true)).toBe(true);
@@ -105,21 +103,21 @@ test('pre-defined atomic types should error decode/encode json medium with wrong
     "Failed to decode from medium:
       Expected null, getting [object String]."
   `);
-  expect(() => x.string.decode(x.json, '123')).toThrow(TypeConstraintError);
-  expect(() => x.number.decode(x.json, 'true')).toThrow(TypeConstraintError);
-  expect(() => x.boolean.decode(x.json, 'null')).toThrow(TypeConstraintError);
+  expect(() => x.string.decode(x.json, '123')).toThrow(x.TypeConstraintError);
+  expect(() => x.number.decode(x.json, 'true')).toThrow(x.TypeConstraintError);
+  expect(() => x.boolean.decode(x.json, 'null')).toThrow(x.TypeConstraintError);
 
   expect(() => x.nullType.encode(x.json, 'text' as any)).toThrow(
-    TypeConstraintError,
+    x.TypeConstraintError,
   );
   expect(() => x.string.encode(x.json, 123 as any)).toThrow(
-    TypeConstraintError,
+    x.TypeConstraintError,
   );
   expect(() => x.number.encode(x.json, true as any)).toThrow(
-    TypeConstraintError,
+    x.TypeConstraintError,
   );
   expect(() => x.boolean.encode(x.json, null as any)).toThrow(
-    TypeConstraintError,
+    x.TypeConstraintError,
   );
 });
 
@@ -132,7 +130,7 @@ test('date atomic type should error decoding json medium', () => {
 
   // Will not throw because json medium has defined atomicTypeSymbol codec as
   // fallback:
-  // expect(() => x.Date.encode(x.json, new Date())).toThrow(TypeConstraintError);
+  // expect(() => x.Date.encode(x.json, new Date())).toThrow(x.TypeConstraintError);
 });
 
 test('date atomic type should work with extended json medium', () => {
@@ -159,14 +157,14 @@ test('date atomic refinement sunday should work with extended json medium', () =
     sunday.getTime(),
   );
   expect(() => Sunday.decode(x.extendedJSON, JSON.stringify(monday))).toThrow(
-    TypeConstraintError,
+    x.TypeConstraintError,
   );
 
-  expect(Sunday.encode(x.extendedJSON, sunday as TypeOf<typeof Sunday>)).toBe(
+  expect(Sunday.encode(x.extendedJSON, sunday as x.TypeOf<typeof Sunday>)).toBe(
     JSON.stringify(sunday),
   );
   expect(() => Sunday.encode(x.extendedJSON, monday as any)).toThrow(
-    TypeConstraintError,
+    x.TypeConstraintError,
   );
 
   expect(Sunday.is(sunday)).toBe(true);
@@ -186,17 +184,17 @@ test('date atomic refinement sunday should work with extended json medium', () =
   type _ = AssertTrue<IsEqual<typeof satisfiedSunday, Sunday>>;
 
   expect(satisfiedSunday).toBe(sunday);
-  expect(() => Sunday.satisfies(monday)).toThrow(TypeConstraintError);
+  expect(() => Sunday.satisfies(monday)).toThrow(x.TypeConstraintError);
 });
 
 test('date atomic refinement sunday should work with extended json value medium', () => {
-  const sunday = new Date('2022-3-27') as TypeOf<typeof Sunday>;
+  const sunday = new Date('2022-3-27') as x.TypeOf<typeof Sunday>;
   const monday = new Date('2022-3-28');
 
   expect(
     Sunday.decode(
       x.extendedJSONValue,
-      sunday.toISOString() as MediumTypeOf<
+      sunday.toISOString() as x.MediumTypeOf<
         typeof Sunday,
         'extended-json-value'
       >,
@@ -204,18 +202,18 @@ test('date atomic refinement sunday should work with extended json value medium'
   ).toBe(sunday.getTime());
   expect(() =>
     Sunday.decode(x.extendedJSONValue, monday.toISOString() as any),
-  ).toThrow(TypeConstraintError);
+  ).toThrow(x.TypeConstraintError);
 
   expect(Sunday.encode(x.extendedJSONValue, sunday)).toEqual(
     sunday.toISOString(),
   );
   expect(() => Sunday.encode(x.extendedJSONValue, monday as any)).toThrow(
-    TypeConstraintError,
+    x.TypeConstraintError,
   );
 });
 
 test('atomic with constraints array should work', () => {
-  const Type = atomic(stringTypeSymbol, [
+  const Type = x.atomic(x.stringTypeSymbol, [
     value => x.constraint(typeof value === 'string'),
   ]);
 

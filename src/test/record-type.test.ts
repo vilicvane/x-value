@@ -1,17 +1,16 @@
 import type {AssertTrue, IsEqual} from 'tslang';
 
 import * as x from '../library';
-import type {TypeOf} from '../library';
 
 test('record type with string key should work', () => {
   const Type = x.record(x.string, x.number);
 
-  const value1: TypeOf<typeof Type> = {
+  const value1: x.TypeOf<typeof Type> = {
     x: 1,
     y: 2,
   };
 
-  const value2: TypeOf<typeof Type> = {};
+  const value2: x.TypeOf<typeof Type> = {};
 
   const value3: any = {
     key: 'invalid value',
@@ -71,9 +70,9 @@ test('record type with string key should work', () => {
 test('record type with number key should work', () => {
   const Type = x.record(x.number, x.string);
 
-  const value1: TypeOf<typeof Type> = ['abc', 'def'];
+  const value1: x.TypeOf<typeof Type> = ['abc', 'def'];
 
-  const value2: TypeOf<typeof Type> = [];
+  const value2: x.TypeOf<typeof Type> = [];
 
   const value3: any = {
     'invalid key': 'invalid value',
@@ -137,7 +136,7 @@ test('record type with nominal string key should work', () => {
 
   const Type = x.record(Email, x.string);
 
-  const value1: TypeOf<typeof Type> = {
+  const value1: x.TypeOf<typeof Type> = {
     ['hello@world' as string & {_nominal: 'email'}]: 'oops',
   };
 
@@ -176,9 +175,9 @@ test('record type with union string key should work', () => {
 
   const Type = x.record(x.union(x.literal('foo'), Email), x.string);
 
-  const email = 'hello@world' as TypeOf<typeof Email>;
+  const email = 'hello@world' as x.TypeOf<typeof Email>;
 
-  const value1: TypeOf<typeof Type> = {
+  const value1: x.TypeOf<typeof Type> = {
     foo: 'oops',
     [email]: 'oops',
   };

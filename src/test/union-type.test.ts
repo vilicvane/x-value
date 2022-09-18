@@ -1,12 +1,10 @@
 import * as x from '../library';
-import type {TypeOf} from '../library';
-import {TypeConstraintError} from '../library';
 
 test('union type of atomic types should work with json medium', () => {
   const Type = x.union(x.string, x.number);
 
-  const value1: TypeOf<typeof Type> = 'abc';
-  const value2: TypeOf<typeof Type> = 123;
+  const value1: x.TypeOf<typeof Type> = 'abc';
+  const value2: x.TypeOf<typeof Type> = 123;
 
   expect(Type.decode(x.json, JSON.stringify(value1))).toEqual(value1);
   expect(Type.decode(x.json, JSON.stringify(value2))).toEqual(value2);
@@ -36,7 +34,7 @@ test('union type property with undefined', () => {
     value: x.union(x.string, x.undefined),
   });
 
-  type Type = TypeOf<typeof Type>;
+  type Type = x.TypeOf<typeof Type>;
 
   const _value_1: Type = {value: 'abc'};
   const _value_2: Type = {value: undefined};
@@ -51,11 +49,11 @@ test('union type of mixed types should work with json medium', () => {
     x.number,
   );
 
-  const value1: TypeOf<typeof Type> = {
+  const value1: x.TypeOf<typeof Type> = {
     type: 'text',
     value: '123',
   };
-  const value2: TypeOf<typeof Type> = 123;
+  const value2: x.TypeOf<typeof Type> = 123;
   const value3: any = true;
   const value4: any = {
     type: 'text',
@@ -99,11 +97,11 @@ test('union type of mixed types should work with json value medium', () => {
     x.number,
   );
 
-  const value1: TypeOf<typeof Type> = {
+  const value1: x.TypeOf<typeof Type> = {
     type: 'text',
     value: '123',
   };
-  const value2: TypeOf<typeof Type> = 123;
+  const value2: x.TypeOf<typeof Type> = 123;
   const value3: any = true;
   const value4: any = {
     type: 'text',
@@ -112,13 +110,13 @@ test('union type of mixed types should work with json value medium', () => {
 
   expect(Type.decode(x.jsonValue, value1)).toEqual(value1);
   expect(Type.decode(x.jsonValue, value2)).toEqual(value2);
-  expect(() => Type.decode(x.jsonValue, value3)).toThrow(TypeConstraintError);
-  expect(() => Type.decode(x.jsonValue, value4)).toThrow(TypeConstraintError);
+  expect(() => Type.decode(x.jsonValue, value3)).toThrow(x.TypeConstraintError);
+  expect(() => Type.decode(x.jsonValue, value4)).toThrow(x.TypeConstraintError);
 
   expect(Type.encode(x.jsonValue, value1)).toEqual(value1);
   expect(Type.encode(x.jsonValue, value2)).toEqual(value2);
-  expect(() => Type.encode(x.jsonValue, value3)).toThrow(TypeConstraintError);
-  expect(() => Type.encode(x.jsonValue, value4)).toThrow(TypeConstraintError);
+  expect(() => Type.encode(x.jsonValue, value3)).toThrow(x.TypeConstraintError);
+  expect(() => Type.encode(x.jsonValue, value4)).toThrow(x.TypeConstraintError);
 });
 
 test('exact with union type', () => {

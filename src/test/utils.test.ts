@@ -1,8 +1,6 @@
 import type {AssertTrue, IsEqual} from 'tslang';
 
 import * as x from '../library';
-import type {Nominal, TypeOf} from '../library';
-import {Integer, integerRange, numberRange} from '../library';
 
 test('UnknownRecord type should work', () => {
   expect(x.UnknownRecord.is({})).toBe(true);
@@ -18,12 +16,12 @@ test('UnknownRecord type should work', () => {
 });
 
 test('Integer and integerRange should work', () => {
-  expect(Integer.is(1)).toBe(true);
-  expect(Integer.is(0)).toBe(true);
-  expect(Integer.is(-1)).toBe(true);
-  expect(Integer.is(1.1)).toBe(false);
+  expect(x.Integer.is(1)).toBe(true);
+  expect(x.Integer.is(0)).toBe(true);
+  expect(x.Integer.is(-1)).toBe(true);
+  expect(x.Integer.is(1.1)).toBe(false);
 
-  expect(Integer.diagnose(-1.1)).toMatchInlineSnapshot(`
+  expect(x.Integer.diagnose(-1.1)).toMatchInlineSnapshot(`
     Array [
       Object {
         "message": "Expected integer, getting -1.1.",
@@ -32,13 +30,13 @@ test('Integer and integerRange should work', () => {
     ]
   `);
 
-  const RangeA = integerRange({min: 0, max: 2});
-  const RangeB = integerRange({min: -1});
-  const RangeC = integerRange({max: 3});
+  const RangeA = x.integerRange({min: 0, max: 2});
+  const RangeB = x.integerRange({min: -1});
+  const RangeC = x.integerRange({max: 3});
 
   type Range = x.TypeOf<typeof RangeA>;
 
-  type _ = AssertTrue<IsEqual<Range, Nominal<'integer', number>>>;
+  type _ = AssertTrue<IsEqual<Range, x.Nominal<'integer', number>>>;
 
   expect(RangeA.is(1)).toBe(true);
   expect(RangeA.is(2)).toBe(true);
@@ -68,8 +66,8 @@ test('Integer and integerRange should work', () => {
 });
 
 test('numberRange should work', () => {
-  const RangeA = numberRange({minInclusive: 1.1, maxExclusive: 2});
-  const RangeB = numberRange({minExclusive: 0, maxInclusive: 3});
+  const RangeA = x.numberRange({minInclusive: 1.1, maxExclusive: 2});
+  const RangeB = x.numberRange({minExclusive: 0, maxInclusive: 3});
 
   type Range = x.TypeOf<typeof RangeA>;
 
@@ -156,9 +154,9 @@ test('literal type should work', () => {
   `);
 
   type _ =
-    | AssertTrue<IsEqual<TypeOf<typeof Foo>, 'foo'>>
-    | AssertTrue<IsEqual<TypeOf<typeof One>, 1>>
-    | AssertTrue<IsEqual<TypeOf<typeof True>, true>>;
+    | AssertTrue<IsEqual<x.TypeOf<typeof Foo>, 'foo'>>
+    | AssertTrue<IsEqual<x.TypeOf<typeof One>, 1>>
+    | AssertTrue<IsEqual<x.TypeOf<typeof True>, true>>;
 });
 
 test('literal type should throw on unsupported values', () => {

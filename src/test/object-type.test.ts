@@ -1,8 +1,6 @@
 import type {AssertTrue, IsEqual} from 'tslang';
 
 import * as x from '../library';
-import type {TypeOf} from '../library';
-import {TypeConstraintError} from '../library';
 
 test('simple object type should work with json medium', () => {
   const Type = x.object({
@@ -11,7 +9,7 @@ test('simple object type should work with json medium', () => {
     age: x.number,
   });
 
-  const value: TypeOf<typeof Type> = {
+  const value: x.TypeOf<typeof Type> = {
     id: 'abc',
     name: 'hello',
     age: 0,
@@ -35,7 +33,7 @@ test('simple object type should work with json medium', () => {
     } as any),
   ).toEqual(JSON.stringify(value));
 
-  expect(() => Type.encode(x.json, {} as any)).toThrow(TypeConstraintError);
+  expect(() => Type.encode(x.json, {} as any)).toThrow(x.TypeConstraintError);
 
   expect(Type.is(value)).toBe(true);
   expect(Type.is({})).toBe(false);
@@ -52,7 +50,7 @@ test('nested object type should decode extended json medium', () => {
     date: x.Date,
   });
 
-  const value: TypeOf<typeof Type> = {
+  const value: x.TypeOf<typeof Type> = {
     id: 'abc',
     profile: {
       name: 'hello',
@@ -84,7 +82,7 @@ test('object type with optional property should work with json medium', () => {
     }),
   });
 
-  const value: TypeOf<typeof Type> = {
+  const value: x.TypeOf<typeof Type> = {
     id: 'abc',
     profile: {
       name: 'hello',
@@ -111,7 +109,7 @@ test('object type with optional property should work with json medium', () => {
         },
       }),
     ),
-  ).toThrow(TypeConstraintError);
+  ).toThrow(x.TypeConstraintError);
 
   expect(Type.encode(x.json, value)).toBe(JSON.stringify(value));
   expect(Type.encode(x.json, {...value, wild: 'oops'} as any)).toBe(
@@ -125,7 +123,7 @@ test('object type with optional property should work with json medium', () => {
         age: 'invalid',
       },
     } as any),
-  ).toThrow(TypeConstraintError);
+  ).toThrow(x.TypeConstraintError);
 
   expect(Type.is(value)).toBe(true);
   expect(
@@ -156,7 +154,7 @@ test('object type with union type property should work with json medium', () => 
     ),
   });
 
-  const value1: TypeOf<typeof Type> = {
+  const value1: x.TypeOf<typeof Type> = {
     id: 'abc',
     profile: {
       version: 1,
@@ -164,7 +162,7 @@ test('object type with union type property should work with json medium', () => 
     },
   };
 
-  const value2: TypeOf<typeof Type> = {
+  const value2: x.TypeOf<typeof Type> = {
     id: 'abc',
     profile: {
       version: 2,
@@ -185,12 +183,14 @@ test('object type with union type property should work with json medium', () => 
   expect(Type.decode(x.json, JSON.stringify(value1))).toEqual(value1);
   expect(Type.decode(x.json, JSON.stringify(value2))).toEqual(value2);
   expect(() => Type.decode(x.json, JSON.stringify(value3))).toThrow(
-    TypeConstraintError,
+    x.TypeConstraintError,
   );
 
   expect(Type.encode(x.json, value1)).toEqual(JSON.stringify(value1));
   expect(Type.encode(x.json, value2)).toEqual(JSON.stringify(value2));
-  expect(() => Type.encode(x.json, value3 as any)).toThrow(TypeConstraintError);
+  expect(() => Type.encode(x.json, value3 as any)).toThrow(
+    x.TypeConstraintError,
+  );
 
   expect(Type.is(value1)).toBe(true);
   expect(Type.is(value2)).toBe(true);
@@ -212,13 +212,13 @@ test('object type with intersection type property should work with json medium',
     ),
   });
 
-  type Type = TypeOf<typeof Type>;
+  type Type = x.TypeOf<typeof Type>;
 
   type Gender = Type['profile']['gender'];
 
   type _ = AssertTrue<IsEqual<Gender, 'male' | 'female'>>;
 
-  const value1: TypeOf<typeof Type> = {
+  const value1: x.TypeOf<typeof Type> = {
     id: 'abc',
     profile: {
       name: 'hello',
@@ -228,7 +228,7 @@ test('object type with intersection type property should work with json medium',
     },
   };
 
-  const value2: TypeOf<typeof Type> = {
+  const value2: x.TypeOf<typeof Type> = {
     id: 'abc',
     profile: {
       name: 'world',
@@ -250,12 +250,14 @@ test('object type with intersection type property should work with json medium',
   expect(Type.decode(x.json, JSON.stringify(value1))).toEqual(value1);
   expect(Type.decode(x.json, JSON.stringify(value2))).toEqual(value2);
   expect(() => Type.decode(x.json, JSON.stringify(value3))).toThrow(
-    TypeConstraintError,
+    x.TypeConstraintError,
   );
 
   expect(JSON.parse(Type.encode(x.json, value1))).toEqual(value1);
   expect(JSON.parse(Type.encode(x.json, value2))).toEqual(value2);
-  expect(() => Type.encode(x.json, value3 as any)).toThrow(TypeConstraintError);
+  expect(() => Type.encode(x.json, value3 as any)).toThrow(
+    x.TypeConstraintError,
+  );
 
   expect(Type.is(value1)).toBe(true);
   expect(Type.is(value2)).toBe(true);
@@ -270,7 +272,7 @@ test('partial() should work', () => {
 
   const PartialO = O.partial();
 
-  type PartialO = TypeOf<typeof PartialO>;
+  type PartialO = x.TypeOf<typeof PartialO>;
 
   expect(PartialO.is({foo: 'abc', bar: 123})).toBe(true);
   expect(PartialO.is({bar: 123})).toBe(true);
@@ -302,7 +304,7 @@ test('pick() should work', () => {
 
   const PickedO = O.pick('foo', 'bar');
 
-  type PickedO = TypeOf<typeof PickedO>;
+  type PickedO = x.TypeOf<typeof PickedO>;
 
   expect(PickedO.is({foo: 'abc', bar: 123})).toBe(true);
   expect(PickedO.is({bar: 123})).toBe(false);
@@ -321,7 +323,7 @@ test('pick() should work', () => {
   );
 
   type _ = AssertTrue<
-    IsEqual<TypeOf<typeof PickedO>, {foo: string; bar?: number}>
+    IsEqual<x.TypeOf<typeof PickedO>, {foo: string; bar?: number}>
   >;
 });
 
@@ -334,7 +336,7 @@ test('omit() should work', () => {
 
   const OmittedO = O.omit('extra');
 
-  type OmittedO = TypeOf<typeof OmittedO>;
+  type OmittedO = x.TypeOf<typeof OmittedO>;
 
   expect(OmittedO.is({foo: 'abc', bar: 123})).toBe(true);
   expect(OmittedO.is({bar: 123})).toBe(false);
@@ -353,7 +355,7 @@ test('omit() should work', () => {
   ).toEqual({foo: 'abc'});
 
   type _ = AssertTrue<
-    IsEqual<TypeOf<typeof OmittedO>, {foo: string; bar?: number}>
+    IsEqual<x.TypeOf<typeof OmittedO>, {foo: string; bar?: number}>
   >;
 });
 
@@ -372,7 +374,7 @@ test('literal property type should be correct', () => {
     type: x.literal('foo'),
   });
 
-  type O = TypeOf<typeof O>;
+  type O = x.TypeOf<typeof O>;
 
   type _ = AssertTrue<IsEqual<O['type'], 'foo'>>;
 });
@@ -387,7 +389,7 @@ test('object shallow exact type should work', () => {
 
   const NonExactO = O.exact(false);
 
-  type O = TypeOf<typeof O>;
+  type O = x.TypeOf<typeof O>;
 
   const value1 = {foo: 'abc', bar: 123};
 

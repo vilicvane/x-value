@@ -1,10 +1,9 @@
 import * as x from '../library';
-import type {TypeOf} from '../library';
 
 test('tuple type should work', () => {
   const Tuple = x.tuple(x.string, x.number);
 
-  const valid1: TypeOf<typeof Tuple> = ['abc', 123];
+  const valid1: x.TypeOf<typeof Tuple> = ['abc', 123];
   const invalid1: any = ['abc', 'def'];
   const invalid2: any = 123;
   const invalid3: any = ['abc', 123, true];

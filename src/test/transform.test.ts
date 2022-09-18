@@ -1,5 +1,4 @@
 import * as x from '../library';
-import type {MediumTypeOf, TypeOf} from '../library';
 
 import {Identifier, mediumA, mediumB} from './@usage';
 
@@ -21,7 +20,7 @@ test('transform medium A to medium B and back', () => {
 
   const idBuffer = Buffer.from([0x12, 0x34]);
 
-  const common: Omit<TypeOf<typeof Type>, 'id'> = {
+  const common: Omit<x.TypeOf<typeof Type>, 'id'> = {
     name: 'common',
     data: [
       {
@@ -38,12 +37,12 @@ test('transform medium A to medium B and back', () => {
     ],
   };
 
-  const a: MediumTypeOf<typeof Type, 'medium-a'> = {
+  const a: x.MediumTypeOf<typeof Type, 'medium-a'> = {
     id: idBuffer,
     ...common,
   };
 
-  const b: MediumTypeOf<typeof Type, 'medium-b'> = {
+  const b: x.MediumTypeOf<typeof Type, 'medium-b'> = {
     id: idBuffer.readUint16BE(),
     ...common,
   };
@@ -60,7 +59,7 @@ test('transform medium A to medium B and back', () => {
     data: [123, {x: true, y: 'abc'}],
   };
 
-  const value: TypeOf<typeof Type> = {
+  const value: x.TypeOf<typeof Type> = {
     id: idBuffer.toString('hex'),
     ...common,
   };

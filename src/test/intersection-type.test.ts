@@ -1,13 +1,11 @@
 import type {AssertTrue, IsEqual} from 'tslang';
 
 import * as x from '../library';
-import type {TypeOf} from '../library';
-import {TypeConstraintError} from '../library';
 
 test('intersection type results in never should work with json medium', () => {
   const Type = x.intersection(x.string, x.number);
 
-  type Type = TypeOf<typeof Type>;
+  type Type = x.TypeOf<typeof Type>;
 
   type _ = AssertTrue<IsEqual<Type, never>>;
 
@@ -20,7 +18,7 @@ test('intersection type results in never should work with json medium', () => {
       Expected number, getting [object String]."
   `);
   expect(() => Type.decode(x.json, JSON.stringify(value2))).toThrow(
-    TypeConstraintError,
+    x.TypeConstraintError,
   );
 
   expect(() => Type.encode(x.json, value1 as never))
@@ -29,7 +27,7 @@ test('intersection type results in never should work with json medium', () => {
       Expected number, getting [object String]."
   `);
   expect(() => Type.encode(x.json, value2 as never)).toThrow(
-    TypeConstraintError,
+    x.TypeConstraintError,
   );
 
   expect(Type.is(value1)).toBe(false);
@@ -46,7 +44,7 @@ test('intersection type should work with json value medium', () => {
     }),
   );
 
-  type Type = TypeOf<typeof Type>;
+  type Type = x.TypeOf<typeof Type>;
 
   type _ = AssertTrue<
     IsEqual<
@@ -109,7 +107,7 @@ test('intersection type should work with json medium', () => {
     }),
   );
 
-  const value1: TypeOf<typeof Type> = {
+  const value1: x.TypeOf<typeof Type> = {
     foo: 'abc',
     bar: 123,
   };
@@ -123,15 +121,19 @@ test('intersection type should work with json medium', () => {
 
   expect(Type.decode(x.json, JSON.stringify(value1))).toEqual(value1);
   expect(() => Type.decode(x.json, JSON.stringify(value2))).toThrow(
-    TypeConstraintError,
+    x.TypeConstraintError,
   );
   expect(() => Type.decode(x.json, JSON.stringify(value3))).toThrow(
-    TypeConstraintError,
+    x.TypeConstraintError,
   );
 
   expect(JSON.parse(Type.encode(x.json, value1))).toEqual(value1);
-  expect(() => Type.encode(x.json, value2 as any)).toThrow(TypeConstraintError);
-  expect(() => Type.encode(x.json, value3 as any)).toThrow(TypeConstraintError);
+  expect(() => Type.encode(x.json, value2 as any)).toThrow(
+    x.TypeConstraintError,
+  );
+  expect(() => Type.encode(x.json, value3 as any)).toThrow(
+    x.TypeConstraintError,
+  );
 
   expect(Type.is(value1)).toBe(true);
   expect(Type.is(value2)).toBe(false);

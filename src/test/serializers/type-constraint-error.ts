@@ -1,13 +1,13 @@
 import type {NewPlugin} from 'pretty-format';
 
-import {TypeConstraintError} from '../../library';
+import * as x from '../../library';
 
 export const test: NewPlugin['test'] = value => {
-  return value instanceof TypeConstraintError;
+  return value instanceof x.TypeConstraintError;
 };
 
 export const serialize: NewPlugin['serialize'] = (
-  value: TypeConstraintError,
+  value: x.TypeConstraintError,
   config,
   indentation,
   depth,
