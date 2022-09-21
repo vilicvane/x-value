@@ -7,7 +7,8 @@
     "author": "vilicvane",
     "tsProjects": [
       {
-        "name": "library"
+        "name": "library",
+        "exportSourceAs": "source"
       },
       {
         "name": "node",
