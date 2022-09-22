@@ -1,4 +1,4 @@
-import {atomicTypeSymbol, medium} from '../medium';
+import {atomicTypeSymbol, medium} from '../core';
 import type {
   bigintTypeSymbol,
   booleanTypeSymbol,

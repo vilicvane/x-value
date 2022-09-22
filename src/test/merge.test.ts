@@ -1,5 +1,4 @@
-// eslint-disable-next-line @mufan/import-path-shallowest,@mufan/scoped-modules
-import {merge} from '../library/@internal';
+import {_mergeIntersectionPartials as merge} from '../library';
 
 test('merge for object-type should work', () => {
   expect(

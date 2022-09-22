@@ -1,4 +1,4 @@
-import type {RefinedType, TypeOf} from '../type';
+import type {RefinedType, TypeOf} from '../core';
 import {number} from '../types';
 import {refinement} from '../utils';
 

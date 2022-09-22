@@ -1,71 +1,13 @@
-/* eslint-disable @mufan/import-groups */
-
-import type {ElementOrArray, MediumTypesPackedType} from '../@internal';
-import {ExactContext} from '../@internal';
-import type {Medium} from '../medium';
-
-export type TypesInMediums = Record<XValue.UsingName, unknown>;
-
-/**
- * DECLARATION ONLY.
- */
-export declare const __type_in_mediums: unique symbol;
-
-export type __type_in_mediums = typeof __type_in_mediums;
-
-/**
- * DECLARATION ONLY.
- */
-export declare const __type_kind: unique symbol;
-
-export type __type_kind = typeof __type_kind;
-
-export interface TypeInMediumsPartial<
-  TInMediums extends TypesInMediums = TypesInMediums,
-> {
-  [__type_in_mediums]: TInMediums;
-}
-
-export interface TypeKindPartial<TKind extends string = string> {
-  [__type_kind]: TKind;
-}
-
-export abstract class TypeLike<
-  TInMediums extends TypesInMediums = TypesInMediums,
-> {
-  [__type_kind]!: string;
-
-  [__type_in_mediums]!: TInMediums;
-
-  /** @internal */
-  abstract _decode(
-    medium: Medium,
-    unpacked: unknown,
-    path: TypePath,
-    exact: Exact,
-  ): [unknown, TypeIssue[]];
-
-  /** @internal */
-  abstract _encode(
-    medium: Medium,
-    value: unknown,
-    path: TypePath,
-    exact: Exact,
-    diagnose: boolean,
-  ): [unknown, TypeIssue[]];
-
-  /** @internal */
-  abstract _transform(
-    from: Medium,
-    to: Medium,
-    unpacked: unknown,
-    path: TypePath,
-    exact: Exact,
-  ): [unknown, TypeIssue[]];
-
-  /** @internal */
-  abstract _diagnose(value: unknown, path: TypePath, exact: Exact): TypeIssue[];
-}
+import type {Exact} from './@exact-context';
+import {ExactContext} from './@exact-context';
+import type {TypeIssue} from './@type-issue';
+import type {Medium, MediumTypesPackedType} from './medium';
+import {TypeLike} from './type-like';
+import type {
+  TypeInMediumsPartial,
+  TypesInMediums,
+  __type_in_mediums,
+} from './type-partials';
 
 export const DISABLED_EXACT_CONTEXT_RESULT = {
   context: undefined,
@@ -87,27 +29,6 @@ export abstract class Type<
     return Object.create(this, {
       _exact: {value: exact},
     });
-  }
-
-  refined<TNominalKey extends string | symbol = never, TRefinement = unknown>(
-    refinements: ElementOrArray<Refinement<TInMediums['value']>>,
-  ): RefinedType<this, TNominalKey, TRefinement> {
-    return new RefinedType(
-      this,
-      Array.isArray(refinements) ? refinements : [refinements],
-    );
-  }
-
-  nominal<TNominalKey extends string | symbol>(): RefinedType<
-    this,
-    TNominalKey,
-    unknown
-  > {
-    return new RefinedType(this, []);
-  }
-
-  optional(): OptionalType<this> {
-    return new OptionalType(this);
   }
 
   decode<TMediumName extends XValue.UsingName, TMediumTypes extends object>(
@@ -185,11 +106,6 @@ export abstract class Type<
     }
 
     throw new TypeConstraintError('Value does not satisfy the type', issues);
-  }
-
-  nominalize(value: DenominalizeDeep<TInMediums['value']>): TInMediums['value'];
-  nominalize(value: unknown): unknown {
-    return this.satisfies(value);
   }
 
   is(value: unknown): value is TInMediums['value'] {
@@ -305,19 +221,6 @@ export abstract class Type<
   }
 }
 
-export type TypePath = (
-  | string
-  | number
-  | symbol
-  | {key: string | number | symbol}
-)[];
-
-export interface TypeIssue {
-  path: TypePath;
-  deferrable?: true;
-  message: string;
-}
-
 export class TypeConstraintError extends TypeError {
   constructor(private _message: string, readonly issues: TypeIssue[]) {
     super();
@@ -348,13 +251,5 @@ ${this.issues
   }
 }
 
-export type Exact = ExactContext | boolean;
-
 export type TypeOf<TType extends TypeInMediumsPartial> =
   TType[__type_in_mediums]['value'];
-
-// Make sure code circularly referenced accessing type.ts after exports ready.
-
-import {OptionalType} from './optional-type';
-import type {DenominalizeDeep, Refinement} from './refined-type';
-import {RefinedType} from './refined-type';

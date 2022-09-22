@@ -1,7 +1,9 @@
-import type {Medium} from '../medium';
-
-import type {Exact, TypeInMediumsPartial, TypeIssue, TypePath} from './type';
-import {Type, __type_kind} from './type';
+import type {Exact} from './@exact-context';
+import type {TypeIssue, TypePath} from './@type-issue';
+import type {Medium} from './medium';
+import {Type} from './type';
+import {__type_kind} from './type-partials';
+import type {TypeInMediumsPartial} from './type-partials';
 
 export class RecursiveType<TRecursive> extends Type<
   RecursiveInMediums<TRecursive>

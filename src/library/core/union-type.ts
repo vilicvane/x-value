@@ -1,9 +1,12 @@
-import type {TupleInMedium} from '../@internal';
-import {ExactContext, hasNonDeferrableTypeIssue} from '../@internal';
-import type {Medium} from '../medium';
-
-import type {Exact, TypeInMediumsPartial, TypeIssue, TypePath} from './type';
-import {DISABLED_EXACT_CONTEXT_RESULT, Type, __type_kind} from './type';
+import type {Exact} from './@exact-context';
+import {ExactContext} from './@exact-context';
+import type {TypeIssue, TypePath} from './@type-issue';
+import {hasNonDeferrableTypeIssue} from './@type-issue';
+import type {TupleInMedium} from './@utils';
+import type {Medium} from './medium';
+import {DISABLED_EXACT_CONTEXT_RESULT, Type} from './type';
+import {__type_kind} from './type-partials';
+import type {TypeInMediumsPartial} from './type-partials';
 
 export class UnionType<
   TTypeTuple extends [

@@ -1,6 +1,7 @@
-import {toString} from './@internal';
-import {atomic} from './type';
+import {atomic} from './core';
 import {constraint} from './utils';
+
+const toString = Object.prototype.toString;
 
 declare global {
   namespace XValue {

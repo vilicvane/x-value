@@ -1,5 +1,5 @@
-import type {MediumAtomicCodecs} from '../medium';
-import {atomicTypeSymbol, medium} from '../medium';
+import type {MediumAtomicCodecs} from '../core';
+import {atomicTypeSymbol, medium} from '../core';
 import type {
   booleanTypeSymbol,
   nullTypeSymbol,

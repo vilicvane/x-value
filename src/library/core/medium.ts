@@ -1,6 +1,3 @@
-import type {MediumTypesPackedType} from './@internal';
-import type {TypeInMediumsPartial, __type_in_mediums} from './type';
-
 export const atomicTypeSymbol = Symbol();
 
 export type GeneralMediumTypes =
@@ -123,7 +120,11 @@ export function medium<TUsingMedium extends object>(
   return new Medium(name, options);
 }
 
-export type MediumTypeOf<
-  TType extends TypeInMediumsPartial,
-  TMediumName extends XValue.UsingName,
-> = TType[__type_in_mediums][TMediumName];
+export type MediumTypesPackedType<
+  TMediumTypes,
+  TFallback = never,
+> = TMediumTypes extends {
+  packed: infer TPacked;
+}
+  ? TPacked
+  : TFallback;

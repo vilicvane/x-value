@@ -1,14 +1,10 @@
-import type {Medium} from '../medium';
-
-import type {
-  Exact,
-  Type,
-  TypeInMediumsPartial,
-  TypeIssue,
-  TypePath,
-  __type_in_mediums,
-} from './type';
-import {TypeLike, __type_kind} from './type';
+import type {Exact} from './@exact-context';
+import type {TypeIssue, TypePath} from './@type-issue';
+import type {Medium} from './medium';
+import {Type} from './type';
+import {TypeLike} from './type-like';
+import type {TypeInMediumsPartial, __type_in_mediums} from './type-partials';
+import {__type_kind} from './type-partials';
 
 export class OptionalType<TType extends TypeInMediumsPartial> extends TypeLike<
   OptionalInMediums<TType>
@@ -68,4 +64,14 @@ type OptionalInMediums<TType extends TypeInMediumsPartial> = {
   [TMediumName in XValue.UsingName]:
     | TType[__type_in_mediums][TMediumName]
     | undefined;
+};
+
+declare module './type' {
+  interface Type {
+    optional(): OptionalType<this>;
+  }
+}
+
+Type.prototype.optional = function () {
+  return new OptionalType(this);
 };

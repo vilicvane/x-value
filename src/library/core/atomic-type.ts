@@ -1,8 +1,9 @@
-import {buildIssueByError, hasNonDeferrableTypeIssue} from '../@internal';
-import type {Medium} from '../medium';
-
-import type {Exact, TypeIssue, TypePath} from './type';
-import {Type, __type_kind} from './type';
+import type {Exact} from './@exact-context';
+import type {TypeIssue, TypePath} from './@type-issue';
+import {buildIssueByError, hasNonDeferrableTypeIssue} from './@type-issue';
+import type {Medium} from './medium';
+import {Type} from './type';
+import {__type_kind} from './type-partials';
 
 export class AtomicType<TSymbol extends symbol> extends Type<
   AtomicInMediums<TSymbol>

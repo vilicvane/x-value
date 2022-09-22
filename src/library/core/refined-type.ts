@@ -1,16 +1,14 @@
-import type {RefinedMediumType} from '../@internal';
-import {buildIssueByError, hasNonDeferrableTypeIssue} from '../@internal';
-import type {Medium} from '../medium';
-
+import type {Exact} from './@exact-context';
+import type {TypeIssue, TypePath} from './@type-issue';
+import {buildIssueByError, hasNonDeferrableTypeIssue} from './@type-issue';
+import type {Medium} from './medium';
+import {Type} from './type';
 import type {
-  Exact,
   TypeInMediumsPartial,
-  TypeIssue,
-  TypePath,
   TypesInMediums,
   __type_in_mediums,
-} from './type';
-import {Type, __type_kind} from './type';
+} from './type-partials';
+import {__type_kind} from './type-partials';
 
 export class RefinedType<
   TType extends TypeInMediumsPartial,
@@ -144,25 +142,46 @@ export class RefinedType<
   }
 }
 
+declare module './type' {
+  interface Type<TInMediums> {
+    refined<TNominalKey extends string | symbol = never, TRefinement = unknown>(
+      refinements: ElementOrArray<Refinement<TInMediums['value']>>,
+    ): RefinedType<this, TNominalKey, TRefinement>;
+
+    nominal<TNominalKey extends string | symbol>(): RefinedType<
+      this,
+      TNominalKey,
+      unknown
+    >;
+
+    nominalize(
+      value: DenominalizeDeep<TInMediums['value']>,
+    ): TInMediums['value'];
+  }
+}
+
+Type.prototype.refined = function (refinements) {
+  return new RefinedType(
+    this,
+    Array.isArray(refinements) ? refinements : [refinements],
+  );
+};
+
+Type.prototype.nominal = function () {
+  return new RefinedType(this, []);
+};
+
+Type.prototype.nominalize = function (value) {
+  return this.satisfies(value);
+};
+
 export type Refinement<T = unknown> = (value: T) => T;
 
-/**
- * DECLARATION ONLY.
- *
- * Exported to avoid TS4023 error:
- * https://github.com/Microsoft/TypeScript/issues/5711
- */
-export declare const __nominal: unique symbol;
+export const __nominal = Symbol('nominal');
 
 export type __nominal = typeof __nominal;
 
-/**
- * DECLARATION ONLY.
- *
- * Exported to avoid TS4023 error:
- * https://github.com/Microsoft/TypeScript/issues/5711
- */
-export declare const __type: unique symbol;
+export const __type = Symbol('type');
 
 export type __type = typeof __type;
 
@@ -195,3 +214,18 @@ type __RefinedInMediums<
     TRefinement
   >;
 };
+
+type RefinedMediumType<
+  TInMedium,
+  TNominalKey extends string | symbol,
+  TRefinement,
+> = [TNominalKey] extends [never]
+  ? TInMedium & TRefinement
+  : __RefinedNominalType<TInMedium & TRefinement, Nominal<TNominalKey>>;
+
+type __RefinedNominalType<T, TNominal extends NominalPartial> = T &
+  (TNominal & Record<__type, Denominalize<T>>);
+
+export type NominalPartial = Record<__nominal, unknown>;
+
+type ElementOrArray<T> = T | T[];

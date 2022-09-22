@@ -1,9 +1,13 @@
-import type {TupleInMedium} from '../@internal';
-import {hasNonDeferrableTypeIssue, toString} from '../@internal';
-import type {Medium} from '../medium';
+import type {Exact} from './@exact-context';
+import type {TypeIssue, TypePath} from './@type-issue';
+import {hasNonDeferrableTypeIssue} from './@type-issue';
+import type {TupleInMedium} from './@utils';
+import type {Medium} from './medium';
+import {DISABLED_EXACT_CONTEXT_RESULT, Type} from './type';
+import {__type_kind} from './type-partials';
+import type {TypeInMediumsPartial} from './type-partials';
 
-import type {Exact, TypeInMediumsPartial, TypeIssue, TypePath} from './type';
-import {DISABLED_EXACT_CONTEXT_RESULT, Type, __type_kind} from './type';
+const toString = Object.prototype.toString;
 
 export class TupleType<
   TElementTypeTuple extends TypeInMediumsPartial[],

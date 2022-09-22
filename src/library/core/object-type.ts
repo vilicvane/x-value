@@ -1,17 +1,18 @@
-import {hasNonDeferrableTypeIssue, toString} from '../@internal';
-import type {Medium} from '../medium';
-
+import type {Exact} from './@exact-context';
+import type {TypeIssue, TypePath} from './@type-issue';
+import {hasNonDeferrableTypeIssue} from './@type-issue';
+import type {Medium} from './medium';
 import {OptionalType} from './optional-type';
+import {Type} from './type';
+import type {TypeLike} from './type-like';
 import type {
-  Exact,
   TypeInMediumsPartial,
-  TypeIssue,
   TypeKindPartial,
-  TypeLike,
-  TypePath,
   __type_in_mediums,
-} from './type';
-import {Type, __type_kind} from './type';
+} from './type-partials';
+import {__type_kind} from './type-partials';
+
+const toString = Object.prototype.toString;
 
 export class ObjectType<
   TDefinition extends Record<string, TypeInMediumsPartial>,

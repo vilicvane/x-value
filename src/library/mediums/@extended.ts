@@ -1,6 +1,7 @@
-import {toString} from '../@internal';
-import type {MediumAtomicCodecs} from '../medium';
+import type {MediumAtomicCodecs} from '../core';
 import {bigintTypeSymbol, dateTypeSymbol, regexpTypeSymbol} from '../types';
+
+const toString = Object.prototype.toString;
 
 const REGEXP_LITERAL_REGEX = /^\/(.*)\/([^/]*)$/;
 

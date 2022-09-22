@@ -1,6 +1,8 @@
 import * as x from '../library';
 import {constraint} from '../library';
 
+const toString = Object.prototype.toString;
+
 declare global {
   namespace XValue {
     interface Types {
@@ -8,8 +10,6 @@ declare global {
     }
   }
 }
-
-const toString = Object.prototype.toString;
 
 export const bufferTypeSymbol = Symbol();
 export const Buffer = x.atomic(bufferTypeSymbol, value =>

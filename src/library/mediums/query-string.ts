@@ -1,9 +1,10 @@
-import {toString} from '../@internal';
-import {atomicTypeSymbol, medium} from '../medium';
+import {atomicTypeSymbol, medium} from '../core';
 import {booleanTypeSymbol, numberTypeSymbol} from '../types';
 
 import type {ExtendedTypes} from './@extended';
 import {EXTENDED_CODECS} from './@extended';
+
+const toString = Object.prototype.toString;
 
 export interface QueryStringTypes {
   packed: string;

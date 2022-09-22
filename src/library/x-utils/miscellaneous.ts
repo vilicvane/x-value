@@ -1,8 +1,13 @@
 import isEqual from 'lodash.isequal';
 
-import type {NominalPartial} from '../@internal';
-import type {TypeInMediumsPartial, TypeOf, __nominal, __type} from '../type';
-import {RefinedType, record} from '../type';
+import type {
+  NominalPartial,
+  TypeInMediumsPartial,
+  TypeOf,
+  __nominal,
+  __type,
+} from '../core';
+import {RefinedType, record} from '../core';
 import {boolean, number, string, unknown} from '../types';
 import {refinement} from '../utils';
 

@@ -1,9 +1,13 @@
-import type {TupleInMedium} from '../@internal';
-import {hasNonDeferrableTypeIssue, merge} from '../@internal';
-import type {Medium} from '../medium';
+import type {Exact} from './@exact-context';
+import type {TypeIssue, TypePath} from './@type-issue';
+import {hasNonDeferrableTypeIssue} from './@type-issue';
+import type {TupleInMedium} from './@utils';
+import type {Medium} from './medium';
+import {DISABLED_EXACT_CONTEXT_RESULT, Type} from './type';
+import {__type_kind} from './type-partials';
+import type {TypeInMediumsPartial} from './type-partials';
 
-import type {Exact, TypeInMediumsPartial, TypeIssue, TypePath} from './type';
-import {DISABLED_EXACT_CONTEXT_RESULT, Type, __type_kind} from './type';
+const hasOwnProperty = Object.prototype.hasOwnProperty;
 
 export class IntersectionType<
   TTypeTuple extends [
@@ -55,7 +59,9 @@ export class IntersectionType<
     }
 
     return [
-      hasNonDeferrableTypeIssue(issues) ? undefined : merge(partials),
+      hasNonDeferrableTypeIssue(issues)
+        ? undefined
+        : _mergeIntersectionPartials(partials),
       issues,
     ];
   }
@@ -93,7 +99,9 @@ export class IntersectionType<
     }
 
     return [
-      hasNonDeferrableTypeIssue(issues) ? undefined : merge(partials),
+      hasNonDeferrableTypeIssue(issues)
+        ? undefined
+        : _mergeIntersectionPartials(partials),
       issues,
     ];
   }
@@ -132,7 +140,9 @@ export class IntersectionType<
     }
 
     return [
-      hasNonDeferrableTypeIssue(issues) ? undefined : merge(partials),
+      hasNonDeferrableTypeIssue(issues)
+        ? undefined
+        : _mergeIntersectionPartials(partials),
       issues,
     ];
   }
@@ -178,3 +188,54 @@ type __Intersection<TTuple extends unknown[]> = TTuple extends [
 ]
   ? T & __Intersection<TRestTuple>
   : unknown;
+
+export function _mergeIntersectionPartials(partials: unknown[]): unknown {
+  let pendingMergeKeyToValues: Map<string | number, unknown[]> | undefined;
+
+  const merged = partials.reduce((merged, partial) => {
+    if (merged === partial) {
+      return merged;
+    }
+
+    if (typeof merged === 'object') {
+      if (merged === null) {
+        // merged !== partial
+        throw new TypeError();
+      }
+
+      if (typeof partial !== 'object' || partial === null) {
+        throw new TypeError();
+      }
+
+      for (const [key, value] of Object.entries(partial)) {
+        let pendingMergeValues: unknown[] | undefined;
+
+        if (pendingMergeKeyToValues) {
+          pendingMergeValues = pendingMergeKeyToValues.get(key);
+        } else {
+          pendingMergeKeyToValues = new Map();
+        }
+
+        if (pendingMergeValues) {
+          pendingMergeValues.push(value);
+        } else if (hasOwnProperty.call(merged, key)) {
+          pendingMergeKeyToValues.set(key, [(merged as any)[key], value]);
+        } else {
+          (merged as any)[key] = value;
+        }
+      }
+
+      return merged;
+    }
+
+    return partial;
+  });
+
+  if (pendingMergeKeyToValues) {
+    for (const [key, values] of pendingMergeKeyToValues) {
+      (merged as any)[key] = _mergeIntersectionPartials(values);
+    }
+  }
+
+  return merged;
+}
