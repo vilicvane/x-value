@@ -39,8 +39,8 @@ test('recursive type should work', () => {
   expect(() => R.encode(x.jsonValue, {} as any))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to encode to medium:
-      [\\"type\\"] Expected string, getting [object Undefined].
-      [\\"children\\"] Expecting value to be an array, getting [object Undefined]."
+      ["type"] Expected string, getting [object Undefined].
+      ["children"] Expecting value to be an array, getting [object Undefined]."
   `);
   expect(() =>
     R.decode(x.jsonValue, {
@@ -49,7 +49,7 @@ test('recursive type should work', () => {
     } as any),
   ).toThrowErrorMatchingInlineSnapshot(`
     "Failed to decode from medium:
-      [\\"children\\"][0] Expecting unpacked value to be a non-null object, getting [object String]."
+      ["children"][0] Expecting unpacked value to be a non-null object, getting [object String]."
   `);
   expect(() =>
     R.transform(x.jsonValue, x.json, {
@@ -68,7 +68,7 @@ test('recursive type should work', () => {
     } as any),
   ).toThrowErrorMatchingInlineSnapshot(`
     "Failed to transform medium:
-      [\\"children\\"][0][\\"children\\"][0][\\"type\\"] Expected string \\"node\\", getting \\"oops\\"."
+      ["children"][0]["children"][0]["type"] Expected string "node", getting "oops"."
   `);
 
   interface RefR {
@@ -134,20 +134,20 @@ test('exact with recursive type should work', () => {
   expect(R.transform(x.jsonValue, x.json, valid1)).toBe(JSON.stringify(valid1));
 
   expect(R.diagnose(invalid1)).toMatchInlineSnapshot(`
-    Array [
-      Object {
+    [
+      {
         "deferrable": true,
-        "message": "Unknown key(s) \\"extra\\".",
-        "path": Array [],
+        "message": "Unknown key(s) "extra".",
+        "path": [],
       },
     ]
   `);
   expect(R.diagnose(invalid2)).toMatchInlineSnapshot(`
-    Array [
-      Object {
+    [
+      {
         "deferrable": true,
-        "message": "Unknown key(s) \\"extra\\".",
-        "path": Array [
+        "message": "Unknown key(s) "extra".",
+        "path": [
           "children",
           0,
         ],
@@ -156,30 +156,30 @@ test('exact with recursive type should work', () => {
   `);
   expect(() => R.encode(x.json, invalid1)).toThrowErrorMatchingInlineSnapshot(`
     "Failed to encode to medium:
-      Unknown key(s) \\"extra\\"."
+      Unknown key(s) "extra"."
   `);
   expect(() => R.encode(x.json, invalid2)).toThrowErrorMatchingInlineSnapshot(`
     "Failed to encode to medium:
-      [\\"children\\"][0] Unknown key(s) \\"extra\\"."
+      ["children"][0] Unknown key(s) "extra"."
   `);
   expect(() => R.decode(x.jsonValue, invalid1))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to decode from medium:
-      Unknown key(s) \\"extra\\"."
+      Unknown key(s) "extra"."
   `);
   expect(() => R.decode(x.jsonValue, invalid2))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to decode from medium:
-      [\\"children\\"][0] Unknown key(s) \\"extra\\"."
+      ["children"][0] Unknown key(s) "extra"."
   `);
   expect(() => R.transform(x.jsonValue, x.json, invalid1))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to transform medium:
-      Unknown key(s) \\"extra\\"."
+      Unknown key(s) "extra"."
   `);
   expect(() => R.transform(x.jsonValue, x.json, invalid2))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to transform medium:
-      [\\"children\\"][0] Unknown key(s) \\"extra\\"."
+      ["children"][0] Unknown key(s) "extra"."
   `);
 });

@@ -8,14 +8,7 @@
         "project": "tsconfig.json"
       },
       "rules": {
-        "@mufan/no-object-literal-type-assertion": "off",
-        "no-unused-vars": [
-          "error",
-          {
-            "varsIgnorePattern": "^_([^_]|$)",
-            "argsIgnorePattern": "^_([^_]|$)"
-          }
-        ]
+        "@mufan/no-object-literal-type-assertion": "off"
       }
     }
   ]

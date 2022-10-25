@@ -72,24 +72,24 @@ test('intersection type should work with json value medium', () => {
   expect(() => Type.decode(x.jsonValue, value2 as any))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to decode from medium:
-      [\\"bar\\"] Expected number, getting [object Undefined]."
+      ["bar"] Expected number, getting [object Undefined]."
   `);
   expect(() => Type.decode(x.jsonValue, value3 as any))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to decode from medium:
-      [\\"bar\\"] Expected number, getting [object String]."
+      ["bar"] Expected number, getting [object String]."
   `);
 
   expect(Type.encode(x.jsonValue, value1)).toEqual(value1);
   expect(() => Type.encode(x.jsonValue, value2 as any))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to encode to medium:
-      [\\"bar\\"] Expected number, getting [object Undefined]."
+      ["bar"] Expected number, getting [object Undefined]."
   `);
   expect(() => Type.encode(x.jsonValue, value3 as any))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to encode to medium:
-      [\\"bar\\"] Expected number, getting [object String]."
+      ["bar"] Expected number, getting [object String]."
   `);
 
   expect(Type.is(value1)).toBe(true);
@@ -205,49 +205,49 @@ test('exact with intersection type should work', () => {
   expect(O.decode(x.json, JSON.stringify(valid3))).toEqual(valid3);
 
   expect(O.diagnose(invalid1)).toMatchInlineSnapshot(`
-    Array [
-      Object {
+    [
+      {
         "deferrable": true,
-        "message": "Unknown key(s) \\"extra\\".",
-        "path": Array [],
+        "message": "Unknown key(s) "extra".",
+        "path": [],
       },
     ]
   `);
   expect(O.diagnose(invalid2)).toMatchInlineSnapshot(`
-    Array [
-      Object {
+    [
+      {
         "deferrable": true,
-        "message": "Unknown key(s) \\"extra1\\", \\"extra2\\".",
-        "path": Array [],
+        "message": "Unknown key(s) "extra1", "extra2".",
+        "path": [],
       },
     ]
   `);
   expect(() => O.encode(x.json, invalid1)).toThrowErrorMatchingInlineSnapshot(`
     "Failed to encode to medium:
-      Unknown key(s) \\"extra\\"."
+      Unknown key(s) "extra"."
   `);
   expect(() => O.encode(x.json, invalid2)).toThrowErrorMatchingInlineSnapshot(`
     "Failed to encode to medium:
-      Unknown key(s) \\"extra1\\", \\"extra2\\"."
+      Unknown key(s) "extra1", "extra2"."
   `);
   expect(() => O.decode(x.jsonValue, invalid1))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to decode from medium:
-      Unknown key(s) \\"extra\\"."
+      Unknown key(s) "extra"."
   `);
   expect(() => O.decode(x.jsonValue, invalid2))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to decode from medium:
-      Unknown key(s) \\"extra1\\", \\"extra2\\"."
+      Unknown key(s) "extra1", "extra2"."
   `);
   expect(() => O.transform(x.jsonValue, x.json, invalid1))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to transform medium:
-      Unknown key(s) \\"extra\\"."
+      Unknown key(s) "extra"."
   `);
   expect(() => O.transform(x.jsonValue, x.json, invalid2))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to transform medium:
-      Unknown key(s) \\"extra1\\", \\"extra2\\"."
+      Unknown key(s) "extra1", "extra2"."
   `);
 });

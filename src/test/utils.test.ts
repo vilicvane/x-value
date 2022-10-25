@@ -22,10 +22,10 @@ test('Integer and integerRange should work', () => {
   expect(x.Integer.is(1.1)).toBe(false);
 
   expect(x.Integer.diagnose(-1.1)).toMatchInlineSnapshot(`
-    Array [
-      Object {
+    [
+      {
         "message": "Expected integer, getting -1.1.",
-        "path": Array [],
+        "path": [],
       },
     ]
   `);
@@ -42,18 +42,18 @@ test('Integer and integerRange should work', () => {
   expect(RangeA.is(2)).toBe(true);
   expect(RangeA.is(-1)).toBe(false);
   expect(RangeA.diagnose(1.1)).toMatchInlineSnapshot(`
-    Array [
-      Object {
+    [
+      {
         "message": "Expected integer, getting 1.1.",
-        "path": Array [],
+        "path": [],
       },
     ]
   `);
   expect(RangeA.diagnose(3)).toMatchInlineSnapshot(`
-    Array [
-      Object {
+    [
+      {
         "message": "Expected integer <= 2, getting 3.",
-        "path": Array [],
+        "path": [],
       },
     ]
   `);
@@ -75,18 +75,18 @@ test('numberRange should work', () => {
 
   expect(RangeA.is(1.1)).toBe(true);
   expect(RangeA.diagnose(1)).toMatchInlineSnapshot(`
-    Array [
-      Object {
+    [
+      {
         "message": "Expected number >= 1.1, getting 1.",
-        "path": Array [],
+        "path": [],
       },
     ]
   `);
   expect(RangeA.diagnose(2)).toMatchInlineSnapshot(`
-    Array [
-      Object {
+    [
+      {
         "message": "Expected number < 2, getting 2.",
-        "path": Array [],
+        "path": [],
       },
     ]
   `);
@@ -94,26 +94,26 @@ test('numberRange should work', () => {
   expect(RangeB.is(2.2)).toBe(true);
   expect(RangeB.is(3)).toBe(true);
   expect(RangeB.diagnose(-1)).toMatchInlineSnapshot(`
-    Array [
-      Object {
+    [
+      {
         "message": "Expected number > 0, getting -1.",
-        "path": Array [],
+        "path": [],
       },
     ]
   `);
   expect(RangeB.diagnose(0)).toMatchInlineSnapshot(`
-    Array [
-      Object {
+    [
+      {
         "message": "Expected number > 0, getting 0.",
-        "path": Array [],
+        "path": [],
       },
     ]
   `);
   expect(RangeB.diagnose(4)).toMatchInlineSnapshot(`
-    Array [
-      Object {
+    [
+      {
         "message": "Expected number <= 3, getting 4.",
-        "path": Array [],
+        "path": [],
       },
     ]
   `);
@@ -129,26 +129,26 @@ test('literal type should work', () => {
   expect(True.is(true)).toBe(true);
 
   expect(Foo.diagnose('bar')).toMatchInlineSnapshot(`
-    Array [
-      Object {
-        "message": "Expected string \\"foo\\", getting \\"bar\\".",
-        "path": Array [],
+    [
+      {
+        "message": "Expected string "foo", getting "bar".",
+        "path": [],
       },
     ]
   `);
   expect(One.diagnose(2)).toMatchInlineSnapshot(`
-    Array [
-      Object {
+    [
+      {
         "message": "Expected number 1, getting 2.",
-        "path": Array [],
+        "path": [],
       },
     ]
   `);
   expect(True.diagnose(false)).toMatchInlineSnapshot(`
-    Array [
-      Object {
+    [
+      {
         "message": "Expected boolean true, getting false.",
-        "path": Array [],
+        "path": [],
       },
     ]
   `);

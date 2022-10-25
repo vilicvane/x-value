@@ -398,25 +398,25 @@ test('object shallow exact type should work', () => {
   expect(O.is(value1)).toBe(true);
   expect(() => O.encode(x.json, value2)).toThrowErrorMatchingInlineSnapshot(`
     "Failed to encode to medium:
-      Unknown key(s) \\"x\\", \\"y\\"."
+      Unknown key(s) "x", "y"."
   `);
   expect(() => O.decode(x.json, JSON.stringify(value2)))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to decode from medium:
-      Unknown key(s) \\"x\\", \\"y\\"."
+      Unknown key(s) "x", "y"."
   `);
   expect(() => O.transform(x.json, x.jsonValue, JSON.stringify(value2)))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to transform medium:
-      Unknown key(s) \\"x\\", \\"y\\"."
+      Unknown key(s) "x", "y"."
   `);
   expect(O.diagnose({foo: 'abc', bar: 123, extra: true}))
     .toMatchInlineSnapshot(`
-    Array [
-      Object {
+    [
+      {
         "deferrable": true,
-        "message": "Unknown key(s) \\"extra\\".",
-        "path": Array [],
+        "message": "Unknown key(s) "extra".",
+        "path": [],
       },
     ]
   `);
@@ -524,22 +524,22 @@ test('object nested exact should work', () => {
   );
 
   expect(O.diagnose(value3)).toMatchInlineSnapshot(`
-    Array [
-      Object {
+    [
+      {
         "deferrable": true,
-        "message": "Unknown key(s) \\"extra\\".",
-        "path": Array [
+        "message": "Unknown key(s) "extra".",
+        "path": [
           "bar",
         ],
       },
     ]
   `);
   expect(O.diagnose(value4)).toMatchInlineSnapshot(`
-    Array [
-      Object {
+    [
+      {
         "deferrable": true,
-        "message": "Unknown key(s) \\"extra1\\", \\"extra2\\".",
-        "path": Array [
+        "message": "Unknown key(s) "extra1", "extra2".",
+        "path": [
           "bar",
           "ha",
         ],
@@ -548,31 +548,31 @@ test('object nested exact should work', () => {
   `);
   expect(() => O.encode(x.json, value3)).toThrowErrorMatchingInlineSnapshot(`
     "Failed to encode to medium:
-      [\\"bar\\"] Unknown key(s) \\"extra\\"."
+      ["bar"] Unknown key(s) "extra"."
   `);
   expect(() => O.encode(x.json, value4)).toThrowErrorMatchingInlineSnapshot(`
     "Failed to encode to medium:
-      [\\"bar\\"][\\"ha\\"] Unknown key(s) \\"extra1\\", \\"extra2\\"."
+      ["bar"]["ha"] Unknown key(s) "extra1", "extra2"."
   `);
   expect(() => O.decode(x.jsonValue, value3))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to decode from medium:
-      [\\"bar\\"] Unknown key(s) \\"extra\\"."
+      ["bar"] Unknown key(s) "extra"."
   `);
   expect(() => O.decode(x.jsonValue, value4))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to decode from medium:
-      [\\"bar\\"][\\"ha\\"] Unknown key(s) \\"extra1\\", \\"extra2\\"."
+      ["bar"]["ha"] Unknown key(s) "extra1", "extra2"."
   `);
   expect(() => O.transform(x.jsonValue, x.json, value3))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to transform medium:
-      [\\"bar\\"] Unknown key(s) \\"extra\\"."
+      ["bar"] Unknown key(s) "extra"."
   `);
   expect(() => O.transform(x.jsonValue, x.json, value4))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to transform medium:
-      [\\"bar\\"][\\"ha\\"] Unknown key(s) \\"extra1\\", \\"extra2\\"."
+      ["bar"]["ha"] Unknown key(s) "extra1", "extra2"."
   `);
 });
 
@@ -603,10 +603,10 @@ test('explicit non-exact object with intersection', () => {
   expect(O.is(valid1)).toBe(true);
 
   expect(O.diagnose(invalid1)).toMatchInlineSnapshot(`
-    Array [
-      Object {
+    [
+      {
         "message": "Expected string, getting [object Undefined].",
-        "path": Array [
+        "path": [
           "foo",
         ],
       },

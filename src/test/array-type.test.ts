@@ -150,20 +150,20 @@ test('object array type should work with json medium', () => {
   expect(Type.diagnose(value1)).toEqual([]);
   expect(Type.diagnose(value2)).toEqual([]);
   expect(Type.diagnose(value3)).toMatchInlineSnapshot(`
-    Array [
-      Object {
+    [
+      {
         "message": "Expecting a non-null object, getting [object Number].",
-        "path": Array [
+        "path": [
           0,
         ],
       },
     ]
   `);
   expect(Type.diagnose(value4)).toMatchInlineSnapshot(`
-    Array [
-      Object {
+    [
+      {
         "message": "Expecting an array, getting [object String].",
-        "path": Array [],
+        "path": [],
       },
     ]
   `);
@@ -189,11 +189,11 @@ test('exact with array type should work', () => {
   ).toStrictEqual(value1);
 
   expect(Type.diagnose(value2)).toMatchInlineSnapshot(`
-    Array [
-      Object {
+    [
+      {
         "deferrable": true,
-        "message": "Unknown key(s) \\"bar\\".",
-        "path": Array [
+        "message": "Unknown key(s) "bar".",
+        "path": [
           1,
         ],
       },
@@ -201,17 +201,17 @@ test('exact with array type should work', () => {
   `);
   expect(() => Type.encode(x.json, value2)).toThrowErrorMatchingInlineSnapshot(`
     "Failed to encode to medium:
-      [1] Unknown key(s) \\"bar\\"."
+      [1] Unknown key(s) "bar"."
   `);
   expect(() => Type.decode(x.json, JSON.stringify(value2)))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to decode from medium:
-      [1] Unknown key(s) \\"bar\\"."
+      [1] Unknown key(s) "bar"."
   `);
   expect(() => Type.transform(x.json, x.jsonValue, JSON.stringify(value2)))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to transform medium:
-      [1] Unknown key(s) \\"bar\\"."
+      [1] Unknown key(s) "bar"."
   `);
 });
 
@@ -254,11 +254,11 @@ test('managed exact with array type', () => {
   ).toStrictEqual(valid1);
 
   expect(R.diagnose(invalid1)).toMatchInlineSnapshot(`
-    Array [
-      Object {
+    [
+      {
         "deferrable": true,
-        "message": "Unknown key(s) \\"bar\\".",
-        "path": Array [
+        "message": "Unknown key(s) "bar".",
+        "path": [
           1,
         ],
       },
@@ -266,25 +266,25 @@ test('managed exact with array type', () => {
   `);
   expect(() => R.encode(x.json, invalid1)).toThrowErrorMatchingInlineSnapshot(`
     "Failed to encode to medium:
-      [1] Unknown key(s) \\"bar\\"."
+      [1] Unknown key(s) "bar"."
   `);
   expect(() => R.decode(x.json, JSON.stringify(invalid1)))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to decode from medium:
-      [1] Unknown key(s) \\"bar\\"."
+      [1] Unknown key(s) "bar"."
   `);
   expect(() => R.transform(x.json, x.jsonValue, JSON.stringify(invalid1)))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to transform medium:
-      [1] Unknown key(s) \\"bar\\"."
+      [1] Unknown key(s) "bar"."
   `);
 
   expect(U.diagnose(invalid1)).toMatchInlineSnapshot(`
-    Array [
-      Object {
+    [
+      {
         "deferrable": true,
-        "message": "Unknown key(s) \\"bar\\".",
-        "path": Array [
+        "message": "Unknown key(s) "bar".",
+        "path": [
           1,
         ],
       },
@@ -292,17 +292,17 @@ test('managed exact with array type', () => {
   `);
   expect(() => U.encode(x.json, invalid1)).toThrowErrorMatchingInlineSnapshot(`
     "Failed to encode to medium:
-      [1] Unknown key(s) \\"bar\\"."
+      [1] Unknown key(s) "bar"."
   `);
   expect(() => U.decode(x.json, JSON.stringify(invalid1)))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to decode from medium:
-      [1] Unknown key(s) \\"bar\\"."
+      [1] Unknown key(s) "bar"."
   `);
   expect(() => U.transform(x.json, x.jsonValue, JSON.stringify(invalid1)))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to transform medium:
-      [1] Unknown key(s) \\"bar\\"."
+      [1] Unknown key(s) "bar"."
   `);
 });
 
@@ -340,19 +340,19 @@ test('explicit non-exact array', () => {
   expect(O.is(valid2)).toBe(true);
 
   expect(O.diagnose(invalid1)).toMatchInlineSnapshot(`
-    Array [
-      Object {
+    [
+      {
         "deferrable": true,
-        "message": "Unknown key(s) \\"extra\\".",
-        "path": Array [],
+        "message": "Unknown key(s) "extra".",
+        "path": [],
       },
     ]
   `);
   expect(O.diagnose(invalid2)).toMatchInlineSnapshot(`
-    Array [
-      Object {
+    [
+      {
         "message": "Expecting an array, getting [object String].",
-        "path": Array [
+        "path": [
           "foo",
         ],
       },

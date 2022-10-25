@@ -71,18 +71,18 @@ test('transform medium A to medium B and back', () => {
   expect(() => Type.transform(mediumA, mediumB, c as any))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to transform medium:
-      [\\"data\\"] Expecting unpacked value to be an array, getting [object Number]."
+      ["data"] Expecting unpacked value to be an array, getting [object Number]."
   `);
   // The duplicates are the result of the intersection type, leave it as-is for
   // now.
   expect(() => Type.transform(mediumA, mediumB, d as any))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to transform medium:
-      [\\"data\\"][0] Expecting unpacked value to be a non-null object, getting [object Number].
-      [\\"data\\"][0] Expecting unpacked value to be a non-null object, getting [object Number].
-      [\\"data\\"][1][\\"x\\"] The unpacked value satisfies none of the type in the union type.
-      [\\"data\\"][1][\\"x\\"] Expected number, getting [object Boolean].
-      [\\"data\\"][1][\\"y\\"] Expected number, getting [object String]."
+      ["data"][0] Expecting unpacked value to be a non-null object, getting [object Number].
+      ["data"][0] Expecting unpacked value to be a non-null object, getting [object Number].
+      ["data"][1]["x"] The unpacked value satisfies none of the type in the union type.
+      ["data"][1]["x"] Expected number, getting [object Boolean].
+      ["data"][1]["y"] Expected number, getting [object String]."
   `);
 
   expect(Type.decode(mediumA, a)).toEqual(value);

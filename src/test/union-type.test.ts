@@ -79,7 +79,7 @@ test('union type of mixed types should work with json medium', () => {
   expect(() => Type.encode(x.json, value4)).toThrowErrorMatchingInlineSnapshot(`
     "Failed to encode to medium:
       The value satisfies none of the type in the union type.
-      [\\"value\\"] Expected string, getting [object Number]."
+      ["value"] Expected string, getting [object Number]."
   `);
 
   expect(Type.is(value1)).toBe(true);
@@ -177,51 +177,51 @@ test('exact with union type', () => {
   );
 
   expect(Type.diagnose(invalid1)).toMatchInlineSnapshot(`
-    Array [
-      Object {
+    [
+      {
         "deferrable": true,
-        "message": "Unknown key(s) \\"extra\\".",
-        "path": Array [],
+        "message": "Unknown key(s) "extra".",
+        "path": [],
       },
     ]
   `);
   expect(Type.diagnose(invalid2)).toMatchInlineSnapshot(`
-    Array [
-      Object {
+    [
+      {
         "deferrable": true,
-        "message": "Unknown key(s) \\"extra\\".",
-        "path": Array [],
+        "message": "Unknown key(s) "extra".",
+        "path": [],
       },
     ]
   `);
   expect(() => Type.encode(x.json, invalid1))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to encode to medium:
-      Unknown key(s) \\"extra\\"."
+      Unknown key(s) "extra"."
   `);
   expect(() => Type.encode(x.json, invalid2))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to encode to medium:
-      Unknown key(s) \\"extra\\"."
+      Unknown key(s) "extra"."
   `);
   expect(() => Type.decode(x.jsonValue, invalid1))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to decode from medium:
-      Unknown key(s) \\"extra\\"."
+      Unknown key(s) "extra"."
   `);
   expect(() => Type.decode(x.jsonValue, invalid2))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to decode from medium:
-      Unknown key(s) \\"extra\\"."
+      Unknown key(s) "extra"."
   `);
   expect(() => Type.transform(x.jsonValue, x.json, invalid1))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to transform medium:
-      Unknown key(s) \\"extra\\"."
+      Unknown key(s) "extra"."
   `);
   expect(() => Type.transform(x.jsonValue, x.json, invalid2))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to transform medium:
-      Unknown key(s) \\"extra\\"."
+      Unknown key(s) "extra"."
   `);
 });

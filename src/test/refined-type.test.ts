@@ -296,57 +296,57 @@ test('exact with refined type should work', () => {
   expect(O.transform(x.jsonValue, x.json, valid1)).toBe(JSON.stringify(valid1));
 
   expect(O.diagnose(invalid1)).toMatchInlineSnapshot(`
-    Array [
-      Object {
+    [
+      {
         "deferrable": true,
-        "message": "Unknown key(s) \\"bar\\".",
-        "path": Array [],
+        "message": "Unknown key(s) "bar".",
+        "path": [],
       },
-      Object {
+      {
         "message": "Unexpected value.",
-        "path": Array [],
+        "path": [],
       },
     ]
   `);
   expect(O.diagnose(invalid2)).toMatchInlineSnapshot(`
-    Array [
-      Object {
+    [
+      {
         "deferrable": true,
-        "message": "Unknown key(s) \\"bar\\".",
-        "path": Array [],
+        "message": "Unknown key(s) "bar".",
+        "path": [],
       },
     ]
   `);
   expect(() => O.encode(x.json, invalid1)).toThrowErrorMatchingInlineSnapshot(`
     "Failed to encode to medium:
-      Unknown key(s) \\"bar\\".
+      Unknown key(s) "bar".
       Unexpected value."
   `);
   expect(() => O.encode(x.json, invalid2)).toThrowErrorMatchingInlineSnapshot(`
     "Failed to encode to medium:
-      Unknown key(s) \\"bar\\"."
+      Unknown key(s) "bar"."
   `);
   expect(() => O.decode(x.jsonValue, invalid1))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to decode from medium:
-      Unknown key(s) \\"bar\\".
+      Unknown key(s) "bar".
       Unexpected value."
   `);
   expect(() => O.decode(x.jsonValue, invalid2))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to decode from medium:
-      Unknown key(s) \\"bar\\"."
+      Unknown key(s) "bar"."
   `);
   expect(() => O.transform(x.jsonValue, x.json, invalid1))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to transform medium:
-      Unknown key(s) \\"bar\\".
+      Unknown key(s) "bar".
       Unexpected value."
   `);
   expect(() => O.transform(x.jsonValue, x.json, invalid2))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to transform medium:
-      Unknown key(s) \\"bar\\"."
+      Unknown key(s) "bar"."
   `);
 });
 
@@ -461,32 +461,32 @@ test('transform exact refined type', () => {
   expect(() => T1.transform(x.jsonValue, x.json, invalid1))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to transform medium:
-      Unknown key(s) \\"bar\\"."
+      Unknown key(s) "bar"."
   `);
   expect(() => T2.transform(x.jsonValue, x.json, invalid2))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to transform medium:
-      [0] Unknown key(s) \\"bar\\"."
+      [0] Unknown key(s) "bar"."
   `);
   expect(() => T3.transform(x.jsonValue, x.json, invalid3))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to transform medium:
-      Unknown key(s) \\"extra\\"."
+      Unknown key(s) "extra"."
   `);
   expect(() => T4.transform(x.jsonValue, x.json, invalid4))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to transform medium:
-      [\\"foo\\"] Unknown key(s) \\"extra\\"."
+      ["foo"] Unknown key(s) "extra"."
   `);
   expect(() => T5.transform(x.jsonValue, x.json, invalid5))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to transform medium:
-      [1] Unknown key(s) \\"extra\\"."
+      [1] Unknown key(s) "extra"."
   `);
   expect(() => T6.transform(x.jsonValue, x.json, invalid6))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to transform medium:
-      [\\"next\\"][\\"next\\"] Unknown key(s) \\"extra\\"."
+      ["next"]["next"] Unknown key(s) "extra"."
   `);
 });
 
@@ -528,10 +528,10 @@ test('refinement transform', () => {
   ).toBe('ghi');
   expect(TrimmedNonEmptyString.is(' abc ')).toBe(true);
   expect(TrimmedNonEmptyString.diagnose(' ')).toMatchInlineSnapshot(`
-    Array [
-      Object {
+    [
+      {
         "message": "Unexpected value.",
-        "path": Array [],
+        "path": [],
       },
     ]
   `);

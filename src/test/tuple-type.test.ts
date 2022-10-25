@@ -9,10 +9,10 @@ test('tuple type should work', () => {
   const invalid3: any = ['abc', 123, true];
 
   expect(Tuple.diagnose(invalid3)).toMatchInlineSnapshot(`
-    Array [
-      Object {
+    [
+      {
         "message": "Expecting value with 2 instead of 3 element(s).",
-        "path": Array [],
+        "path": [],
       },
     ]
   `);
@@ -113,11 +113,11 @@ test('exact with tuple type should work', () => {
   );
 
   expect(Tuple.diagnose(invalid1)).toMatchInlineSnapshot(`
-    Array [
-      Object {
+    [
+      {
         "deferrable": true,
-        "message": "Unknown key(s) \\"extra\\".",
-        "path": Array [
+        "message": "Unknown key(s) "extra".",
+        "path": [
           1,
         ],
       },
@@ -126,17 +126,17 @@ test('exact with tuple type should work', () => {
   expect(() => Tuple.encode(x.json, invalid1))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to encode to medium:
-      [1] Unknown key(s) \\"extra\\"."
+      [1] Unknown key(s) "extra"."
   `);
   expect(() => Tuple.decode(x.jsonValue, invalid1))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to decode from medium:
-      [1] Unknown key(s) \\"extra\\"."
+      [1] Unknown key(s) "extra"."
   `);
   expect(() => Tuple.transform(x.jsonValue, x.json, invalid1))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to transform medium:
-      [1] Unknown key(s) \\"extra\\"."
+      [1] Unknown key(s) "extra"."
   `);
 });
 
@@ -181,11 +181,11 @@ test('exact + intersection with tuple type', () => {
   );
 
   expect(Tuple.diagnose(invalid1)).toMatchInlineSnapshot(`
-    Array [
-      Object {
+    [
+      {
         "deferrable": true,
-        "message": "Unknown key(s) \\"extra\\".",
-        "path": Array [
+        "message": "Unknown key(s) "extra".",
+        "path": [
           1,
         ],
       },
@@ -194,16 +194,16 @@ test('exact + intersection with tuple type', () => {
   expect(() => Tuple.encode(x.json, invalid1))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to encode to medium:
-      [1] Unknown key(s) \\"extra\\"."
+      [1] Unknown key(s) "extra"."
   `);
   expect(() => Tuple.decode(x.jsonValue, invalid1))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to decode from medium:
-      [1] Unknown key(s) \\"extra\\"."
+      [1] Unknown key(s) "extra"."
   `);
   expect(() => Tuple.transform(x.jsonValue, x.json, invalid1))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to transform medium:
-      [1] Unknown key(s) \\"extra\\"."
+      [1] Unknown key(s) "extra"."
   `);
 });
