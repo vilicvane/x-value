@@ -11,6 +11,17 @@ type Sunday = x.TypeOf<typeof Sunday>;
 test('pre-defined atomic types should decode/encode ecmascript medium', () => {
   expect(x.unknown.decode(x.ecmascript, true)).toBe(true);
   expect(x.unknown.decode(x.ecmascript, 123)).toBe(123);
+  expect(
+    x.unknown.decode(x.ecmascript, {
+      foo: {
+        bar: 'abc',
+      },
+    }),
+  ).toEqual({
+    foo: {
+      bar: 'abc',
+    },
+  });
   expect(x.undefined.decode(x.ecmascript, undefined)).toBe(undefined);
   expect(x.voidType.decode(x.ecmascript, undefined)).toBe(undefined);
   expect(x.nullType.decode(x.ecmascript, null)).toBe(null);
