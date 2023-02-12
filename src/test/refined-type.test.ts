@@ -2,6 +2,7 @@ import type {AssertTrue, IsEqual} from 'tslang';
 
 import * as x from '../library';
 
+import type {IdentifierInMediumA} from './@usage';
 import {Identifier, mediumA} from './@usage';
 
 let unknownValue: unknown;
@@ -93,7 +94,9 @@ test('atomic refinement should work', () => {
         IsEqual<LiveEmailInJSONValue, x.Nominal<'email' | 'live-email', string>>
       >
     | AssertTrue<IsEqual<UserId, x.Nominal<'user', string>>>
-    | AssertTrue<IsEqual<UserIdInMediumA, x.Nominal<'user', Buffer>>>
+    | AssertTrue<
+        IsEqual<UserIdInMediumA, x.Nominal<'user', IdentifierInMediumA>>
+      >
     | AssertTrue<IsEqual<UserIdInMediumB, x.Nominal<'user', number>>>
     | AssertTrue<IsEqual<typeof encodedUserIdInMediumA, UserIdInMediumA>>
     | AssertTrue<IsEqual<typeof userId, UserId>>
@@ -502,9 +505,9 @@ test('nominalize', () => {
     | AssertTrue<
         IsEqual<typeof liveEmail, x.Nominal<'email' | 'live-email', string>>
       >
-    | AssertTrue<IsEqual<Parameters<(typeof Email)['nominalize']>[0], string>>
+    | AssertTrue<IsEqual<Parameters<typeof Email['nominalize']>[0], string>>
     | AssertTrue<
-        IsEqual<Parameters<(typeof LiveEmail)['nominalize']>[0], string>
+        IsEqual<Parameters<typeof LiveEmail['nominalize']>[0], string>
       >;
 
   expect(email).toBe('user@host');
