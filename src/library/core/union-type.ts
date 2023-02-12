@@ -234,7 +234,7 @@ export function union<
     TypeInMediumsPartial,
     ...TypeInMediumsPartial[],
   ],
->(...Types: TTypeTuple): UnionType<TTypeTuple> {
+>(Types: TTypeTuple): UnionType<TTypeTuple> {
   return new UnionType(Types);
 }
 

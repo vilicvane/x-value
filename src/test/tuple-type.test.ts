@@ -1,7 +1,7 @@
 import * as x from '../library';
 
 test('tuple type should work', () => {
-  const Tuple = x.tuple(x.string, x.number);
+  const Tuple = x.tuple([x.string, x.number]);
 
   const valid1: x.TypeOf<typeof Tuple> = ['abc', 123];
   const invalid1: any = ['abc', 'def'];
@@ -77,13 +77,13 @@ test('tuple type should work', () => {
 
 test('exact with tuple type should work', () => {
   const Tuple = x
-    .tuple(
+    .tuple([
       x.string,
       x.object({
         foo: x.string,
         bar: x.number,
       }),
-    )
+    ])
     .exact();
 
   type Tuple = x.TypeOf<typeof Tuple>;
@@ -142,16 +142,16 @@ test('exact with tuple type should work', () => {
 
 test('exact + intersection with tuple type', () => {
   const Tuple = x
-    .intersection(
-      x.tuple(
+    .intersection([
+      x.tuple([
         x.string,
         x.object({
           foo: x.string,
           bar: x.number,
         }),
-      ),
+      ]),
       x.object({}),
-    )
+    ])
     .exact();
 
   type Tuple = x.TypeOf<typeof Tuple>;

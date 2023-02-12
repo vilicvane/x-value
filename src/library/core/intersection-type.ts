@@ -172,7 +172,7 @@ export function intersection<
     TypeInMediumsPartial,
     ...TypeInMediumsPartial[],
   ],
->(...Types: TTypeTuple): IntersectionType<TTypeTuple> {
+>(Types: TTypeTuple): IntersectionType<TTypeTuple> {
   return new IntersectionType(Types);
 }
 

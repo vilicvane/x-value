@@ -1,7 +1,7 @@
 import * as x from '../library';
 
 test('union type of atomic types should work with json medium', () => {
-  const Type = x.union(x.string, x.number);
+  const Type = x.union([x.string, x.number]);
 
   const value1: x.TypeOf<typeof Type> = 'abc';
   const value2: x.TypeOf<typeof Type> = 123;
@@ -31,7 +31,7 @@ test('union type of atomic types should work with json medium', () => {
 
 test('union type property with undefined', () => {
   const Type = x.object({
-    value: x.union(x.string, x.undefined),
+    value: x.union([x.string, x.undefined]),
   });
 
   type Type = x.TypeOf<typeof Type>;
@@ -41,13 +41,13 @@ test('union type property with undefined', () => {
 });
 
 test('union type of mixed types should work with json medium', () => {
-  const Type = x.union(
+  const Type = x.union([
     x.object({
       type: x.literal('text'),
       value: x.string,
     }),
     x.number,
-  );
+  ]);
 
   const value1: x.TypeOf<typeof Type> = {
     type: 'text',
@@ -89,13 +89,13 @@ test('union type of mixed types should work with json medium', () => {
 });
 
 test('union type of mixed types should work with json value medium', () => {
-  const Type = x.union(
+  const Type = x.union([
     x.object({
       type: x.literal('text'),
       value: x.string,
     }),
     x.number,
-  );
+  ]);
 
   const value1: x.TypeOf<typeof Type> = {
     type: 'text',
@@ -121,11 +121,11 @@ test('union type of mixed types should work with json value medium', () => {
 
 test('exact with union type', () => {
   const Type = x
-    .union(
+    .union([
       x.object({
         type: x.literal('a'),
       }),
-      x.intersection(
+      x.intersection([
         x.object({
           type: x.literal('b'),
         }),
@@ -135,8 +135,8 @@ test('exact with union type', () => {
         x.object({
           bar: x.number,
         }),
-      ),
-    )
+      ]),
+    ])
     .exact();
 
   type Type = x.TypeOf<typeof Type>;

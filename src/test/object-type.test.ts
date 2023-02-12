@@ -140,7 +140,7 @@ test('object type with optional property should work with json medium', () => {
 test('object type with union type property should work with json medium', () => {
   const Type = x.object({
     id: x.string,
-    profile: x.union(
+    profile: x.union([
       x.object({
         version: x.literal(1),
         name: x.string,
@@ -151,7 +151,7 @@ test('object type with union type property should work with json medium', () => 
         displayName: x.string,
         age: x.number.optional(),
       }),
-    ),
+    ]),
   });
 
   const value1: x.TypeOf<typeof Type> = {
@@ -200,16 +200,16 @@ test('object type with union type property should work with json medium', () => 
 test('object type with intersection type property should work with json medium', () => {
   const Type = x.object({
     id: x.string,
-    profile: x.intersection(
+    profile: x.intersection([
       x.object({
         name: x.string,
         age: x.number.optional(),
       }),
       x.object({
         displayName: x.string,
-        gender: x.union(x.literal('male'), x.literal('female')),
+        gender: x.union([x.literal('male'), x.literal('female')]),
       }),
-    ),
+    ]),
   });
 
   type Type = x.TypeOf<typeof Type>;
@@ -361,7 +361,7 @@ test('omit() should work', () => {
 
 test('undefined with json should work as expected', () => {
   const O = x.object({
-    foo: x.union(x.string, x.undefined),
+    foo: x.union([x.string, x.undefined]),
   });
 
   expect(O.is({foo: undefined})).toBe(true);
@@ -433,7 +433,7 @@ test('object nested exact should work', () => {
       bar: x.object({
         yo: x.number,
         ha: x
-          .union(
+          .union([
             x.string,
             x.object({
               x: x.number,
@@ -444,7 +444,7 @@ test('object nested exact should work', () => {
                 })
                 .exact(false),
             }),
-          )
+          ])
           .optional(),
       }),
     })
@@ -578,7 +578,7 @@ test('object nested exact should work', () => {
 
 test('explicit non-exact object with intersection', () => {
   const O = x
-    .intersection(
+    .intersection([
       x
         .object({
           foo: x.string,
@@ -587,7 +587,7 @@ test('explicit non-exact object with intersection', () => {
       x.object({
         bar: x.number,
       }),
-    )
+    ])
     .exact(true);
 
   const valid1: any = {

@@ -226,14 +226,14 @@ test('managed exact with array type', () => {
     .exact();
 
   const U = x
-    .intersection(
+    .intersection([
       x.array(
         x.object({
           foo: x.string,
         }),
       ),
       x.object({}),
-    )
+    ])
     .exact();
 
   const valid1 = [{foo: 'abc'}];

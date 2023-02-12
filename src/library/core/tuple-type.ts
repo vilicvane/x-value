@@ -240,9 +240,11 @@ export class TupleType<
   }
 }
 
-export function tuple<TElementTypeTuple extends TypeInMediumsPartial[]>(
-  ...ElementTypeTuple: TElementTypeTuple
-): TupleType<TElementTypeTuple> {
+export function tuple<
+  TElementTypeTuple extends
+    | []
+    | [TypeInMediumsPartial, ...TypeInMediumsPartial[]],
+>(ElementTypeTuple: TElementTypeTuple): TupleType<TElementTypeTuple> {
   return new TupleType(ElementTypeTuple);
 }
 

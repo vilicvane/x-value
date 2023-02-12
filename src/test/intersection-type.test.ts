@@ -3,7 +3,7 @@ import type {AssertTrue, IsEqual} from 'tslang';
 import * as x from '../library';
 
 test('intersection type results in never should work with json medium', () => {
-  const Type = x.intersection(x.string, x.number);
+  const Type = x.intersection([x.string, x.number]);
 
   type Type = x.TypeOf<typeof Type>;
 
@@ -35,14 +35,14 @@ test('intersection type results in never should work with json medium', () => {
 });
 
 test('intersection type should work with json value medium', () => {
-  const Type = x.intersection(
+  const Type = x.intersection([
     x.object({
       foo: x.string,
     }),
     x.object({
       bar: x.number,
     }),
-  );
+  ]);
 
   type Type = x.TypeOf<typeof Type>;
 
@@ -98,14 +98,14 @@ test('intersection type should work with json value medium', () => {
 });
 
 test('intersection type should work with json medium', () => {
-  const Type = x.intersection(
+  const Type = x.intersection([
     x.object({
       foo: x.string,
     }),
     x.object({
       bar: x.number,
     }),
-  );
+  ]);
 
   const value1: x.TypeOf<typeof Type> = {
     foo: 'abc',
@@ -142,14 +142,14 @@ test('intersection type should work with json medium', () => {
 
 test('exact with intersection type should work', () => {
   const O = x
-    .intersection(
+    .intersection([
       x
         .object({
           foo: x.string,
         })
         // Should not change the result.
         .exact(),
-      x.union(
+      x.union([
         x.object({
           bar: x.number,
           ha: x.boolean.optional(),
@@ -157,8 +157,8 @@ test('exact with intersection type should work', () => {
         x.object({
           oops: x.string,
         }),
-      ),
-    )
+      ]),
+    ])
     .exact();
 
   const valid1 = {

@@ -33,16 +33,16 @@ const Rock = x.record(x.string, x.number);
 
 const Aha = x.array(Oops);
 
-const Tick = x.tuple(x.string, x.number);
+const Tick = x.tuple([x.string, x.number]);
 
-const Um = x.union(Oops, x.boolean);
+const Um = x.union([Oops, x.boolean]);
 
-const I = x.intersection(
+const I = x.intersection([
   Oops,
   x.object({
     yoha: x.boolean,
   }),
-);
+]);
 
 interface R {
   type: 'recursive';

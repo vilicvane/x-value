@@ -7,14 +7,14 @@ test('transform medium A to medium B and back', () => {
     id: Identifier,
     name: x.string,
     data: x.array(
-      x.intersection(
+      x.intersection([
         x.object({
-          x: x.union(x.number, x.string),
+          x: x.union([x.number, x.string]),
         }),
         x.object({
           y: x.number.optional(),
         }),
-      ),
+      ]),
     ),
   });
 

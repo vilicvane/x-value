@@ -150,7 +150,7 @@ test('object refinement should work', () => {
 
 test('nullable refinement should work', () => {
   const O = x
-    .union(x.string, x.undefined)
+    .union([x.string, x.undefined])
     .refined<'includes #'>(value =>
       x.refinement(value === undefined || value.includes('#'), value),
     );
@@ -195,7 +195,7 @@ test('record refinement should work', () => {
 
 test('tuple refinement should work', () => {
   const O = x
-    .tuple(x.string, x.number)
+    .tuple([x.string, x.number])
     .refined<'string is abc and number is 123'>(([a, b]) =>
       x.refinement(a === 'abc' && b === 123, [a, b]),
     );
@@ -220,7 +220,7 @@ test('tuple refinement should work', () => {
 
 test('intersection refinement should work', () => {
   const O = x
-    .intersection(x.object({foo: x.string}), x.object({bar: x.number}))
+    .intersection([x.object({foo: x.string}), x.object({bar: x.number})])
     .refined<'foo is abc'>(value => x.refinement(value.foo === 'abc', value));
 
   type O = x.TypeOf<typeof O>;
@@ -241,7 +241,7 @@ test('intersection refinement should work', () => {
 
 test('union refinement should work', () => {
   const O = x
-    .union(x.object({foo: x.string}), x.object({bar: x.number}))
+    .union([x.object({foo: x.string}), x.object({bar: x.number})])
     .refined<'foo is abc or bar is 123'>(value =>
       x.refinement(
         ('foo' in value && value.foo === 'abc') ||
@@ -355,7 +355,7 @@ test('exact with refined type should work', () => {
 
 test('transform exact refined type', () => {
   const T1 = x
-    .union(x.object({foo: x.string}), x.object({bar: x.number}))
+    .union([x.object({foo: x.string}), x.object({bar: x.number})])
     .refined(value => value)
     .exact();
 
@@ -365,7 +365,7 @@ test('transform exact refined type', () => {
     .exact();
 
   const T3 = x
-    .intersection(x.object({foo: x.string}), x.object({bar: x.number}))
+    .intersection([x.object({foo: x.string}), x.object({bar: x.number})])
     .refined(value => value)
     .exact();
 
@@ -375,7 +375,7 @@ test('transform exact refined type', () => {
     .exact();
 
   const T5 = x
-    .tuple(x.string, x.object({bar: x.number}))
+    .tuple([x.string, x.object({bar: x.number})])
     .refined(value => value)
     .exact();
 
@@ -505,9 +505,9 @@ test('nominalize', () => {
     | AssertTrue<
         IsEqual<typeof liveEmail, x.Nominal<'email' | 'live-email', string>>
       >
-    | AssertTrue<IsEqual<Parameters<typeof Email['nominalize']>[0], string>>
+    | AssertTrue<IsEqual<Parameters<(typeof Email)['nominalize']>[0], string>>
     | AssertTrue<
-        IsEqual<Parameters<typeof LiveEmail['nominalize']>[0], string>
+        IsEqual<Parameters<(typeof LiveEmail)['nominalize']>[0], string>
       >;
 
   expect(email).toBe('user@host');

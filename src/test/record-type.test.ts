@@ -173,7 +173,7 @@ test('record type with union string key should work', () => {
     x.refinement(value.includes('@'), value, 'Expected an email address.'),
   );
 
-  const Type = x.record(x.union(x.literal('foo'), Email), x.string);
+  const Type = x.record(x.union([x.literal('foo'), Email]), x.string);
 
   const email = 'hello@world' as x.TypeOf<typeof Email>;
 
@@ -390,7 +390,7 @@ test('exact with record type should work', () => {
 
 test('managed exact with record type', () => {
   const O = x
-    .union(
+    .union([
       x.object({
         foo: x.string,
         bar: x.record(
@@ -401,7 +401,7 @@ test('managed exact with record type', () => {
         ),
       }),
       x.string,
-    )
+    ])
     .exact();
 
   const valid1 = {
@@ -551,12 +551,12 @@ test('managed exact with record type', () => {
 test('exact intersection with record', () => {
   const O = x
     .object({
-      foo: x.intersection(
+      foo: x.intersection([
         x.object({
           bar: x.literal('oops'),
         }),
         x.record(x.string, x.string),
-      ),
+      ]),
     })
     .exact();
 
@@ -621,15 +621,15 @@ test('exact intersection with record', () => {
 
 test('exact intersect + union with record type', () => {
   const Type = x
-    .intersection(
+    .intersection([
       x.object({foo: x.string}),
-      x.union(
+      x.union([
         x.object({
           type: x.literal('a'),
         }),
         x.record(x.string, x.string),
-      ),
-    )
+      ]),
+    ])
     .exact();
 
   const valid1 = {
