@@ -3,6 +3,7 @@ import type {
   bigintTypeSymbol,
   booleanTypeSymbol,
   dateTypeSymbol,
+  neverTypeSymbol,
   nullTypeSymbol,
   numberTypeSymbol,
   regexpTypeSymbol,
@@ -13,6 +14,7 @@ import type {
 } from '../types';
 
 export interface ECMAScriptTypes {
+  [neverTypeSymbol]: never;
   [unknownTypeSymbol]: unknown;
   [undefinedTypeSymbol]: undefined;
   [voidTypeSymbol]: void;

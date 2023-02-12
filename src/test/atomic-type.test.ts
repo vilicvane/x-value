@@ -38,6 +38,11 @@ test('pre-defined atomic types should decode/encode ecmascript medium', () => {
 });
 
 test('pre-defined atomic types should error decode/encode ecmascript medium with wrong packed value', () => {
+  expect(() => x.never.decode(x.ecmascript, true as never))
+    .toThrowErrorMatchingInlineSnapshot(`
+    "Failed to decode from medium:
+      Expected never, getting [object Boolean]."
+  `);
   expect(() => x.undefined.decode(x.ecmascript, true as any))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to decode from medium:

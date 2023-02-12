@@ -6,6 +6,7 @@ const toString = Object.prototype.toString;
 declare global {
   namespace XValue {
     interface Types {
+      [neverTypeSymbol]: never;
       [unknownTypeSymbol]: unknown;
       [undefinedTypeSymbol]: undefined;
       [voidTypeSymbol]: void;
@@ -25,6 +26,11 @@ declare global {
     type UsingName = keyof Using;
   }
 }
+
+export const neverTypeSymbol = Symbol();
+export const never = atomic(neverTypeSymbol, value => {
+  throw `Expected never, getting ${toString.call(value)}.`;
+});
 
 export const unknownTypeSymbol = Symbol();
 export const unknown = atomic(unknownTypeSymbol, () => {});
