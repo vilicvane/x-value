@@ -502,9 +502,9 @@ test('nominalize', () => {
     | AssertTrue<
         IsEqual<typeof liveEmail, x.Nominal<'email' | 'live-email', string>>
       >
-    | AssertTrue<IsEqual<Parameters<typeof Email['nominalize']>[0], string>>
+    | AssertTrue<IsEqual<Parameters<(typeof Email)['nominalize']>[0], string>>
     | AssertTrue<
-        IsEqual<Parameters<typeof LiveEmail['nominalize']>[0], string>
+        IsEqual<Parameters<(typeof LiveEmail)['nominalize']>[0], string>
       >;
 
   expect(email).toBe('user@host');
