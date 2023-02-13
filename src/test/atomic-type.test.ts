@@ -211,8 +211,8 @@ test('date atomic refinement sunday should work with extended json value medium'
     Sunday.decode(
       x.extendedJSONValue,
       sunday.toISOString() as x.MediumTypeOf<
-        typeof Sunday,
-        'extended-json-value'
+        'extended-json-value',
+        typeof Sunday
       >,
     ).getTime(),
   ).toBe(sunday.getTime());

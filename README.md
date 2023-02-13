@@ -67,7 +67,7 @@ declare global {
 }
 
 type Oops = x.TypeOf<typeof Oops>;
-type JSONOops = x.MediumTypeOf<typeof Oops, 'json'>;
+type JSONOops = x.MediumTypeOf<'json', typeof Oops>;
 ```
 
 Refine type:

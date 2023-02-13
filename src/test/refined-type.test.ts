@@ -37,7 +37,7 @@ test('atomic refinement should work', () => {
   );
 
   type Email = x.TypeOf<typeof Email>;
-  type EmailInJSONValue = x.MediumTypeOf<typeof Email, 'json-value'>;
+  type EmailInJSONValue = x.MediumTypeOf<'json-value', typeof Email>;
 
   expect(Email.is('user@domain')).toBe(true);
   expect(Email.is('user#domain')).toBe(false);
@@ -58,7 +58,7 @@ test('atomic refinement should work', () => {
   ]);
 
   type LiveEmail = x.TypeOf<typeof LiveEmail>;
-  type LiveEmailInJSONValue = x.MediumTypeOf<typeof LiveEmail, 'json-value'>;
+  type LiveEmailInJSONValue = x.MediumTypeOf<'json-value', typeof LiveEmail>;
 
   expect(LiveEmail.is('user@live')).toBe(true);
   expect(LiveEmail.is('user@domain')).toBe(false);
@@ -72,8 +72,8 @@ test('atomic refinement should work', () => {
 
   type UserId = x.TypeOf<typeof UserId>;
 
-  type UserIdInMediumA = x.MediumTypeOf<typeof UserId, 'medium-a'>;
-  type UserIdInMediumB = x.MediumTypeOf<typeof UserId, 'medium-b'>;
+  type UserIdInMediumA = x.MediumTypeOf<'medium-a', typeof UserId>;
+  type UserIdInMediumB = x.MediumTypeOf<'medium-b', typeof UserId>;
 
   const encodedUserIdInMediumA = UserId.encode(mediumA, 'ffff' as UserId);
 
@@ -111,7 +111,7 @@ test('array refinement should work', () => {
     );
 
   type Triple = x.TypeOf<typeof Triple>;
-  type TripleInJSONValue = x.MediumTypeOf<typeof Triple, 'json-value'>;
+  type TripleInJSONValue = x.MediumTypeOf<'json-value', typeof Triple>;
 
   expect(Triple.is(['', '', ''])).toBe(true);
   expect(Triple.is([])).toBe(false);

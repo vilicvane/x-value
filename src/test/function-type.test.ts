@@ -8,7 +8,7 @@ test('encode/decode/transform/diagnose', () => {
   const F = x.fn([x.string, x.boolean], x.number);
 
   type F = x.TypeOf<typeof F>;
-  type FInECMAScriptMedium = x.MediumTypeOf<typeof F, 'ecmascript'>;
+  type FInECMAScriptMedium = x.MediumTypeOf<'ecmascript', typeof F>;
 
   const f: F = (a, b) => {
     return b ? a.length + 1 : a.length - 1;
@@ -54,7 +54,7 @@ test('guard', () => {
   const F = x.fn([Identifier], Identifier);
 
   type F = x.TypeOf<typeof F>;
-  type FInMediumA = x.MediumTypeOf<typeof F, 'medium-a'>;
+  type FInMediumA = x.MediumTypeOf<'medium-a', typeof F>;
 
   const f = F.guard(id => (parseInt(id, 16) + 1).toString(16).padStart(4, '0'));
 

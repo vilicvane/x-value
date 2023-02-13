@@ -1,8 +1,8 @@
 import type {TypeInMediumsPartial, __type_in_mediums} from './core';
 
 export type MediumTypeOf<
-  TType extends TypeInMediumsPartial,
   TMediumName extends XValue.UsingName,
+  TType extends TypeInMediumsPartial,
 > = TType[__type_in_mediums][TMediumName];
 
 export function constraint(

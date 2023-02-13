@@ -37,12 +37,12 @@ test('transform medium A to medium B and back', () => {
     ],
   };
 
-  const a: x.MediumTypeOf<typeof Type, 'medium-a'> = {
+  const a: x.MediumTypeOf<'medium-a', typeof Type> = {
     id: idBuffer,
     ...common,
   };
 
-  const b: x.MediumTypeOf<typeof Type, 'medium-b'> = {
+  const b: x.MediumTypeOf<'medium-b', typeof Type> = {
     id: idBuffer.readUint16BE(),
     ...common,
   };
