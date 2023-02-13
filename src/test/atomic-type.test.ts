@@ -35,6 +35,11 @@ test('pre-defined atomic types should decode/encode ecmascript medium', () => {
   expect(x.string.encode(x.ecmascript, 'text')).toBe('text');
   expect(x.number.encode(x.ecmascript, 123)).toBe(123);
   expect(x.boolean.encode(x.ecmascript, true)).toBe(true);
+
+  const fn = (): void => {};
+
+  expect(x.Function.decode(x.ecmascript, fn)).toBe(fn);
+  expect(x.Function.encode(x.ecmascript, fn)).toBe(fn);
 });
 
 test('pre-defined atomic types should error decode/encode ecmascript medium with wrong packed value', () => {
@@ -98,6 +103,11 @@ test('pre-defined atomic types should error decode/encode ecmascript medium with
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to encode to medium:
       Expected boolean, getting [object Number]."
+  `);
+  expect(() => x.Function.encode(x.ecmascript, null as any))
+    .toThrowErrorMatchingInlineSnapshot(`
+    "Failed to encode to medium:
+      Expected function, getting [object Null]."
   `);
 });
 

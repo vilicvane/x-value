@@ -3,6 +3,7 @@ import type {
   bigintTypeSymbol,
   booleanTypeSymbol,
   dateTypeSymbol,
+  functionTypeSymbol,
   neverTypeSymbol,
   nullTypeSymbol,
   numberTypeSymbol,
@@ -23,6 +24,7 @@ export interface ECMAScriptTypes {
   [numberTypeSymbol]: number;
   [bigintTypeSymbol]: bigint;
   [booleanTypeSymbol]: boolean;
+  [functionTypeSymbol]: Function;
   [dateTypeSymbol]: Date;
   [regexpTypeSymbol]: RegExp;
 }

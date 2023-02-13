@@ -15,6 +15,7 @@ declare global {
       [numberTypeSymbol]: number;
       [bigintTypeSymbol]: bigint;
       [booleanTypeSymbol]: boolean;
+      [functionTypeSymbol]: Function;
       [dateTypeSymbol]: Date;
       [regexpTypeSymbol]: RegExp;
     }
@@ -33,7 +34,7 @@ export const never = atomic(neverTypeSymbol, value => {
 });
 
 export const unknownTypeSymbol = Symbol();
-export const unknown = atomic(unknownTypeSymbol, () => {});
+export const unknown = atomic(unknownTypeSymbol, []);
 
 export const undefinedTypeSymbol = Symbol();
 export const undefined = atomic(undefinedTypeSymbol, value =>
@@ -90,6 +91,14 @@ export const boolean = atomic(booleanTypeSymbol, value =>
   constraint(
     typeof value === 'boolean',
     () => `Expected boolean, getting ${toString.call(value)}.`,
+  ),
+);
+
+export const functionTypeSymbol = Symbol();
+export const Function = atomic(functionTypeSymbol, value =>
+  constraint(
+    typeof value === 'function',
+    () => `Expected function, getting ${toString.call(value)}.`,
   ),
 );
 
