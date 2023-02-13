@@ -51,6 +51,8 @@ export const voidType = atomic(voidTypeSymbol, value =>
   ),
 );
 
+export {voidType as void};
+
 export const nullTypeSymbol = Symbol();
 export const nullType = atomic(nullTypeSymbol, value =>
   constraint(

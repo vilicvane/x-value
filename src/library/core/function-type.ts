@@ -233,6 +233,8 @@ export function fn<
   return new FunctionType(ArgumentTypeTuple, ReturnType);
 }
 
+export {fn as function};
+
 type FunctionInMediums<
   TArgumentTypeTuple extends TypeInMediumsPartial[],
   TReturnType extends TypeInMediumsPartial,
