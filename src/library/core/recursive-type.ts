@@ -10,7 +10,7 @@ export class RecursiveType<TRecursive> extends Type<
 > {
   [__type_kind]!: 'recursive';
 
-  readonly Type: Type;
+  private Type: Type;
 
   constructor(
     recursion: (Type: RecursiveType<TRecursive>) => TypeInMediumsPartial,

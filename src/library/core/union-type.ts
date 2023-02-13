@@ -18,7 +18,7 @@ export class UnionType<
   [__type_kind]!: 'union';
 
   constructor(TypeTuple: TTypeTuple);
-  constructor(readonly TypeTuple: Type[]) {
+  constructor(private TypeTuple: Type[]) {
     if (TypeTuple.length < 2) {
       throw new TypeError('Expecting at least 2 type for union type');
     }

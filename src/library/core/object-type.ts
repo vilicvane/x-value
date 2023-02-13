@@ -20,7 +20,7 @@ export class ObjectType<
   [__type_kind]!: 'object';
 
   constructor(definition: TDefinition);
-  constructor(readonly definition: Record<string, TypeLike>) {
+  constructor(private definition: Record<string, TypeLike>) {
     super();
   }
 

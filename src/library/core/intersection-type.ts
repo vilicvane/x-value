@@ -19,7 +19,7 @@ export class IntersectionType<
   [__type_kind]!: 'intersection';
 
   constructor(TypeTuple: TTypeTuple);
-  constructor(readonly TypeTuple: Type[]) {
+  constructor(private TypeTuple: Type[]) {
     if (TypeTuple.length < 2) {
       throw new TypeError('Expecting at least 2 types for intersection type');
     }
@@ -198,13 +198,10 @@ export function _mergeIntersectionPartials(partials: unknown[]): unknown {
     }
 
     if (typeof merged === 'object') {
-      if (merged === null) {
-        // merged !== partial
-        throw new TypeError();
-      }
-
-      if (typeof partial !== 'object' || partial === null) {
-        throw new TypeError();
+      if (merged === null || typeof partial !== 'object' || partial === null) {
+        throw new TypeError(
+          'Cannot merge object and non-object for intersection',
+        );
       }
 
       for (const [key, value] of Object.entries(partial)) {

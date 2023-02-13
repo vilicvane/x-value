@@ -25,6 +25,8 @@ export const Identifier = x.atomic(identifierTypeSymbol, value =>
   x.constraint(typeof value === 'string'),
 );
 
+export type Identifier = x.TypeOf<typeof Identifier>;
+
 export interface IdentifierInMediumA extends Buffer {
   toString(encoding: 'hex'): x.TransformNominal<this, string>;
 }
@@ -50,14 +52,14 @@ export const mediumA = x.ecmascript.extend<UsingMediumA>('medium-a', {
     [identifierTypeSymbol]: {
       encode(value) {
         if (value.length === 0) {
-          throw new TypeError('Value cannot be empty string');
+          throw 'Value cannot be empty string';
         }
 
         return Buffer.from(value, 'hex');
       },
       decode(value) {
         if (!Buffer.isBuffer(value)) {
-          throw new TypeError();
+          throw 'Value must be a buffer';
         }
 
         return value.toString('hex');
@@ -71,7 +73,6 @@ export const mediumB = x.jsonValue.extend<UsingMediumB>('medium-b', {
     [identifierTypeSymbol]: {
       encode(value) {
         if (value.length === 0) {
-          // eslint-disable-next-line no-throw-literal
           throw 'Value cannot be empty string';
         }
 
@@ -79,7 +80,7 @@ export const mediumB = x.jsonValue.extend<UsingMediumB>('medium-b', {
       },
       decode(value) {
         if (typeof value !== 'number') {
-          throw new TypeError();
+          throw 'Value must be a number';
         }
 
         const buffer = Buffer.alloc(2);

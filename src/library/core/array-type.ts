@@ -14,7 +14,7 @@ export class ArrayType<TElementType extends TypeInMediumsPartial> extends Type<
   [__type_kind]!: 'array';
 
   constructor(ElementType: TElementType);
-  constructor(readonly ElementType: Type) {
+  constructor(private ElementType: Type) {
     super();
   }
 

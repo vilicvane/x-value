@@ -12,7 +12,7 @@ export class OptionalType<TType extends TypeInMediumsPartial> extends TypeLike<
   [__type_kind]!: 'optional';
 
   constructor(Type: TType);
-  constructor(readonly Type: Type) {
+  constructor(private Type: Type) {
     super();
   }
 

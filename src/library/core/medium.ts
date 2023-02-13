@@ -128,3 +128,8 @@ export type MediumTypesPackedType<
 }
   ? TPacked
   : TFallback;
+
+export type MediumName<TMedium extends Medium<XValue.UsingName, object>> =
+  TMedium extends Medium<infer TMediumName extends XValue.UsingName, object>
+    ? TMediumName
+    : never;

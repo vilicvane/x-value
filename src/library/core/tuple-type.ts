@@ -15,7 +15,7 @@ export class TupleType<
   [__type_kind]!: 'tuple';
 
   constructor(ElementTypeTuple: TElementTypeTuple);
-  constructor(readonly ElementTypeTuple: Type[]) {
+  constructor(private ElementTypeTuple: Type[]) {
     super();
   }
 

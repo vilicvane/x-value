@@ -1,4 +1,7 @@
+export * from './medium';
 export * from './type';
+export * from './type-like';
+export * from './type-partials';
 export * from './atomic-type';
 export * from './object-type';
 export * from './array-type';
@@ -9,6 +12,4 @@ export * from './record-type';
 export * from './tuple-type';
 export * from './refined-type';
 export * from './recursive-type';
-export * from './medium';
-export * from './type-like';
-export * from './type-partials';
+export * from './function-type';

@@ -12,8 +12,8 @@ export class AtomicType<TSymbol extends symbol> extends Type<
 
   constructor(symbol: TSymbol, constraints: AtomicTypeConstraint[]);
   constructor(
-    readonly symbol: symbol,
-    readonly constraints: AtomicTypeConstraint[],
+    private symbol: symbol,
+    private constraints: AtomicTypeConstraint[],
   ) {
     super();
   }

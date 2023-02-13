@@ -18,7 +18,7 @@ export class RefinedType<
   [__type_kind]!: 'refined';
 
   constructor(Type: TType, refinements: Refinement[]);
-  constructor(readonly Type: Type, readonly refinements: Refinement[]) {
+  constructor(private Type: Type, private refinements: Refinement[]) {
     super();
   }
 

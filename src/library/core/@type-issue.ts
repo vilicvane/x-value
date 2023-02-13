@@ -3,6 +3,7 @@ export type TypePath = (
   | number
   | symbol
   | {key: string | number | symbol}
+  | {argument: number}
 )[];
 
 export interface TypeIssue {

@@ -15,7 +15,7 @@ export class RecordType<
   [__type_kind]!: 'record';
 
   constructor(Key: TKeyType, Value: TValueType);
-  constructor(readonly Key: Type, readonly Value: Type) {
+  constructor(private Key: Type, private Value: Type) {
     super();
   }
 
