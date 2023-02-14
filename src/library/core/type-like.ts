@@ -49,14 +49,14 @@ function JSON_SCHEMA_TYPE_KEY(id: number): string {
   return `type-${id}`;
 }
 
-function JSON_SCHEMA_TYPE_SCHEMA(id: number): JSONSchema {
-  return {
-    $ref: `#/$defs/${JSON_SCHEMA_TYPE_KEY(id)}`,
-  };
+function JSON_SCHEMA_TYPE_REF(id: number): string {
+  return `#/$defs/${JSON_SCHEMA_TYPE_KEY(id)}`;
 }
 
 export class JSONSchemaContext {
   private typeMap = new Map<TypeLike, number>();
+
+  private refToDefinitionMap = new Map<string, JSONSchema>();
 
   readonly definitions: Record<string, JSONSchema> = {};
 
@@ -74,24 +74,32 @@ export class JSONSchemaContext {
 
     if (definition) {
       this.definitions[JSON_SCHEMA_TYPE_KEY(id)] = definition;
-      return JSON_SCHEMA_TYPE_SCHEMA(id);
+
+      const ref = JSON_SCHEMA_TYPE_REF(id);
+
+      this.refToDefinitionMap.set(ref, definition);
+
+      return {$ref: ref};
     }
   }
 
   getDefinition(Type: TypeLike): JSONSchema | undefined {
     const id = this.typeMap.get(Type);
 
-    return typeof id === 'number' ? JSON_SCHEMA_TYPE_SCHEMA(id) : undefined;
+    return typeof id === 'number'
+      ? {$ref: JSON_SCHEMA_TYPE_REF(id)}
+      : undefined;
   }
 
-  requireDefinition(Type: TypeLike): JSONSchema {
-    const ref = this.getDefinition(Type);
+  requireDefinitionByRef(ref: string): JSONSchema {
+    const schema = this.refToDefinitionMap.get(ref);
 
-    if (!ref) {
-      throw new Error('Expecting a definition ref');
+    /* istanbul ignore if */
+    if (!schema) {
+      throw new Error('Invalid JSON Schema reference');
     }
 
-    return ref;
+    return schema;
   }
 }
 

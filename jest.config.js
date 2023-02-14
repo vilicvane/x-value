@@ -13,7 +13,6 @@ module.exports = {
   },
   clearMocks: true,
   coverageDirectory: 'coverage',
-  coverageProvider: 'v8',
   coveragePathIgnorePatterns: ['node_modules/', 'src/test/'],
   coverageThreshold: {
     global: {

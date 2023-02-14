@@ -174,7 +174,10 @@ export class IntersectionType<
     );
 
     return {
-      schema: context.define(this, mergeIntersectionJSONSchemas(schemas)),
+      schema: context.define(
+        this,
+        mergeIntersectionJSONSchemas(context, schemas),
+      ),
     };
   }
 }
@@ -252,12 +255,19 @@ export function internal_mergeIntersectionPartials(
   return merged;
 }
 
-function mergeIntersectionJSONSchemas(schemas: JSONSchema[]): JSONSchema {
+function mergeIntersectionJSONSchemas(
+  context: JSONSchemaContext,
+  schemas: JSONSchema[],
+): JSONSchema {
   const requiredSet = new Set<string>();
 
   const properties: Record<string, JSONSchema> = {};
 
-  for (const schema of schemas) {
+  for (let schema of schemas) {
+    if (schema.$ref) {
+      schema = context.requireDefinitionByRef(schema.$ref);
+    }
+
     if (schema.type !== 'object') {
       throw new TypeError('Cannot merge non-object JSON schemas');
     }
@@ -271,7 +281,7 @@ function mergeIntersectionJSONSchemas(schemas: JSONSchema[]): JSONSchema {
     if (schema.properties) {
       for (const [key, propertySchema] of Object.entries(schema.properties)) {
         if (hasOwnProperty.call(properties, key)) {
-          properties[key] = mergeIntersectionJSONSchemas([
+          properties[key] = mergeIntersectionJSONSchemas(context, [
             properties[key],
             propertySchema,
           ]);
