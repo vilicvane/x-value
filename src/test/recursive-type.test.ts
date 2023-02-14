@@ -6,7 +6,7 @@ test('recursive type should work', () => {
   interface RecursiveR {
     type: 'node';
     text?: typeof x.string;
-    children: RecursiveR[];
+    children?: RecursiveR[];
   }
 
   const R = x.recursive<RecursiveR>(R =>
@@ -74,7 +74,7 @@ test('recursive type should work', () => {
   interface RefR {
     type: 'node';
     text?: string;
-    children: RefR[];
+    children?: RefR[];
   }
 
   type _ = AssertTrue<IsEqual<R, RefR>>;
@@ -182,4 +182,77 @@ test('exact with recursive type should work', () => {
     "Failed to transform medium:
       ["children"][0] Unknown key(s) "extra"."
   `);
+});
+
+test('recursive type with non-recursive part', () => {
+  const NonRecursivePart = x.object({
+    type: x.string,
+    date: x.Date,
+  });
+
+  type RecursiveTypeDefinition = x.Recursive<
+    {
+      next?: RecursiveTypeDefinition;
+    },
+    typeof NonRecursivePart
+  >;
+
+  const RecursiveType = x.recursive<RecursiveTypeDefinition>(RecursiveType =>
+    NonRecursivePart.extend({
+      next: RecursiveType.optional(),
+    }),
+  );
+
+  type RecursiveType = x.TypeOf<typeof RecursiveType>;
+
+  type RecursiveTypeInExtendedJSONValue = x.MediumTypeOf<
+    'extended-json-value',
+    typeof RecursiveType
+  >;
+
+  const value_1: RecursiveType = {
+    type: 'node',
+    date: new Date(),
+  };
+
+  const value_2: RecursiveType = {
+    type: 'node',
+    date: new Date(),
+    next: {
+      type: 'leaf',
+      date: new Date(),
+    },
+  };
+
+  expect(RecursiveType.is(value_1)).toBe(true);
+  expect(RecursiveType.is(value_2)).toBe(true);
+  expect(RecursiveType.is({type: 'node', next: {}})).toBe(false);
+
+  expect(RecursiveType.encode(x.extendedJSONValue, value_1)).toEqual(
+    JSON.parse(JSON.stringify(value_1)),
+  );
+  expect(RecursiveType.encode(x.extendedJSONValue, value_2)).toEqual(
+    JSON.parse(JSON.stringify(value_2)),
+  );
+
+  interface RecursiveTypeComparison {
+    type: string;
+    date: Date;
+    next?: RecursiveTypeComparison;
+  }
+
+  interface RecursiveTypeInExtendedJSONValueComparison {
+    type: string;
+    date: string;
+    next?: RecursiveTypeInExtendedJSONValueComparison;
+  }
+
+  type _ =
+    | AssertTrue<IsEqual<RecursiveType, RecursiveTypeComparison>>
+    | AssertTrue<
+        IsEqual<
+          RecursiveTypeInExtendedJSONValue,
+          RecursiveTypeInExtendedJSONValueComparison
+        >
+      >;
 });

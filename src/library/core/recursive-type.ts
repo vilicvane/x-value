@@ -4,19 +4,15 @@ import type {Medium} from './medium';
 import {Type} from './type';
 import type {JSONSchemaContext, JSONSchemaData} from './type-like';
 import {__type_kind} from './type-partials';
-import type {TypeInMediumsPartial} from './type-partials';
+import type {TypeInMediumsPartial, __type_in_mediums} from './type-partials';
 
-export class RecursiveType<TRecursive> extends Type<
-  RecursiveInMediums<TRecursive>
-> {
+export class RecursiveType<T> extends Type<RecursiveInMediums<T>> {
   readonly [__type_kind] = 'recursive';
 
   private Type: Type;
 
-  constructor(
-    recursion: (Type: RecursiveType<TRecursive>) => TypeInMediumsPartial,
-  );
-  constructor(recursion: (Type: RecursiveType<TRecursive>) => Type) {
+  constructor(recursion: (Type: RecursiveType<T>) => TypeInMediumsPartial);
+  constructor(recursion: (Type: RecursiveType<T>) => Type) {
     super();
 
     this.Type = recursion(this);
@@ -79,10 +75,6 @@ export class RecursiveType<TRecursive> extends Type<
       };
     }
   }
-
-  private static jsonSchemaContext:
-    | Map<RecursiveType<unknown>, string>
-    | undefined;
 }
 
 export function recursive<T>(
@@ -91,15 +83,48 @@ export function recursive<T>(
   return new RecursiveType(recursion);
 }
 
-type RecursiveInMediums<TRecursive> = {
-  [TMediumName in XValue.UsingName]: RecursiveInMedium<TRecursive, TMediumName>;
+export type Recursive<
+  TRecursivePartial,
+  TNonRecursivePartial extends TypeInMediumsPartial = TypeInMediumsPartial,
+> = TypeInMediumsPartial<RecursivePartialInMediums<TRecursivePartial>> &
+  TNonRecursivePartial;
+
+type RecursivePartialInMediums<TRecursivePartial> = {
+  [TMediumName in XValue.UsingName]: RecursivePartialInMedium<
+    TRecursivePartial,
+    TMediumName
+  >;
 };
+
+type RecursivePartialInMedium<
+  TRecursivePartial,
+  TMediumName extends XValue.UsingName,
+> = TRecursivePartial extends TypeInMediumsPartial<infer TInMediums> | undefined
+  ? TRecursivePartial extends undefined
+    ? undefined
+    : RecursivePartialInMedium<TInMediums[TMediumName], TMediumName>
+  : TRecursivePartial extends Function
+  ? TRecursivePartial
+  : {
+      [TKey in keyof TRecursivePartial]: RecursivePartialInMedium<
+        TRecursivePartial[TKey],
+        TMediumName
+      >;
+    };
+
+type RecursiveInMediums<T> = T extends TypeInMediumsPartial
+  ? T[__type_in_mediums]
+  : {
+      [TMediumName in XValue.UsingName]: RecursiveInMedium<T, TMediumName>;
+    };
 
 type RecursiveInMedium<
   TRecursive,
   TMediumName extends XValue.UsingName,
 > = TRecursive extends TypeInMediumsPartial<infer TInMediums>
   ? TInMediums[TMediumName]
+  : TRecursive extends Function
+  ? TRecursive
   : {
       [TKey in keyof TRecursive]: RecursiveInMedium<
         TRecursive[TKey],
