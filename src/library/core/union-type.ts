@@ -229,13 +229,15 @@ export class UnionType<
   }
 
   /** @internal */
-  _toJSONSchema(context: JSONSchemaContext): JSONSchemaData {
+  _toJSONSchema(context: JSONSchemaContext, exact: boolean): JSONSchemaData {
+    exact = this._exact ?? exact;
+
     const schemas = this.TypeTuple.map(
-      Type => Type._toJSONSchema(context).schema,
+      Type => Type._toJSONSchema(context, exact).schema,
     );
 
     return {
-      schema: context.define(this, {
+      schema: context.define(this, exact, {
         anyOf: schemas,
       }),
     };

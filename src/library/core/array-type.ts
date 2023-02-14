@@ -187,11 +187,13 @@ export class ArrayType<TElementType extends TypeInMediumsPartial> extends Type<
   }
 
   /** @internal */
-  _toJSONSchema(context: JSONSchemaContext): JSONSchemaData {
+  _toJSONSchema(context: JSONSchemaContext, exact: boolean): JSONSchemaData {
+    exact = this._exact ?? exact;
+
     return {
-      schema: context.define(this, {
+      schema: context.define(this, exact, {
         type: 'array',
-        items: this.ElementType._toJSONSchema(context).schema,
+        items: this.ElementType._toJSONSchema(context, exact).schema,
       }),
     };
   }

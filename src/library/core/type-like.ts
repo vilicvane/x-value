@@ -42,7 +42,10 @@ export abstract class TypeLike<
   abstract _diagnose(value: unknown, path: TypePath, exact: Exact): TypeIssue[];
 
   /** @internal */
-  abstract _toJSONSchema(context: JSONSchemaContext): JSONSchemaData;
+  abstract _toJSONSchema(
+    context: JSONSchemaContext,
+    exact: boolean,
+  ): JSONSchemaData;
 }
 
 function JSON_SCHEMA_TYPE_KEY(id: number): string {
@@ -54,22 +57,29 @@ function JSON_SCHEMA_TYPE_REF(id: number): string {
 }
 
 export class JSONSchemaContext {
-  private typeMap = new Map<TypeLike, number>();
+  private lastId = 0;
+
+  private typeIdMap = new Map<TypeLike, number>();
+  private exactTypeIdMap = new Map<TypeLike, number>();
 
   private refToDefinitionMap = new Map<string, JSONSchema>();
 
   readonly definitions: Record<string, JSONSchema> = {};
 
-  define(Type: TypeLike): void;
-  define(Type: TypeLike, definition: JSONSchema): JSONSchema;
-  define(Type: TypeLike, definition?: JSONSchema): JSONSchema | void {
-    const typeMap = this.typeMap;
+  define(Type: TypeLike, exact: boolean): void;
+  define(Type: TypeLike, exact: boolean, definition: JSONSchema): JSONSchema;
+  define(
+    Type: TypeLike,
+    exact: boolean,
+    definition?: JSONSchema,
+  ): JSONSchema | void {
+    const typeIdMap = exact ? this.exactTypeIdMap : this.typeIdMap;
 
-    let id = typeMap.get(Type);
+    let id = typeIdMap.get(Type);
 
     if (id === undefined) {
-      id = typeMap.size + 1;
-      typeMap.set(Type, id);
+      id = ++this.lastId;
+      typeIdMap.set(Type, id);
     }
 
     if (definition) {
@@ -83,8 +93,10 @@ export class JSONSchemaContext {
     }
   }
 
-  getDefinition(Type: TypeLike): JSONSchema | undefined {
-    const id = this.typeMap.get(Type);
+  getDefinition(Type: TypeLike, exact: boolean): JSONSchema | undefined {
+    const typeIdMap = exact ? this.exactTypeIdMap : this.typeIdMap;
+
+    const id = typeIdMap.get(Type);
 
     return typeof id === 'number'
       ? {$ref: JSON_SCHEMA_TYPE_REF(id)}

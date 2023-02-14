@@ -294,13 +294,15 @@ export class ObjectType<
   }
 
   /** @internal */
-  _toJSONSchema(context: JSONSchemaContext): JSONSchemaData {
+  _toJSONSchema(context: JSONSchemaContext, exact: boolean): JSONSchemaData {
+    exact = this._exact ?? exact;
+
     const required: string[] = [];
 
     const properties: Record<string, JSONSchema> = {};
 
     for (const [key, Type] of Object.entries(this.definition)) {
-      const {schema, optional = false} = Type._toJSONSchema(context);
+      const {schema, optional = false} = Type._toJSONSchema(context, exact);
 
       if (!optional) {
         required.push(key);
@@ -310,10 +312,11 @@ export class ObjectType<
     }
 
     return {
-      schema: context.define(this, {
+      schema: context.define(this, exact, {
         type: 'object',
         required,
         properties,
+        ...(exact ? {additionalProperties: false} : undefined),
       }),
     };
   }

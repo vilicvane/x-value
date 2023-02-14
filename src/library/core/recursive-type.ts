@@ -60,20 +60,22 @@ export class RecursiveType<TRecursive> extends Type<
   }
 
   /** @internal */
-  _toJSONSchema(context: JSONSchemaContext): JSONSchemaData {
-    const schema = context.getDefinition(this);
+  _toJSONSchema(context: JSONSchemaContext, exact: boolean): JSONSchemaData {
+    exact = this._exact ?? exact;
+
+    const schema = context.getDefinition(this, exact);
 
     if (schema) {
       return {
         schema,
       };
     } else {
-      context.define(this);
+      context.define(this, exact);
 
-      const {schema} = this.Type._toJSONSchema(context);
+      const {schema} = this.Type._toJSONSchema(context, exact);
 
       return {
-        schema: context.define(this, schema),
+        schema: context.define(this, exact, schema),
       };
     }
   }

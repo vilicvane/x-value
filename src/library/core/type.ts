@@ -121,7 +121,7 @@ export abstract class Type<
     const context = new JSONSchemaContext();
 
     return {
-      ...this._toJSONSchema(context).schema,
+      ...this._toJSONSchema(context, this._exact ?? false).schema,
       $defs: context.definitions,
     };
   }

@@ -126,8 +126,8 @@ export class RefinedType<
   }
 
   /** @internal */
-  _toJSONSchema(context: JSONSchemaContext): JSONSchemaData {
-    return this.Type._toJSONSchema(context);
+  _toJSONSchema(context: JSONSchemaContext, exact: boolean): JSONSchemaData {
+    return this.Type._toJSONSchema(context, this._exact ?? exact);
   }
 
   private processRefinements(

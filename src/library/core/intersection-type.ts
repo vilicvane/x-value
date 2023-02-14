@@ -168,16 +168,24 @@ export class IntersectionType<
   }
 
   /** @internal */
-  _toJSONSchema(context: JSONSchemaContext): JSONSchemaData {
+  _toJSONSchema(context: JSONSchemaContext, exact: boolean): JSONSchemaData {
+    exact = this._exact ?? exact;
+
     const schemas = this.TypeTuple.map(
-      Type => Type._toJSONSchema(context).schema,
+      Type => Type._toJSONSchema(context, exact).schema,
     );
 
+    let mergedSchema = mergeIntersectionJSONSchemas(context, schemas);
+
+    if (exact && mergedSchema.additionalProperties === undefined) {
+      mergedSchema = {
+        ...mergedSchema,
+        additionalProperties: false,
+      };
+    }
+
     return {
-      schema: context.define(
-        this,
-        mergeIntersectionJSONSchemas(context, schemas),
-      ),
+      schema: context.define(this, exact, mergedSchema),
     };
   }
 }
@@ -263,6 +271,8 @@ function mergeIntersectionJSONSchemas(
 
   const properties: Record<string, JSONSchema> = {};
 
+  let additionalProperties: JSONSchema | boolean | undefined;
+
   for (let schema of schemas) {
     if (schema.$ref) {
       schema = context.requireDefinitionByRef(schema.$ref);
@@ -290,11 +300,18 @@ function mergeIntersectionJSONSchemas(
         }
       }
     }
+
+    if (schema.additionalProperties !== undefined) {
+      additionalProperties = schema.additionalProperties;
+    }
   }
 
   return {
     type: 'object',
     required: Array.from(requiredSet),
     properties,
+    ...(additionalProperties !== undefined
+      ? {additionalProperties}
+      : undefined),
   };
 }

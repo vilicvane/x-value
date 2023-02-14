@@ -241,12 +241,14 @@ export class TupleType<
   }
 
   /** @internal */
-  _toJSONSchema(context: JSONSchemaContext): JSONSchemaData {
+  _toJSONSchema(context: JSONSchemaContext, exact: boolean): JSONSchemaData {
+    exact = this._exact ?? exact;
+
     return {
-      schema: context.define(this, {
+      schema: context.define(this, exact, {
         type: 'array',
         prefixItems: this.ElementTypeTuple.map(
-          Element => Element._toJSONSchema(context).schema,
+          Element => Element._toJSONSchema(context, exact).schema,
         ),
       }),
     };

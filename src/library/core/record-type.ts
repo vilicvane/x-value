@@ -215,12 +215,14 @@ export class RecordType<
   }
 
   /** @internal */
-  _toJSONSchema(context: JSONSchemaContext): JSONSchemaData {
+  _toJSONSchema(context: JSONSchemaContext, exact: boolean): JSONSchemaData {
+    exact = this._exact ?? exact;
+
     return {
-      schema: context.define(this, {
+      schema: context.define(this, exact, {
         type: 'object',
-        propertyNames: this.Key._toJSONSchema(context).schema,
-        additionalProperties: this.Value._toJSONSchema(context).schema,
+        propertyNames: this.Key._toJSONSchema(context, exact).schema,
+        additionalProperties: this.Value._toJSONSchema(context, exact).schema,
       }),
     };
   }

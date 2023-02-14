@@ -61,8 +61,8 @@ export class OptionalType<TType extends TypeInMediumsPartial> extends TypeLike<
   }
 
   /** @internal */
-  _toJSONSchema(context: JSONSchemaContext): JSONSchemaData {
-    const {schema} = this.Type._toJSONSchema(context);
+  _toJSONSchema(context: JSONSchemaContext, exact: boolean): JSONSchemaData {
+    const {schema} = this.Type._toJSONSchema(context, exact);
 
     return {
       schema,
