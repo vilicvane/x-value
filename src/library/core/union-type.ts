@@ -5,6 +5,7 @@ import {hasNonDeferrableTypeIssue} from './@type-issue';
 import type {TupleInMedium} from './@utils';
 import type {Medium} from './medium';
 import {DISABLED_EXACT_CONTEXT_RESULT, Type} from './type';
+import type {JSONSchemaContext, JSONSchemaData} from './type-like';
 import {__type_kind} from './type-partials';
 import type {TypeInMediumsPartial} from './type-partials';
 
@@ -15,7 +16,7 @@ export class UnionType<
     ...TypeInMediumsPartial[],
   ],
 > extends Type<UnionInMediums<TTypeTuple>> {
-  [__type_kind]!: 'union';
+  readonly [__type_kind] = 'union';
 
   constructor(TypeTuple: TTypeTuple);
   constructor(private TypeTuple: Type[]) {
@@ -225,6 +226,19 @@ export class UnionType<
       },
       ...outputIssues,
     ];
+  }
+
+  /** @internal */
+  _toJSONSchema(context: JSONSchemaContext): JSONSchemaData {
+    const schemas = this.TypeTuple.map(
+      Type => Type._toJSONSchema(context).schema,
+    );
+
+    return {
+      schema: context.define(this, {
+        anyOf: schemas,
+      }),
+    };
   }
 }
 

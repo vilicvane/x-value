@@ -1,8 +1,9 @@
 import type {Exact} from './@exact-context';
 import {ExactContext} from './@exact-context';
 import type {TypeIssue} from './@type-issue';
+import type {JSONSchema} from './json-schema';
 import type {Medium, MediumTypesPackedType} from './medium';
-import {TypeLike} from './type-like';
+import {JSONSchemaContext, TypeLike} from './type-like';
 import type {
   TypeInMediumsPartial,
   TypesInMediums,
@@ -114,6 +115,15 @@ export abstract class Type<
 
   diagnose(value: unknown): TypeIssue[] {
     return this._diagnose(value, [], this._exact ?? false);
+  }
+
+  toJSONSchema(): JSONSchema {
+    const context = new JSONSchemaContext();
+
+    return {
+      ...this._toJSONSchema(context).schema,
+      $defs: context.definitions,
+    };
   }
 
   protected getExactContext(

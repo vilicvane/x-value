@@ -1,4 +1,4 @@
-import {_mergeIntersectionPartials as merge} from '../library';
+import {internal_mergeIntersectionPartials as merge} from '../library';
 
 test('merge for object-type should work', () => {
   expect(

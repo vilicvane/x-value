@@ -2,6 +2,7 @@ import type {Exact} from './@exact-context';
 import type {TypeIssue, TypePath} from './@type-issue';
 import type {Medium} from './medium';
 import {Type} from './type';
+import type {JSONSchemaContext, JSONSchemaData} from './type-like';
 import {TypeLike} from './type-like';
 import type {TypeInMediumsPartial, __type_in_mediums} from './type-partials';
 import {__type_kind} from './type-partials';
@@ -9,7 +10,7 @@ import {__type_kind} from './type-partials';
 export class OptionalType<TType extends TypeInMediumsPartial> extends TypeLike<
   OptionalInMediums<TType>
 > {
-  [__type_kind]!: 'optional';
+  readonly [__type_kind] = 'optional';
 
   constructor(Type: TType);
   constructor(private Type: Type) {
@@ -57,6 +58,16 @@ export class OptionalType<TType extends TypeInMediumsPartial> extends TypeLike<
   /** @internal */
   _diagnose(value: unknown, path: TypePath, exact: Exact): TypeIssue[] {
     return value === undefined ? [] : this.Type._diagnose(value, path, exact);
+  }
+
+  /** @internal */
+  _toJSONSchema(context: JSONSchemaContext): JSONSchemaData {
+    const {schema} = this.Type._toJSONSchema(context);
+
+    return {
+      schema,
+      optional: true,
+    };
   }
 }
 

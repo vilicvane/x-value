@@ -2,8 +2,10 @@ import type {Exact} from './@exact-context';
 import type {TypeIssue, TypePath} from './@type-issue';
 import {hasNonDeferrableTypeIssue} from './@type-issue';
 import type {TupleInMedium} from './@utils';
+import type {JSONSchema} from './json-schema';
 import type {Medium} from './medium';
 import {DISABLED_EXACT_CONTEXT_RESULT, Type} from './type';
+import type {JSONSchemaContext, JSONSchemaData} from './type-like';
 import {__type_kind} from './type-partials';
 import type {TypeInMediumsPartial} from './type-partials';
 
@@ -16,7 +18,7 @@ export class IntersectionType<
     ...TypeInMediumsPartial[],
   ],
 > extends Type<IntersectionInMediums<TTypeTuple>> {
-  [__type_kind]!: 'intersection';
+  readonly [__type_kind] = 'intersection';
 
   constructor(TypeTuple: TTypeTuple);
   constructor(private TypeTuple: Type[]) {
@@ -61,7 +63,7 @@ export class IntersectionType<
     return [
       hasNonDeferrableTypeIssue(issues)
         ? undefined
-        : _mergeIntersectionPartials(partials),
+        : internal_mergeIntersectionPartials(partials),
       issues,
     ];
   }
@@ -101,7 +103,7 @@ export class IntersectionType<
     return [
       hasNonDeferrableTypeIssue(issues)
         ? undefined
-        : _mergeIntersectionPartials(partials),
+        : internal_mergeIntersectionPartials(partials),
       issues,
     ];
   }
@@ -142,7 +144,7 @@ export class IntersectionType<
     return [
       hasNonDeferrableTypeIssue(issues)
         ? undefined
-        : _mergeIntersectionPartials(partials),
+        : internal_mergeIntersectionPartials(partials),
       issues,
     ];
   }
@@ -163,6 +165,17 @@ export class IntersectionType<
     }
 
     return issues;
+  }
+
+  /** @internal */
+  _toJSONSchema(context: JSONSchemaContext): JSONSchemaData {
+    const schemas = this.TypeTuple.map(
+      Type => Type._toJSONSchema(context).schema,
+    );
+
+    return {
+      schema: context.define(this, mergeIntersectionJSONSchemas(schemas)),
+    };
   }
 }
 
@@ -189,7 +202,9 @@ type __Intersection<TTuple extends unknown[]> = TTuple extends [
   ? T & __Intersection<TRestTuple>
   : unknown;
 
-export function _mergeIntersectionPartials(partials: unknown[]): unknown {
+export function internal_mergeIntersectionPartials(
+  partials: unknown[],
+): unknown {
   let pendingMergeKeyToValues: Map<string | number, unknown[]> | undefined;
 
   const merged = partials.reduce((merged, partial) => {
@@ -230,9 +245,46 @@ export function _mergeIntersectionPartials(partials: unknown[]): unknown {
 
   if (pendingMergeKeyToValues) {
     for (const [key, values] of pendingMergeKeyToValues) {
-      (merged as any)[key] = _mergeIntersectionPartials(values);
+      (merged as any)[key] = internal_mergeIntersectionPartials(values);
     }
   }
 
   return merged;
+}
+
+function mergeIntersectionJSONSchemas(schemas: JSONSchema[]): JSONSchema {
+  const requiredSet = new Set<string>();
+
+  const properties: Record<string, JSONSchema> = {};
+
+  for (const schema of schemas) {
+    if (schema.type !== 'object') {
+      throw new TypeError('Cannot merge non-object JSON schemas');
+    }
+
+    if (schema.required) {
+      for (const key of schema.required) {
+        requiredSet.add(key);
+      }
+    }
+
+    if (schema.properties) {
+      for (const [key, propertySchema] of Object.entries(schema.properties)) {
+        if (hasOwnProperty.call(properties, key)) {
+          properties[key] = mergeIntersectionJSONSchemas([
+            properties[key],
+            propertySchema,
+          ]);
+        } else {
+          properties[key] = propertySchema;
+        }
+      }
+    }
+  }
+
+  return {
+    type: 'object',
+    required: Array.from(requiredSet),
+    properties,
+  };
 }

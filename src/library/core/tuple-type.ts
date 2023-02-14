@@ -4,6 +4,7 @@ import {hasNonDeferrableTypeIssue} from './@type-issue';
 import type {TupleInMedium} from './@utils';
 import type {Medium} from './medium';
 import {DISABLED_EXACT_CONTEXT_RESULT, Type} from './type';
+import type {JSONSchemaContext, JSONSchemaData} from './type-like';
 import {__type_kind} from './type-partials';
 import type {TypeInMediumsPartial} from './type-partials';
 
@@ -12,7 +13,7 @@ const toString = Object.prototype.toString;
 export class TupleType<
   TElementTypeTuple extends TypeInMediumsPartial[],
 > extends Type<TupleInMediums<TElementTypeTuple>> {
-  [__type_kind]!: 'tuple';
+  readonly [__type_kind] = 'tuple';
 
   constructor(ElementTypeTuple: TElementTypeTuple);
   constructor(private ElementTypeTuple: Type[]) {
@@ -237,6 +238,18 @@ export class TupleType<
     );
 
     return issues;
+  }
+
+  /** @internal */
+  _toJSONSchema(context: JSONSchemaContext): JSONSchemaData {
+    return {
+      schema: context.define(this, {
+        type: 'array',
+        prefixItems: this.ElementTypeTuple.map(
+          Element => Element._toJSONSchema(context).schema,
+        ),
+      }),
+    };
   }
 }
 

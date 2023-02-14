@@ -13,3 +13,4 @@ export * from './tuple-type';
 export * from './refined-type';
 export * from './recursive-type';
 export * from './function-type';
+export * from './json-schema';

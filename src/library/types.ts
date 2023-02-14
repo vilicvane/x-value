@@ -34,7 +34,7 @@ export const never = atomic(neverTypeSymbol, value => {
 });
 
 export const unknownTypeSymbol = Symbol();
-export const unknown = atomic(unknownTypeSymbol, []);
+export const unknown = atomic(unknownTypeSymbol, [], {});
 
 export const undefinedTypeSymbol = Symbol();
 export const undefined = atomic(undefinedTypeSymbol, value =>
@@ -55,43 +55,58 @@ export const voidType = atomic(voidTypeSymbol, value =>
 export {voidType as void};
 
 export const nullTypeSymbol = Symbol();
-export const nullType = atomic(nullTypeSymbol, value =>
-  constraint(
-    value === null,
-    () => `Expected null, getting ${toString.call(value)}.`,
-  ),
+export const nullType = atomic(
+  nullTypeSymbol,
+  value =>
+    constraint(
+      value === null,
+      () => `Expected null, getting ${toString.call(value)}.`,
+    ),
+  {type: 'null'},
 );
 
 export const stringTypeSymbol = Symbol();
-export const string = atomic(stringTypeSymbol, value =>
-  constraint(
-    typeof value === 'string',
-    () => `Expected string, getting ${toString.call(value)}.`,
-  ),
+export const string = atomic(
+  stringTypeSymbol,
+  value =>
+    constraint(
+      typeof value === 'string',
+      () => `Expected string, getting ${toString.call(value)}.`,
+    ),
+  {type: 'string'},
 );
 
 export const numberTypeSymbol = Symbol();
-export const number = atomic(numberTypeSymbol, value =>
-  constraint(
-    typeof value === 'number',
-    () => `Expected number, getting ${toString.call(value)}.`,
-  ),
+export const number = atomic(
+  numberTypeSymbol,
+  value =>
+    constraint(
+      typeof value === 'number',
+      () => `Expected number, getting ${toString.call(value)}.`,
+    ),
+  {type: 'number'},
 );
 
 export const bigintTypeSymbol = Symbol();
-export const bigint = atomic(bigintTypeSymbol, value =>
-  constraint(
-    typeof value === 'bigint',
-    () => `Expected bigint, getting ${toString.call(value)}.`,
-  ),
+export const bigint = atomic(
+  bigintTypeSymbol,
+  value =>
+    constraint(
+      typeof value === 'bigint',
+      () => `Expected bigint, getting ${toString.call(value)}.`,
+    ),
+  {type: 'integer'},
 );
 
 export const booleanTypeSymbol = Symbol();
-export const boolean = atomic(booleanTypeSymbol, value =>
-  constraint(
-    typeof value === 'boolean',
-    () => `Expected boolean, getting ${toString.call(value)}.`,
-  ),
+export const boolean = atomic(
+  booleanTypeSymbol,
+  value =>
+    constraint(
+      typeof value === 'boolean',
+      () => `Expected boolean, getting ${toString.call(value)}.`,
+    ),
+  {type: 'boolean'},
 );
 
 export const functionTypeSymbol = Symbol();

@@ -2,13 +2,14 @@ import type {Exact} from './@exact-context';
 import type {TypeIssue, TypePath} from './@type-issue';
 import type {Medium} from './medium';
 import {Type} from './type';
+import type {JSONSchemaContext, JSONSchemaData} from './type-like';
 import {__type_kind} from './type-partials';
 import type {TypeInMediumsPartial} from './type-partials';
 
 export class RecursiveType<TRecursive> extends Type<
   RecursiveInMediums<TRecursive>
 > {
-  [__type_kind]!: 'recursive';
+  readonly [__type_kind] = 'recursive';
 
   private Type: Type;
 
@@ -57,6 +58,29 @@ export class RecursiveType<TRecursive> extends Type<
   _diagnose(value: unknown, path: TypePath, exact: Exact): TypeIssue[] {
     return this.Type._diagnose(value, path, exact);
   }
+
+  /** @internal */
+  _toJSONSchema(context: JSONSchemaContext): JSONSchemaData {
+    const schema = context.getDefinition(this);
+
+    if (schema) {
+      return {
+        schema,
+      };
+    } else {
+      context.define(this);
+
+      const {schema} = this.Type._toJSONSchema(context);
+
+      return {
+        schema: context.define(this, schema),
+      };
+    }
+  }
+
+  private static jsonSchemaContext:
+    | Map<RecursiveType<unknown>, string>
+    | undefined;
 }
 
 export function recursive<T>(

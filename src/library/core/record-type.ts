@@ -3,6 +3,7 @@ import type {TypeIssue, TypePath} from './@type-issue';
 import {hasNonDeferrableTypeIssue} from './@type-issue';
 import type {Medium} from './medium';
 import {DISABLED_EXACT_CONTEXT_RESULT, Type} from './type';
+import type {JSONSchemaContext, JSONSchemaData} from './type-like';
 import type {TypeInMediumsPartial, __type_in_mediums} from './type-partials';
 import {__type_kind} from './type-partials';
 
@@ -12,7 +13,7 @@ export class RecordType<
   TKeyType extends TypeInMediumsPartial,
   TValueType extends TypeInMediumsPartial,
 > extends Type<RecordInMediums<TKeyType, TValueType>> {
-  [__type_kind]!: 'record';
+  readonly [__type_kind] = 'record';
 
   constructor(Key: TKeyType, Value: TValueType);
   constructor(private Key: Type, private Value: Type) {
@@ -211,6 +212,17 @@ export class RecordType<
       ...Key._diagnose(key, [...path, {key}], nestedExact),
       ...Value._diagnose(nestedValue, [...path, key], nestedExact),
     ]);
+  }
+
+  /** @internal */
+  _toJSONSchema(context: JSONSchemaContext): JSONSchemaData {
+    return {
+      schema: context.define(this, {
+        type: 'object',
+        propertyNames: this.Key._toJSONSchema(context).schema,
+        additionalProperties: this.Value._toJSONSchema(context).schema,
+      }),
+    };
   }
 }
 

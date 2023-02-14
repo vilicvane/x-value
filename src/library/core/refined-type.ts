@@ -3,6 +3,7 @@ import type {TypeIssue, TypePath} from './@type-issue';
 import {buildIssueByError, hasNonDeferrableTypeIssue} from './@type-issue';
 import type {Medium} from './medium';
 import {Type} from './type';
+import type {JSONSchemaContext, JSONSchemaData} from './type-like';
 import type {
   TypeInMediumsPartial,
   TypesInMediums,
@@ -15,7 +16,7 @@ export class RefinedType<
   TNominalKey extends string | symbol,
   TRefinement,
 > extends Type<RefinedInMediums<TType, TNominalKey, TRefinement>> {
-  [__type_kind]!: 'refined';
+  readonly [__type_kind] = 'refined';
 
   constructor(Type: TType, refinements: Refinement[]);
   constructor(private Type: Type, private refinements: Refinement[]) {
@@ -122,6 +123,11 @@ export class RefinedType<
     issues.push(...refinementIssues);
 
     return issues;
+  }
+
+  /** @internal */
+  _toJSONSchema(context: JSONSchemaContext): JSONSchemaData {
+    return this.Type._toJSONSchema(context);
   }
 
   private processRefinements(

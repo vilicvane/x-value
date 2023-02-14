@@ -1,10 +1,11 @@
 import type {Exact} from './@exact-context';
 import type {TypeIssue, TypePath} from './@type-issue';
 import {hasNonDeferrableTypeIssue} from './@type-issue';
+import type {JSONSchema} from './json-schema';
 import type {Medium} from './medium';
 import {OptionalType} from './optional-type';
 import {Type} from './type';
-import type {TypeLike} from './type-like';
+import type {JSONSchemaContext, JSONSchemaData, TypeLike} from './type-like';
 import type {
   TypeInMediumsPartial,
   TypeKindPartial,
@@ -17,7 +18,7 @@ const toString = Object.prototype.toString;
 export class ObjectType<
   TDefinition extends Record<string, TypeInMediumsPartial>,
 > extends Type<ObjectInMediums<TDefinition>> {
-  [__type_kind]!: 'object';
+  readonly [__type_kind] = 'object';
 
   constructor(definition: TDefinition);
   constructor(private definition: Record<string, TypeLike>) {
@@ -290,6 +291,31 @@ export class ObjectType<
     }
 
     return issues;
+  }
+
+  /** @internal */
+  _toJSONSchema(context: JSONSchemaContext): JSONSchemaData {
+    const required: string[] = [];
+
+    const properties: Record<string, JSONSchema> = {};
+
+    for (const [key, Type] of Object.entries(this.definition)) {
+      const {schema, optional = false} = Type._toJSONSchema(context);
+
+      if (!optional) {
+        required.push(key);
+      }
+
+      properties[key] = schema;
+    }
+
+    return {
+      schema: context.define(this, {
+        type: 'object',
+        required,
+        properties,
+      }),
+    };
   }
 }
 

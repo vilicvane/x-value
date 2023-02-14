@@ -11,7 +11,7 @@ export class FunctionType<
   TArgumentTypeTuple extends TypeInMediumsPartial[],
   TReturnType extends TypeInMediumsPartial,
 > extends Type<FunctionInMediums<TArgumentTypeTuple, TReturnType>> {
-  [__type_kind]!: 'function';
+  readonly [__type_kind] = 'function';
 
   constructor(ArgumentTypeTuple: TArgumentTypeTuple, ReturnType: TReturnType);
   constructor(private ArgumentTypeTuple: Type[], private ReturnType: Type) {
@@ -218,6 +218,11 @@ export class FunctionType<
     }
 
     return [];
+  }
+
+  /** @internal */
+  _toJSONSchema(): never {
+    throw new TypeError('Cannot convert Function type to JSON Schema');
   }
 }
 

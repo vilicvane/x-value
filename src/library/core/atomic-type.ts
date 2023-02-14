@@ -1,19 +1,26 @@
 import type {Exact} from './@exact-context';
 import type {TypeIssue, TypePath} from './@type-issue';
 import {buildIssueByError, hasNonDeferrableTypeIssue} from './@type-issue';
+import type {JSONSchema} from './json-schema';
 import type {Medium} from './medium';
 import {Type} from './type';
+import type {JSONSchemaData} from './type-like';
 import {__type_kind} from './type-partials';
 
 export class AtomicType<TSymbol extends symbol> extends Type<
   AtomicInMediums<TSymbol>
 > {
-  [__type_kind]!: 'atomic';
+  readonly [__type_kind] = 'atomic';
 
-  constructor(symbol: TSymbol, constraints: AtomicTypeConstraint[]);
+  constructor(
+    symbol: TSymbol,
+    constraints: AtomicTypeConstraint[],
+    jsonSchema?: JSONSchema,
+  );
   constructor(
     private symbol: symbol,
     private constraints: AtomicTypeConstraint[],
+    private jsonSchema: JSONSchema | undefined,
   ) {
     super();
   }
@@ -114,15 +121,30 @@ export class AtomicType<TSymbol extends symbol> extends Type<
 
     return issues;
   }
+
+  /** @internal */
+  _toJSONSchema(): JSONSchemaData {
+    const schema = this.jsonSchema;
+
+    if (!schema) {
+      throw new TypeError('JSON schema is not defined for this atomic type');
+    }
+
+    return {
+      schema,
+    };
+  }
 }
 
 export function atomic<TSymbol extends symbol>(
   symbol: TSymbol,
   constraints: AtomicTypeConstraint | AtomicTypeConstraint[],
+  jsonSchema?: JSONSchema,
 ): AtomicType<TSymbol> {
   return new AtomicType(
     symbol,
     Array.isArray(constraints) ? constraints : [constraints],
+    jsonSchema,
   );
 }
 

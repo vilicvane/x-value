@@ -3,6 +3,7 @@ import type {TypeIssue, TypePath} from './@type-issue';
 import {hasNonDeferrableTypeIssue} from './@type-issue';
 import type {Medium} from './medium';
 import {DISABLED_EXACT_CONTEXT_RESULT, Type} from './type';
+import type {JSONSchemaContext, JSONSchemaData} from './type-like';
 import type {TypeInMediumsPartial, __type_in_mediums} from './type-partials';
 import {__type_kind} from './type-partials';
 
@@ -11,7 +12,7 @@ const toString = Object.prototype.toString;
 export class ArrayType<TElementType extends TypeInMediumsPartial> extends Type<
   ArrayInMediums<TElementType>
 > {
-  [__type_kind]!: 'array';
+  readonly [__type_kind] = 'array';
 
   constructor(ElementType: TElementType);
   constructor(private ElementType: Type) {
@@ -183,6 +184,16 @@ export class ArrayType<TElementType extends TypeInMediumsPartial> extends Type<
     context?.addKeys(Array.from(value.keys(), key => key.toString()));
 
     return issues;
+  }
+
+  /** @internal */
+  _toJSONSchema(context: JSONSchemaContext): JSONSchemaData {
+    return {
+      schema: context.define(this, {
+        type: 'array',
+        items: this.ElementType._toJSONSchema(context).schema,
+      }),
+    };
   }
 }
 
