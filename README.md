@@ -505,16 +505,16 @@ X-Value can optionally unpacks data for a structured input (e.g., `JSON.parse()`
 For medium that requires packing (e.g., `x.json` and `x.queryString`), different configuration is required.
 
 ```ts
-export interface UsingPacked {
-  packed: PackedTypes;
+export interface UsingMyPacked {
+  'my-packed': MyPackedTypes;
 }
 
-interface PackedTypes {
+interface MyPackedTypes {
   // Define the packed type instead of atomic type symbol mapping.
   packed: string;
 }
 
-const packed = x.medium<UsingPacked>({
+const packed = x.medium<UsingMyPacked>({
   // Define packing methods.
   packing: {
     pack(data) {
@@ -524,9 +524,9 @@ const packed = x.medium<UsingPacked>({
       return JSON.parse(json);
     },
   },
+  // Optionally define the codec for packed medium. Use `atomicTypeSymbol` to
+  // catch all atomic types without explicit codec.
   codecs: {
-    // Optionally define the codec for packed medium. Use `atomicTypeSymbol` to
-    // catch all atomic types without explicit codec.
     [atomicTypeSymbol]: {
       encode(value) {
         return value;
@@ -556,13 +556,13 @@ We can encode values to mediums:
 
 <!-- prettier-ignore -->
 ```ts
-let id = '6246056b1be8cbf6ca18401f';
+const id = '6246056b1be8cbf6ca18401f';
 
 ObjectId.encode(browser, id); // string '6246056b1be8cbf6ca18401f'
 ObjectId.encode(rpc, id);     // packed string '"6246056b1be8cbf6ca18401f"'
 ObjectId.encode(server, id);  // new ObjectId('6246056b1be8cbf6ca18401f')
 
-let date = new Date('2022-03-31T16:00:00.000Z');
+const date = new Date('2022-03-31T16:00:00.000Z');
 
 Date.encode(browser, date); // new Date('2022-03-31T16:00:00.000Z')
 Date.encode(rpc, date);     // packed string '"2022-03-31T16:00:00.000Z"'
