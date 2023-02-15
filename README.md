@@ -26,6 +26,7 @@ Comparing to alternatives like [io-ts](https://github.com/gcanti/io-ts) and [Zod
   - [Function Type](#function-type)
   - [Refined Type](#refined-type)
   - [Nominal Type](#nominal-type)
+  - [Exact Type](#exact-type)
 - [Type Usages](#type-usages)
   - [Decode from Medium](#decode-from-medium)
   - [Encode to Medium](#encode-to-medium)
@@ -313,6 +314,31 @@ Nominal type is just [refined type](#refined-type) with only nominal key and no 
 ```ts
 const RefinedType = x.string.nominal<'email'>(); // x.string.refined<'email'>([])
 ```
+
+### Exact Type
+
+X-Value by default parses only known properties. However, the extra properties are ignored without throwing errors.
+
+To make sure type guards and assertions work as expected, you may use `Type.exact()` if needed.
+
+```ts
+const ExactType = x
+  .object({
+    // exact: true
+    foo: x.object({
+      // exact: inherited true
+      bar: x
+        .object({
+          // exact: false
+          pia: x.string,
+        })
+        .exact(false),
+    }),
+  })
+  .exact();
+```
+
+> `Type.exact()` is inheritable unless you explicitly use `.exact(false)`.
 
 ## Type Usages
 
