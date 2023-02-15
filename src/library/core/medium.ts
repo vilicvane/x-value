@@ -50,10 +50,9 @@ export class Medium<TUsingMedium extends object = GeneralUsingMedium> {
     this.codecs = codecs;
   }
 
-  extend<TUsingExtendedMedium extends object>({
-    packing,
-    codecs,
-  }: MediumOptions<TUsingExtendedMedium>): Medium<TUsingExtendedMedium>;
+  extend<TUsingExtendedMedium extends object>(
+    options?: MediumOptions<TUsingExtendedMedium>,
+  ): Medium<TUsingExtendedMedium>;
   extend({
     packing = this.packing,
     codecs,

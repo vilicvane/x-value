@@ -39,14 +39,6 @@ export interface UsingMediumA {
   'medium-a': MediumATypes;
 }
 
-export interface MediumBTypes extends x.JSONValueTypes {
-  [identifierTypeSymbol]: number;
-}
-
-export interface UsingMediumB {
-  'medium-b': MediumBTypes;
-}
-
 export const mediumA = x.ecmascript.extend<UsingMediumA>({
   codecs: {
     [identifierTypeSymbol]: {
@@ -67,6 +59,14 @@ export const mediumA = x.ecmascript.extend<UsingMediumA>({
     },
   },
 });
+
+export interface MediumBTypes extends x.JSONValueTypes {
+  [identifierTypeSymbol]: number;
+}
+
+export interface UsingMediumB {
+  'medium-b': MediumBTypes;
+}
 
 export const mediumB = x.jsonValue.extend<UsingMediumB>({
   codecs: {
@@ -92,3 +92,13 @@ export const mediumB = x.jsonValue.extend<UsingMediumB>({
     },
   },
 });
+
+export interface MediumCTypes extends x.JSONValueTypes {
+  [identifierTypeSymbol]: string;
+}
+
+export interface UsingMediumC {
+  'medium-b': MediumCTypes;
+}
+
+export const mediumC = x.jsonValue.extend<UsingMediumC>();

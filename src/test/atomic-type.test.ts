@@ -215,6 +215,8 @@ test('date atomic refinement sunday should work with extended json medium', () =
     ]
   `);
 
+  expect(() => Sunday.asserts(monday)).toThrow(x.TypeConstraintError);
+
   const satisfiedSunday = Sunday.satisfies(sunday);
 
   type _ = AssertTrue<IsEqual<typeof satisfiedSunday, Sunday>>;
@@ -226,6 +228,8 @@ test('date atomic refinement sunday should work with extended json medium', () =
 test('date atomic refinement sunday should work with extended json value medium', () => {
   const sunday = new Date('2022-3-27') as x.TypeOf<typeof Sunday>;
   const monday = new Date('2022-3-28');
+
+  Sunday.asserts(sunday);
 
   expect(
     Sunday.decode(
