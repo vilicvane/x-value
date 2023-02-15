@@ -98,7 +98,7 @@ export interface MediumCTypes extends x.JSONValueTypes {
 }
 
 export interface UsingMediumC {
-  'medium-b': MediumCTypes;
+  'medium-c': MediumCTypes;
 }
 
 export const mediumC = x.jsonValue.extend<UsingMediumC>();
