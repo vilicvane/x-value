@@ -43,68 +43,81 @@ test('pre-defined atomic types should decode/encode ecmascript medium', () => {
 });
 
 test('pre-defined atomic types should error decode/encode ecmascript medium with wrong packed value', () => {
-  expect(() => x.never.decode(x.ecmascript, true as never))
+  // @ts-expect-error
+  expect(() => x.never.decode(x.ecmascript, true))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to decode from medium:
       Expected never, getting [object Boolean]."
   `);
-  expect(() => x.undefined.decode(x.ecmascript, true as any))
+  // @ts-expect-error
+  expect(() => x.undefined.decode(x.ecmascript, true))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to decode from medium:
       Expected undefined, getting [object Boolean]."
   `);
-  expect(() => x.voidType.decode(x.ecmascript, true as any))
+  // @ts-expect-error
+  expect(() => x.voidType.decode(x.ecmascript, true))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to decode from medium:
       Expected undefined, getting [object Boolean]."
   `);
-  expect(() => x.nullType.decode(x.ecmascript, undefined as any))
+  // @ts-expect-error
+  expect(() => x.nullType.decode(x.ecmascript, undefined))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to decode from medium:
       Expected null, getting [object Undefined]."
   `);
-  expect(() => x.string.decode(x.ecmascript, null as any))
+  // @ts-expect-error
+  expect(() => x.string.decode(x.ecmascript, null))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to decode from medium:
       Expected string, getting [object Null]."
   `);
-  expect(() => x.number.decode(x.ecmascript, 'text' as any))
+  // @ts-expect-error
+  expect(() => x.number.decode(x.ecmascript, 'text'))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to decode from medium:
       Expected number, getting [object String]."
   `);
-  expect(() => x.boolean.decode(x.ecmascript, 123 as any))
+  // @ts-expect-error
+  expect(() => x.boolean.decode(x.ecmascript, 123))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to decode from medium:
       Expected boolean, getting [object Number]."
   `);
 
-  expect(() => x.undefined.encode(x.ecmascript, true as any))
+  // @ts-expect-error
+  expect(() => x.undefined.encode(x.ecmascript, true))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to encode to medium:
       Expected undefined, getting [object Boolean]."
   `);
-  expect(() => x.nullType.encode(x.ecmascript, undefined as any))
+  // @ts-expect-error
+  expect(() => x.nullType.encode(x.ecmascript, undefined))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to encode to medium:
       Expected null, getting [object Undefined]."
   `);
-  expect(() => x.string.encode(x.ecmascript, null as any))
+  // @ts-expect-error
+  expect(() => x.string.encode(x.ecmascript, null))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to encode to medium:
       Expected string, getting [object Null]."
   `);
-  expect(() => x.number.encode(x.ecmascript, 'text' as any))
+  // @ts-expect-error
+  expect(() => x.number.encode(x.ecmascript, 'text'))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to encode to medium:
       Expected number, getting [object String]."
   `);
-  expect(() => x.boolean.encode(x.ecmascript, 123 as any))
+  // @ts-expect-error
+  expect(() => x.boolean.encode(x.ecmascript, 123))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to encode to medium:
       Expected boolean, getting [object Number]."
   `);
-  expect(() => x.Function.encode(x.ecmascript, null as any))
+  // @ts-expect-error
+  expect(() => x.Function.encode(x.ecmascript, null))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to encode to medium:
       Expected function, getting [object Null]."
@@ -133,18 +146,16 @@ test('pre-defined atomic types should error decode/encode json medium with wrong
   expect(() => x.number.decode(x.json, 'true')).toThrow(x.TypeConstraintError);
   expect(() => x.boolean.decode(x.json, 'null')).toThrow(x.TypeConstraintError);
 
-  expect(() => x.nullType.encode(x.json, 'text' as any)).toThrow(
+  // @ts-expect-error
+  expect(() => x.nullType.encode(x.json, 'text')).toThrow(
     x.TypeConstraintError,
   );
-  expect(() => x.string.encode(x.json, 123 as any)).toThrow(
-    x.TypeConstraintError,
-  );
-  expect(() => x.number.encode(x.json, true as any)).toThrow(
-    x.TypeConstraintError,
-  );
-  expect(() => x.boolean.encode(x.json, null as any)).toThrow(
-    x.TypeConstraintError,
-  );
+  // @ts-expect-error
+  expect(() => x.string.encode(x.json, 123)).toThrow(x.TypeConstraintError);
+  // @ts-expect-error
+  expect(() => x.number.encode(x.json, true)).toThrow(x.TypeConstraintError);
+  // @ts-expect-error
+  expect(() => x.boolean.encode(x.json, null)).toThrow(x.TypeConstraintError);
 });
 
 test('date atomic type should error decoding json medium', () => {
@@ -185,11 +196,10 @@ test('date atomic refinement sunday should work with extended json medium', () =
   expect(() => Sunday.decode(x.extendedJSON, JSON.stringify(monday))).toThrow(
     x.TypeConstraintError,
   );
-
-  expect(Sunday.encode(x.extendedJSON, sunday as x.TypeOf<typeof Sunday>)).toBe(
-    JSON.stringify(sunday),
-  );
-  expect(() => Sunday.encode(x.extendedJSON, monday as any)).toThrow(
+  // @ts-expect-error
+  expect(Sunday.encode(x.extendedJSON, sunday)).toBe(JSON.stringify(sunday));
+  // @ts-expect-error
+  expect(() => Sunday.encode(x.extendedJSON, monday)).toThrow(
     x.TypeConstraintError,
   );
 
@@ -205,7 +215,7 @@ test('date atomic refinement sunday should work with extended json medium', () =
     ]
   `);
 
-  const satisfiedSunday = Sunday.satisfies(sunday as unknown);
+  const satisfiedSunday = Sunday.satisfies(sunday);
 
   type _ = AssertTrue<IsEqual<typeof satisfiedSunday, Sunday>>;
 
@@ -227,13 +237,15 @@ test('date atomic refinement sunday should work with extended json value medium'
     ).getTime(),
   ).toBe(sunday.getTime());
   expect(() =>
-    Sunday.decode(x.extendedJSONValue, monday.toISOString() as any),
+    // @ts-expect-error
+    Sunday.decode(x.extendedJSONValue, monday.toISOString()),
   ).toThrow(x.TypeConstraintError);
 
   expect(Sunday.encode(x.extendedJSONValue, sunday)).toEqual(
     sunday.toISOString(),
   );
-  expect(() => Sunday.encode(x.extendedJSONValue, monday as any)).toThrow(
+  // @ts-expect-error
+  expect(() => Sunday.encode(x.extendedJSONValue, monday)).toThrow(
     x.TypeConstraintError,
   );
 });

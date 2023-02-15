@@ -47,7 +47,7 @@ export interface UsingMediumB {
   'medium-b': MediumBTypes;
 }
 
-export const mediumA = x.ecmascript.extend<UsingMediumA>('medium-a', {
+export const mediumA = x.ecmascript.extend<UsingMediumA>({
   codecs: {
     [identifierTypeSymbol]: {
       encode(value) {
@@ -68,7 +68,7 @@ export const mediumA = x.ecmascript.extend<UsingMediumA>('medium-a', {
   },
 });
 
-export const mediumB = x.jsonValue.extend<UsingMediumB>('medium-b', {
+export const mediumB = x.jsonValue.extend<UsingMediumB>({
   codecs: {
     [identifierTypeSymbol]: {
       encode(value) {

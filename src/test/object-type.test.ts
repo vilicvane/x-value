@@ -9,35 +9,45 @@ test('simple object type should work with json medium', () => {
     age: x.number,
   });
 
-  const value: x.TypeOf<typeof Type> = {
+  type Type = x.TypeOf<typeof Type>;
+
+  const value: Type = {
     id: 'abc',
     name: 'hello',
     age: 0,
   };
 
-  expect(
-    Type.decode(
-      x.json,
-      JSON.stringify({
-        ...value,
-        wild: 'oops',
-      }),
-    ),
-  ).toEqual(value);
+  const decoded_1 = Type.decode(
+    x.json,
+    JSON.stringify({
+      ...value,
+      wild: 'oops',
+    }),
+  );
 
-  expect(Type.encode(x.json, value)).toEqual(JSON.stringify(value));
+  expect(decoded_1).toEqual(value);
+
+  const encoded_1 = Type.encode(x.json, value);
+
+  expect(encoded_1).toEqual(JSON.stringify(value));
   expect(
     Type.encode(x.json, {
       ...value,
+      // @ts-expect-error
       wild: 'oops',
-    } as any),
+    }),
   ).toEqual(JSON.stringify(value));
 
-  expect(() => Type.encode(x.json, {} as any)).toThrow(x.TypeConstraintError);
+  // @ts-expect-error
+  expect(() => Type.encode(x.json, {})).toThrow(x.TypeConstraintError);
 
   expect(Type.is(value)).toBe(true);
   expect(Type.is({})).toBe(false);
   expect(Type.is(123)).toBe(false);
+
+  type _ =
+    | AssertTrue<IsEqual<typeof decoded_1, Type>>
+    | AssertTrue<IsEqual<typeof encoded_1, string>>;
 });
 
 test('nested object type should decode extended json medium', () => {
@@ -112,7 +122,8 @@ test('object type with optional property should work with json medium', () => {
   ).toThrow(x.TypeConstraintError);
 
   expect(Type.encode(x.json, value)).toBe(JSON.stringify(value));
-  expect(Type.encode(x.json, {...value, wild: 'oops'} as any)).toBe(
+  // @ts-expect-error
+  expect(Type.encode(x.json, {...value, wild: 'oops'})).toBe(
     JSON.stringify(value),
   );
   expect(() =>
@@ -120,9 +131,10 @@ test('object type with optional property should work with json medium', () => {
       ...value,
       profile: {
         ...value.profile,
+        // @ts-expect-error
         age: 'invalid',
       },
-    } as any),
+    }),
   ).toThrow(x.TypeConstraintError);
 
   expect(Type.is(value)).toBe(true);
@@ -188,9 +200,8 @@ test('object type with union type property should work with json medium', () => 
 
   expect(Type.encode(x.json, value1)).toEqual(JSON.stringify(value1));
   expect(Type.encode(x.json, value2)).toEqual(JSON.stringify(value2));
-  expect(() => Type.encode(x.json, value3 as any)).toThrow(
-    x.TypeConstraintError,
-  );
+  // @ts-expect-error
+  expect(() => Type.encode(x.json, value3)).toThrow(x.TypeConstraintError);
 
   expect(Type.is(value1)).toBe(true);
   expect(Type.is(value2)).toBe(true);
@@ -255,9 +266,8 @@ test('object type with intersection type property should work with json medium',
 
   expect(JSON.parse(Type.encode(x.json, value1))).toEqual(value1);
   expect(JSON.parse(Type.encode(x.json, value2))).toEqual(value2);
-  expect(() => Type.encode(x.json, value3 as any)).toThrow(
-    x.TypeConstraintError,
-  );
+  // @ts-expect-error
+  expect(() => Type.encode(x.json, value3)).toThrow(x.TypeConstraintError);
 
   expect(Type.is(value1)).toBe(true);
   expect(Type.is(value2)).toBe(true);
@@ -280,19 +290,25 @@ test('partial() should work', () => {
   expect(PartialO.is({})).toBe(true);
   expect(PartialO.is(123)).toBe(false);
 
-  expect(PartialO.encode(x.jsonValue, {bar: 123})).toEqual({bar: 123});
+  const encoded_1 = PartialO.encode(x.jsonValue, {bar: 123});
+
+  expect(encoded_1).toEqual({bar: 123});
   expect(PartialO.encode(x.jsonValue, {foo: 'abc'})).toEqual({foo: 'abc'});
   expect(
-    PartialO.encode(x.jsonValue, {foo: 'abc', extra: true} as any),
+    // @ts-expect-error
+    PartialO.encode(x.jsonValue, {foo: 'abc', extra: true}),
   ).toEqual({foo: 'abc'});
 
   expect(PartialO.decode(x.jsonValue, {bar: 123})).toEqual({bar: 123});
   expect(PartialO.decode(x.jsonValue, {foo: 'abc'})).toEqual({foo: 'abc'});
   expect(
-    PartialO.decode(x.jsonValue, {foo: 'abc', extra: true} as any),
+    // @ts-expect-error
+    PartialO.decode(x.jsonValue, {foo: 'abc', extra: true}),
   ).toEqual({foo: 'abc'});
 
-  type _ = AssertTrue<IsEqual<PartialO, {foo?: string; bar?: number}>>;
+  type _ =
+    | AssertTrue<IsEqual<PartialO, {foo?: string; bar?: number}>>
+    | AssertTrue<IsEqual<typeof encoded_1, {foo?: string; bar?: number}>>;
 });
 
 test('pick() should work', () => {
@@ -313,14 +329,16 @@ test('pick() should work', () => {
   expect(PickedO.is(123)).toBe(false);
 
   expect(PickedO.encode(x.jsonValue, {foo: 'abc'})).toEqual({foo: 'abc'});
-  expect(PickedO.encode(x.jsonValue, {foo: 'abc', extra: true} as any)).toEqual(
-    {foo: 'abc'},
-  );
+  // @ts-expect-error
+  expect(PickedO.encode(x.jsonValue, {foo: 'abc', extra: true})).toEqual({
+    foo: 'abc',
+  });
 
   expect(PickedO.decode(x.jsonValue, {foo: 'abc'})).toEqual({foo: 'abc'});
-  expect(PickedO.decode(x.jsonValue, {foo: 'abc', extra: true} as any)).toEqual(
-    {foo: 'abc'},
-  );
+  // @ts-expect-error
+  expect(PickedO.decode(x.jsonValue, {foo: 'abc', extra: true})).toEqual({
+    foo: 'abc',
+  });
 
   type _ = AssertTrue<
     IsEqual<x.TypeOf<typeof PickedO>, {foo: string; bar?: number}>
@@ -346,12 +364,14 @@ test('omit() should work', () => {
 
   expect(OmittedO.encode(x.jsonValue, {foo: 'abc'})).toEqual({foo: 'abc'});
   expect(
-    OmittedO.encode(x.jsonValue, {foo: 'abc', extra: true} as any),
+    // @ts-expect-error
+    OmittedO.encode(x.jsonValue, {foo: 'abc', extra: true}),
   ).toEqual({foo: 'abc'});
 
   expect(OmittedO.decode(x.jsonValue, {foo: 'abc'})).toEqual({foo: 'abc'});
   expect(
-    OmittedO.decode(x.jsonValue, {foo: 'abc', extra: true} as any),
+    // @ts-expect-error
+    OmittedO.decode(x.jsonValue, {foo: 'abc', extra: true}),
   ).toEqual({foo: 'abc'});
 
   type _ = AssertTrue<

@@ -1,4 +1,4 @@
-import {atomicTypeSymbol, medium} from '../core';
+import {medium} from '../core';
 
 import type {ExtendedTypes} from './@extended';
 import {EXTENDED_CODECS} from './@extended';
@@ -11,7 +11,7 @@ export interface UsingJSONMedium {
   json: JSONTypes;
 }
 
-export const json = medium<UsingJSONMedium>('json', {
+export const json = medium<UsingJSONMedium>({
   packing: {
     pack(data) {
       return JSON.stringify(data);
@@ -28,9 +28,6 @@ export interface UsingExtendedJSONMedium {
   'extended-json': ExtendedJSONTypes;
 }
 
-export const extendedJSON = json.extend<UsingExtendedJSONMedium>(
-  'extended-json',
-  {
-    codecs: EXTENDED_CODECS,
-  },
-);
+export const extendedJSON = json.extend<UsingExtendedJSONMedium>({
+  codecs: EXTENDED_CODECS,
+});

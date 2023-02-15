@@ -21,14 +21,13 @@ test('intersection type results in never should work with json medium', () => {
     x.TypeConstraintError,
   );
 
-  expect(() => Type.encode(x.json, value1 as never))
-    .toThrowErrorMatchingInlineSnapshot(`
+  // @ts-expect-error
+  expect(() => Type.encode(x.json, value1)).toThrowErrorMatchingInlineSnapshot(`
     "Failed to encode to medium:
       Expected number, getting [object String]."
   `);
-  expect(() => Type.encode(x.json, value2 as never)).toThrow(
-    x.TypeConstraintError,
-  );
+  // @ts-expect-error
+  expect(() => Type.encode(x.json, value2)).toThrow(x.TypeConstraintError);
 
   expect(Type.is(value1)).toBe(false);
   expect(Type.is(value2)).toBe(false);
@@ -69,24 +68,28 @@ test('intersection type should work with json value medium', () => {
   };
 
   expect(Type.decode(x.jsonValue, value1)).toEqual(value1);
-  expect(() => Type.decode(x.jsonValue, value2 as any))
+  // @ts-expect-error
+  expect(() => Type.decode(x.jsonValue, value2))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to decode from medium:
       ["bar"] Expected number, getting [object Undefined]."
   `);
-  expect(() => Type.decode(x.jsonValue, value3 as any))
+  // @ts-expect-error
+  expect(() => Type.decode(x.jsonValue, value3))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to decode from medium:
       ["bar"] Expected number, getting [object String]."
   `);
 
   expect(Type.encode(x.jsonValue, value1)).toEqual(value1);
-  expect(() => Type.encode(x.jsonValue, value2 as any))
+  // @ts-expect-error
+  expect(() => Type.encode(x.jsonValue, value2))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to encode to medium:
       ["bar"] Expected number, getting [object Undefined]."
   `);
-  expect(() => Type.encode(x.jsonValue, value3 as any))
+  // @ts-expect-error
+  expect(() => Type.encode(x.jsonValue, value3))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to encode to medium:
       ["bar"] Expected number, getting [object String]."
@@ -128,12 +131,10 @@ test('intersection type should work with json medium', () => {
   );
 
   expect(JSON.parse(Type.encode(x.json, value1))).toEqual(value1);
-  expect(() => Type.encode(x.json, value2 as any)).toThrow(
-    x.TypeConstraintError,
-  );
-  expect(() => Type.encode(x.json, value3 as any)).toThrow(
-    x.TypeConstraintError,
-  );
+  // @ts-expect-error
+  expect(() => Type.encode(x.json, value2)).toThrow(x.TypeConstraintError);
+  // @ts-expect-error
+  expect(() => Type.encode(x.json, value3)).toThrow(x.TypeConstraintError);
 
   expect(Type.is(value1)).toBe(true);
   expect(Type.is(value2)).toBe(false);

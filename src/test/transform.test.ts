@@ -66,16 +66,20 @@ test('transform medium A to medium B and back', () => {
 
   expect(Type.transform(mediumA, mediumB, a)).toEqual(b);
   expect(Type.transform(mediumB, mediumA, b)).toEqual(a);
-  expect(() => Type.transform(mediumA, mediumB, b as any)).toThrow(TypeError);
-  expect(() => Type.transform(mediumB, mediumA, a as any)).toThrow(TypeError);
-  expect(() => Type.transform(mediumA, mediumB, c as any))
+  // @ts-expect-error
+  expect(() => Type.transform(mediumA, mediumB, b)).toThrow(TypeError);
+  // @ts-expect-error
+  expect(() => Type.transform(mediumB, mediumA, a)).toThrow(TypeError);
+  // @ts-expect-error
+  expect(() => Type.transform(mediumA, mediumB, c))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to transform medium:
       ["data"] Expecting unpacked value to be an array, getting [object Number]."
   `);
   // The duplicates are the result of the intersection type, leave it as-is for
   // now.
-  expect(() => Type.transform(mediumA, mediumB, d as any))
+  // @ts-expect-error
+  expect(() => Type.transform(mediumA, mediumB, d))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to transform medium:
       ["data"][0] Expecting unpacked value to be a non-null object, getting [object Number].

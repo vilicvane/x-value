@@ -19,22 +19,25 @@ test('encode/decode/transform/diagnose', () => {
   expect(F.transform(x.ecmascript, x.ecmascript, f)).toBe(f);
   expect(F.diagnose(f)).toEqual([]);
 
-  expect(() => F.encode(x.ecmascript, undefined as any))
+  // @ts-expect-error
+  expect(() => F.encode(x.ecmascript, undefined))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to encode to medium:
       Expecting value to be a function, getting [object Undefined]."
   `);
-  expect(() => F.decode(x.ecmascript, undefined as any))
+  // @ts-expect-error
+  expect(() => F.decode(x.ecmascript, undefined))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to decode from medium:
       Expecting unpacked value to be a function, getting [object Undefined]."
   `);
-  expect(() => F.transform(x.ecmascript, x.ecmascript, undefined as any))
+  // @ts-expect-error
+  expect(() => F.transform(x.ecmascript, x.ecmascript, undefined))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to transform medium:
       Expecting unpacked value to be a function, getting [object Undefined]."
   `);
-  expect(F.diagnose(undefined as any)).toMatchInlineSnapshot(`
+  expect(F.diagnose(undefined)).toMatchInlineSnapshot(`
     [
       {
         "message": "Expecting a function, getting [object Undefined].",
@@ -71,12 +74,13 @@ test('guard', () => {
     "Failed to call guarded function:
       Expecting at least 1 argument(s), getting 0."
   `);
-  expect(() => f(1234 as any)).toThrowErrorMatchingInlineSnapshot(`
+  // @ts-expect-error
+  expect(() => f(1234)).toThrowErrorMatchingInlineSnapshot(`
     "Failed to call guarded function:
       [args[0]] Unexpected value."
   `);
-  expect(() => F.guard(() => 1234 as any)('0000'))
-    .toThrowErrorMatchingInlineSnapshot(`
+  // @ts-expect-error
+  expect(() => F.guard(() => 1234)('0000')).toThrowErrorMatchingInlineSnapshot(`
     "Failed to validate guarded function return value:
       Unexpected value."
   `);
@@ -84,11 +88,13 @@ test('guard', () => {
     "Failed to call guarded function:
       Expecting at least 1 argument(s), getting 0."
   `);
-  expect(() => fForMediumA(1234 as any)).toThrowErrorMatchingInlineSnapshot(`
+  // @ts-expect-error
+  expect(() => fForMediumA(1234)).toThrowErrorMatchingInlineSnapshot(`
     "Failed to call guarded function:
       [args[0]] Value must be a buffer"
   `);
-  expect(() => F.guard(mediumA, () => 1234 as any)(Buffer.from([0x00, 0x01])))
+  // @ts-expect-error
+  expect(() => F.guard(mediumA, () => 1234)(Buffer.from([0x00, 0x01])))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to validate guarded function return value:
       Unexpected value."
@@ -100,8 +106,9 @@ test('guard', () => {
       .exact()
       .guard(() => {})({
       foo: 'abc',
+      // @ts-expect-error
       bar: 123,
-    } as any),
+    }),
   ).toThrowErrorMatchingInlineSnapshot(`
     "Failed to call guarded function:
       [args[0]] Unknown key(s) "bar"."
@@ -109,5 +116,7 @@ test('guard', () => {
 
   type _ =
     | AssertTrue<IsEqual<F, (...args: [string]) => string>>
-    | AssertTrue<IsEqual<FInMediumA, (...args: [Buffer]) => Buffer>>;
+    | AssertTrue<IsEqual<FInMediumA, (...args: [Buffer]) => Buffer>>
+    | AssertTrue<IsEqual<typeof f, (...args: [string]) => string>>
+    | AssertTrue<IsEqual<typeof fForMediumA, (...args: [Buffer]) => Buffer>>;
 });

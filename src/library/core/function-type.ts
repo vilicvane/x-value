@@ -1,6 +1,6 @@
 import type {Exact} from './@exact-context';
 import type {TypeIssue, TypePath} from './@type-issue';
-import type {Medium, MediumName} from './medium';
+import type {Medium, UsingMediumName} from './medium';
 import {Type, TypeConstraintError} from './type';
 import {__type_kind} from './type-partials';
 import type {TypeInMediumsPartial, __type_in_mediums} from './type-partials';
@@ -22,9 +22,9 @@ export class FunctionType<
     fn: TFunction,
   ): this[__type_in_mediums]['value'];
   guard<
-    TMedium extends Medium<XValue.UsingName, object>,
+    TMedium extends Medium<object>,
     T extends this[__type_in_mediums]['value'],
-  >(medium: TMedium, fn: T): this[__type_in_mediums][MediumName<TMedium>];
+  >(medium: TMedium, fn: T): this[__type_in_mediums][UsingMediumName<TMedium>];
   guard(...args: [Function] | [Medium, Function]): Function {
     const ArgumentTypeTuple = this.ArgumentTypeTuple;
     const ReturnType = this.ReturnType;

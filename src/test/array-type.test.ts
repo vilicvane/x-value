@@ -21,12 +21,10 @@ test('simple array type should work with json medium', () => {
 
   expect(Type.encode(x.json, value1)).toEqual(JSON.stringify(value1));
   expect(Type.encode(x.json, value2)).toEqual(JSON.stringify(value2));
-  expect(() => Type.encode(x.json, value3 as any)).toThrow(
-    x.TypeConstraintError,
-  );
-  expect(() => Type.encode(x.json, value4 as any)).toThrow(
-    x.TypeConstraintError,
-  );
+  // @ts-expect-error
+  expect(() => Type.encode(x.json, value3)).toThrow(x.TypeConstraintError);
+  // @ts-expect-error
+  expect(() => Type.encode(x.json, value4)).toThrow(x.TypeConstraintError);
 });
 
 test('simple array type should work with extended json medium', () => {
@@ -53,10 +51,12 @@ test('simple array type should work with extended json medium', () => {
 
   expect(Type.encode(x.extendedJSON, value1)).toEqual(JSON.stringify(value1));
   expect(Type.encode(x.extendedJSON, value2)).toEqual(JSON.stringify(value2));
-  expect(() => Type.encode(x.extendedJSON, value3 as any)).toThrow(
+  // @ts-expect-error
+  expect(() => Type.encode(x.extendedJSON, value3)).toThrow(
     x.TypeConstraintError,
   );
-  expect(() => Type.encode(x.extendedJSON, value4 as any)).toThrow(
+  // @ts-expect-error
+  expect(() => Type.encode(x.extendedJSON, value4)).toThrow(
     x.TypeConstraintError,
   );
 });
@@ -84,10 +84,10 @@ test('simple array type should work with extended json value medium', () => {
       value2.map(date => date.toISOString()),
     ),
   ).toEqual(value2);
-  expect(() => Type.decode(x.extendedJSONValue, value3 as any)).toThrow(
-    TypeError,
-  );
-  expect(() => Type.decode(x.extendedJSONValue, value4 as any)).toThrow(
+  // @ts-expect-error
+  expect(() => Type.decode(x.extendedJSONValue, value3)).toThrow(TypeError);
+  // @ts-expect-error
+  expect(() => Type.decode(x.extendedJSONValue, value4)).toThrow(
     x.TypeConstraintError,
   );
 
@@ -97,10 +97,12 @@ test('simple array type should work with extended json value medium', () => {
   expect(Type.encode(x.extendedJSONValue, value2)).toEqual(
     JSON.parse(JSON.stringify(value2)),
   );
-  expect(() => Type.encode(x.extendedJSONValue, value3 as any)).toThrow(
+  // @ts-expect-error
+  expect(() => Type.encode(x.extendedJSONValue, value3)).toThrow(
     x.TypeConstraintError,
   );
-  expect(() => Type.encode(x.extendedJSONValue, value4 as any)).toThrow(
+  // @ts-expect-error
+  expect(() => Type.encode(x.extendedJSONValue, value4)).toThrow(
     x.TypeConstraintError,
   );
 });
@@ -140,12 +142,10 @@ test('object array type should work with json medium', () => {
 
   expect(Type.encode(x.json, value1)).toEqual(JSON.stringify(value1));
   expect(Type.encode(x.json, value2)).toEqual(JSON.stringify(value2));
-  expect(() => Type.encode(x.json, value3 as any)).toThrow(
-    x.TypeConstraintError,
-  );
-  expect(() => Type.encode(x.json, value4 as any)).toThrow(
-    x.TypeConstraintError,
-  );
+  // @ts-expect-error
+  expect(() => Type.encode(x.json, value3)).toThrow(x.TypeConstraintError);
+  // @ts-expect-error
+  expect(() => Type.encode(x.json, value4)).toThrow(x.TypeConstraintError);
 
   expect(Type.diagnose(value1)).toEqual([]);
   expect(Type.diagnose(value2)).toEqual([]);

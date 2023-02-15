@@ -1,4 +1,4 @@
-import {atomicTypeSymbol, medium} from '../core';
+import {medium} from '../core';
 import type {
   bigintTypeSymbol,
   booleanTypeSymbol,
@@ -33,4 +33,4 @@ export interface UsingECMAScriptMedium {
   ecmascript: ECMAScriptTypes;
 }
 
-export const ecmascript = medium<UsingECMAScriptMedium>('ecmascript');
+export const ecmascript = medium<UsingECMAScriptMedium>();

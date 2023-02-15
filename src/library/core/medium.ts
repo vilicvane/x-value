@@ -18,9 +18,9 @@ export type GeneralMediumTypes =
       [symbol: symbol]: unknown;
     };
 
-export type GeneralUsingMedium = Medium<XValue.UsingName, object>;
+export type GeneralUsingMedium = Record<string, GeneralMediumTypes>;
 
-export type MediumAtomicCodecs<TMediumTypes extends object> = {
+export type MediumAtomicCodecs<TMediumTypes> = {
   [TSymbol in keyof XValue.Types]?: __MediumAtomicCodec<
     TMediumTypes extends {[TKey in TSymbol]: infer T} ? T : unknown,
     XValue.Types[TSymbol]
@@ -34,45 +34,31 @@ export interface MediumPacking<TPacked> {
   unpack(packed: TPacked): unknown;
 }
 
-export interface MediumOptions<
-  TMediumTypes extends object = GeneralMediumTypes,
-> {
-  packing?: MediumPacking<MediumTypesPackedType<TMediumTypes>>;
-  codecs?: MediumAtomicCodecs<TMediumTypes>;
+export interface MediumOptions<TUsingMedium> {
+  packing?: MediumPacking<UsingMediumPackedType<TUsingMedium>>;
+  codecs?: MediumAtomicCodecs<TUsingMedium[keyof TUsingMedium]>;
 }
 
-export class Medium<
-  TName extends string = string,
-  TTypes extends object = GeneralMediumTypes,
-> {
-  private packing: MediumPacking<MediumTypesPackedType<TTypes>> | undefined;
-  private codecs: MediumAtomicCodecs<TTypes>;
+export class Medium<TUsingMedium extends object = GeneralUsingMedium> {
+  private packing:
+    | MediumPacking<UsingMediumPackedType<GeneralUsingMedium>>
+    | undefined;
+  private codecs: MediumAtomicCodecs<GeneralMediumTypes>;
 
-  constructor(
-    readonly name: TName,
-    {packing, codecs = {}}: MediumOptions<TTypes> = {},
-  ) {
+  constructor({packing, codecs = {}}: MediumOptions<TUsingMedium> = {}) {
     this.packing = packing;
     this.codecs = codecs;
   }
 
-  extend<TUsingExtendedMedium extends object>(
-    name: Extract<keyof TUsingExtendedMedium, string>,
-    {
-      packing,
-      codecs,
-    }: MediumOptions<
-      Extract<TUsingExtendedMedium[keyof TUsingExtendedMedium], object>
-    >,
-  ): Medium<
-    Extract<keyof TUsingExtendedMedium, string>,
-    Extract<TUsingExtendedMedium[keyof TUsingExtendedMedium], object>
-  >;
-  extend(
-    name: string,
-    {packing = this.packing, codecs}: MediumOptions,
-  ): Medium {
-    return new Medium(name, {
+  extend<TUsingExtendedMedium extends object>({
+    packing,
+    codecs,
+  }: MediumOptions<TUsingExtendedMedium>): Medium<TUsingExtendedMedium>;
+  extend({
+    packing = this.packing,
+    codecs,
+  }: MediumOptions<GeneralUsingMedium> = {}): Medium {
+    return new Medium({
       packing,
       codecs: {
         ...this.codecs,
@@ -81,9 +67,6 @@ export class Medium<
     });
   }
 
-  getCodec<TSymbol extends keyof TTypes>(
-    symbol: TSymbol,
-  ): MediumAtomicCodec<TTypes, TSymbol>;
   getCodec(symbol: symbol): __MediumAtomicCodec {
     const codecs = this.codecs;
 
@@ -94,19 +77,18 @@ export class Medium<
     );
   }
 
-  unpack(packed: MediumTypesPackedType<TTypes>): unknown {
+  unpack(packed: unknown): unknown {
     return this.packing ? this.packing.unpack(packed) : packed;
   }
 
-  pack(unpacked: unknown): MediumTypesPackedType<TTypes>;
   pack(unpacked: unknown): unknown {
     return this.packing ? this.packing.pack(unpacked) : unpacked;
   }
 }
 
 export type MediumAtomicCodec<
-  TMediumTypes extends object = GeneralMediumTypes,
-  TSymbol extends keyof TMediumTypes = keyof TMediumTypes,
+  TMediumTypes,
+  TSymbol extends keyof TMediumTypes,
 > = __MediumAtomicCodec<
   TMediumTypes[TSymbol],
   TSymbol extends keyof XValue.Types ? XValue.Types[TSymbol] : unknown
@@ -119,25 +101,34 @@ interface __MediumAtomicCodec<TMediumAtomic = unknown, TValue = unknown> {
 }
 
 export function medium<TUsingMedium extends object>(
-  name: Extract<keyof TUsingMedium, string>,
-  options?: MediumOptions<Extract<TUsingMedium[keyof TUsingMedium], object>>,
-): Medium<
-  Extract<keyof TUsingMedium, string>,
-  Extract<TUsingMedium[keyof TUsingMedium], object>
-> {
-  return new Medium(name, options);
+  options?: MediumOptions<TUsingMedium>,
+): Medium<TUsingMedium> {
+  return new Medium(options);
 }
 
-export type MediumTypesPackedType<
-  TMediumTypes,
-  TFallback = never,
-> = TMediumTypes extends {
+export type UsingMediumPackedType<TUsingMedium> = MediumTypesPackedType_<
+  TUsingMedium[keyof TUsingMedium],
+  unknown
+>;
+
+export type MediumPackedType<
+  TMedium extends Medium<object>,
+  TInMediums,
+> = TMedium extends Medium<infer TUsingMedium>
+  ? MediumTypesPackedType_<
+      TUsingMedium[keyof TUsingMedium],
+      TInMediums[Extract<keyof TUsingMedium, keyof TInMediums>]
+    >
+  : never;
+
+type MediumTypesPackedType_<TMediumTypes, TFallback> = TMediumTypes extends {
   packed: infer TPacked;
 }
   ? TPacked
   : TFallback;
 
-export type MediumName<TMedium extends Medium<XValue.UsingName, object>> =
-  TMedium extends Medium<infer TMediumName extends XValue.UsingName, object>
-    ? TMediumName
-    : never;
+export type UsingMediumName<TMedium extends Medium> = TMedium extends Medium<
+  Record<infer TName, GeneralMediumTypes>
+>
+  ? Extract<TName, XValue.UsingName>
+  : never;

@@ -1,5 +1,5 @@
 import type {MediumAtomicCodecs} from '../core';
-import {atomicTypeSymbol, medium} from '../core';
+import {medium} from '../core';
 import type {
   booleanTypeSymbol,
   neverTypeSymbol,
@@ -25,7 +25,7 @@ export interface UsingJSONValueMedium {
   'json-value': JSONValueTypes;
 }
 
-export const jsonValue = medium<UsingJSONValueMedium>('json-value');
+export const jsonValue = medium<UsingJSONValueMedium>();
 
 export interface ExtendedJSONValueTypes extends JSONValueTypes, ExtendedTypes {}
 
@@ -34,7 +34,6 @@ export interface UsingExtendedJSONValueMedium {
 }
 
 export const extendedJSONValue = jsonValue.extend<UsingExtendedJSONValueMedium>(
-  'extended-json-value',
   {
     codecs: EXTENDED_CODECS as MediumAtomicCodecs<ExtendedJSONValueTypes>,
   },

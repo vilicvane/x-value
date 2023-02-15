@@ -17,8 +17,8 @@ test('union type of atomic types should work with json medium', () => {
 
   expect(JSON.parse(Type.encode(x.json, value1))).toEqual(value1);
   expect(JSON.parse(Type.encode(x.json, value2))).toEqual(value2);
-  expect(() => Type.encode(x.json, true as any))
-    .toThrowErrorMatchingInlineSnapshot(`
+  // @ts-expect-error
+  expect(() => Type.encode(x.json, true)).toThrowErrorMatchingInlineSnapshot(`
     "Failed to encode to medium:
       The value satisfies none of the type in the union type.
       Expected string, getting [object Boolean]."

@@ -36,8 +36,8 @@ test('recursive type should work', () => {
 
   expect(R.is({type: 'oops', children: []})).toBe(false);
 
-  expect(() => R.encode(x.jsonValue, {} as any))
-    .toThrowErrorMatchingInlineSnapshot(`
+  // @ts-expect-error
+  expect(() => R.encode(x.jsonValue, {})).toThrowErrorMatchingInlineSnapshot(`
     "Failed to encode to medium:
       ["type"] Expected string, getting [object Undefined].
       ["children"] Expecting value to be an array, getting [object Undefined]."
@@ -45,8 +45,9 @@ test('recursive type should work', () => {
   expect(() =>
     R.decode(x.jsonValue, {
       type: 'node',
+      // @ts-expect-error
       children: ['text'],
-    } as any),
+    }),
   ).toThrowErrorMatchingInlineSnapshot(`
     "Failed to decode from medium:
       ["children"][0] Expecting unpacked value to be a non-null object, getting [object String]."
@@ -59,13 +60,14 @@ test('recursive type should work', () => {
           type: 'node',
           children: [
             {
+              // @ts-expect-error
               type: 'oops',
               children: [],
             },
           ],
         },
       ],
-    } as any),
+    }),
   ).toThrowErrorMatchingInlineSnapshot(`
     "Failed to transform medium:
       ["children"][0]["children"][0]["type"] Expected string "node", getting "oops"."

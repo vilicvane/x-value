@@ -160,7 +160,8 @@ test('literal type should work', () => {
 });
 
 test('literal type should throw on unsupported values', () => {
-  expect(() => x.literal({} as any)).toThrow(TypeError);
+  // @ts-expect-error
+  expect(() => x.literal({})).toThrow(TypeError);
 });
 
 test('equal should work', () => {
@@ -176,7 +177,8 @@ test('equal should work', () => {
   expect(O.encode(x.json, o)).toBe(JSON.stringify(o));
   expect(O.decode(x.json, JSON.stringify(o))).toEqual(o);
 
-  expect(() => O.encode(x.json, {} as any)).toThrowErrorMatchingInlineSnapshot(`
+  // @ts-expect-error
+  expect(() => O.encode(x.json, {})).toThrowErrorMatchingInlineSnapshot(`
     "Failed to encode to medium:
       Unexpected value."
   `);

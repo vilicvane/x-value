@@ -2,7 +2,7 @@ import type {Exact} from './@exact-context';
 import {ExactContext} from './@exact-context';
 import type {TypeIssue} from './@type-issue';
 import type {JSONSchema} from './json-schema';
-import type {Medium, MediumTypesPackedType} from './medium';
+import type {Medium, MediumPackedType} from './medium';
 import {JSONSchemaContext, TypeLike} from './type-like';
 import type {
   TypeInMediumsPartial,
@@ -32,9 +32,9 @@ export abstract class Type<
     });
   }
 
-  decode<TMediumName extends XValue.UsingName, TMediumTypes extends object>(
-    medium: Medium<TMediumName, TMediumTypes>,
-    packed: MediumTypesPackedType<TMediumTypes, TInMediums[TMediumName]>,
+  decode<TMedium extends Medium<object>>(
+    medium: TMedium,
+    packed: MediumPackedType<TMedium, TInMediums>,
   ): TInMediums['value'];
   decode(medium: Medium, packed: unknown): unknown {
     const unpacked = medium.unpack(packed);
@@ -52,10 +52,10 @@ export abstract class Type<
     return value;
   }
 
-  encode<TMediumName extends XValue.UsingName, TMediumTypes extends object>(
-    medium: Medium<TMediumName, TMediumTypes>,
+  encode<TMedium extends Medium<object>>(
+    medium: TMedium,
     value: TInMediums['value'],
-  ): MediumTypesPackedType<TMediumTypes, TInMediums[TMediumName]>;
+  ): MediumPackedType<TMedium, TInMediums>;
   encode(medium: Medium, value: unknown): unknown {
     const [unpacked, issues] = this._encode(
       medium,
@@ -73,15 +73,13 @@ export abstract class Type<
   }
 
   transform<
-    TFromMediumName extends XValue.UsingName,
-    TFromMediumTypes extends object,
-    TToMediumName extends XValue.UsingName,
-    TToMediumTypes extends object,
+    TFromMedium extends Medium<object>,
+    TToMedium extends Medium<object>,
   >(
-    from: Medium<TFromMediumName, TFromMediumTypes>,
-    to: Medium<TToMediumName, TToMediumTypes>,
-    value: MediumTypesPackedType<TFromMediumTypes, TInMediums[TFromMediumName]>,
-  ): MediumTypesPackedType<TToMediumTypes, TInMediums[TToMediumName]>;
+    from: TFromMedium,
+    to: TToMedium,
+    value: MediumPackedType<TFromMedium, TInMediums>,
+  ): MediumPackedType<TToMedium, TInMediums>;
   transform(from: Medium, to: Medium, packed: unknown): unknown {
     const unpacked = from.unpack(packed);
     const [transformedUnpacked, issues] = this._transform(

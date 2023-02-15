@@ -21,12 +21,14 @@ test('atomic refinement should work', () => {
     "Failed to encode to medium:
       Empty"
   `);
-  expect(() => NonEmptyString.encode(x.jsonValue, [1, 2, 3] as any))
+  // @ts-expect-error
+  expect(() => NonEmptyString.encode(x.jsonValue, [1, 2, 3]))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to encode to medium:
       Expected string, getting [object Array]."
   `);
-  expect(() => NonEmptyString.decode(x.jsonValue, 0 as any))
+  // @ts-expect-error
+  expect(() => NonEmptyString.decode(x.jsonValue, 0))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to decode from medium:
       Expected string, getting [object Number]."

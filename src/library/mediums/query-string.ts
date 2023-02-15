@@ -14,7 +14,7 @@ export interface UsingQueryStringMedium {
   'query-string': QueryStringTypes;
 }
 
-export const queryString = medium<UsingQueryStringMedium>('query-string', {
+export const queryString = medium<UsingQueryStringMedium>({
   packing: {
     pack(data) {
       return stringify(data);
@@ -68,7 +68,7 @@ export interface UsingExtendedQueryStringMedium {
 }
 
 export const extendedQueryString =
-  queryString.extend<UsingExtendedQueryStringMedium>('extended-query-string', {
+  queryString.extend<UsingExtendedQueryStringMedium>({
     codecs: EXTENDED_CODECS,
   });
 
