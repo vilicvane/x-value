@@ -205,7 +205,7 @@ type IntersectionType = x.TypeOf<typeof IntersectionType>; // {foo: string; bar?
 
 ### Recursive Type
 
-Recursive type requires a hand-written TypeScript declaration:
+Recursive type requires a hand-written definition:
 
 ```ts
 /**
