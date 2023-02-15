@@ -1,4 +1,4 @@
-import type {AssertTrue, IsEqual} from 'tslang';
+import type {AssertFalse, AssertTrue, IsCompatible, IsEqual} from 'tslang';
 
 import * as x from '../library';
 
@@ -187,4 +187,22 @@ test('equal should work', () => {
     "Failed to decode from medium:
       Unexpected value."
   `);
+});
+
+test('XTypeOfValue/XTypeOfMediumValue should work', () => {
+  type _ =
+    | AssertTrue<
+        IsCompatible<
+          typeof x.Date,
+          x.XTypeOfMediumValue<'extended-json-value', string>
+        >
+      >
+    | AssertFalse<
+        IsCompatible<
+          typeof x.Date,
+          x.XTypeOfMediumValue<'extended-json-value', number>
+        >
+      >
+    | AssertTrue<IsCompatible<typeof x.Date, x.XTypeOfValue<Date>>>
+    | AssertFalse<IsCompatible<typeof x.Date, x.XTypeOfValue<123>>>;
 });

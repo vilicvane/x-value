@@ -1,9 +1,19 @@
-import type {TypeInMediumsPartial, __type_in_mediums} from './core';
+import type {Type, TypeInMediumsPartial, __type_in_mediums} from './core';
 
 export type MediumTypeOf<
   TMediumName extends XValue.UsingName,
   TType extends TypeInMediumsPartial,
 > = TType[__type_in_mediums][TMediumName];
+
+export type XTypeOfValue<T> = Type<
+  Record<'value', T> & Record<Exclude<XValue.UsingName, 'value'>, unknown>
+>;
+
+export type XTypeOfMediumValue<TMediumName extends XValue.UsingName, T> = Type<
+  Record<TMediumName, T> &
+    Record<Exclude<XValue.UsingName, TMediumName>, unknown> &
+    Record<XValue.UsingName, unknown>
+>;
 
 export function constraint(
   condition: boolean,
