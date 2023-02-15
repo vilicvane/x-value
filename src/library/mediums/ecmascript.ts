@@ -33,15 +33,4 @@ export interface UsingECMAScriptMedium {
   ecmascript: ECMAScriptTypes;
 }
 
-export const ecmascript = medium<UsingECMAScriptMedium>('ecmascript', {
-  codecs: {
-    [atomicTypeSymbol]: {
-      encode(value) {
-        return value;
-      },
-      decode(value) {
-        return value;
-      },
-    },
-  },
-});
+export const ecmascript = medium<UsingECMAScriptMedium>('ecmascript');

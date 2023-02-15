@@ -25,18 +25,7 @@ export interface UsingJSONValueMedium {
   'json-value': JSONValueTypes;
 }
 
-export const jsonValue = medium<UsingJSONValueMedium>('json-value', {
-  codecs: {
-    [atomicTypeSymbol]: {
-      encode(value) {
-        return value;
-      },
-      decode(value) {
-        return value;
-      },
-    },
-  },
-});
+export const jsonValue = medium<UsingJSONValueMedium>('json-value');
 
 export interface ExtendedJSONValueTypes extends JSONValueTypes, ExtendedTypes {}
 

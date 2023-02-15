@@ -102,11 +102,19 @@ export abstract class Type<
   satisfies(value: unknown): TInMediums['value'] {
     const issues = this.diagnose(value);
 
-    if (issues.length === 0) {
-      return value;
+    if (issues.length > 0) {
+      throw new TypeConstraintError('Value does not satisfy the type', issues);
     }
 
-    throw new TypeConstraintError('Value does not satisfy the type', issues);
+    return value;
+  }
+
+  asserts(value: unknown): asserts value is TInMediums['value'] {
+    const issues = this.diagnose(value);
+
+    if (issues.length > 0) {
+      throw new TypeConstraintError('Value does not satisfy the type', issues);
+    }
   }
 
   is(value: unknown): value is TInMediums['value'] {

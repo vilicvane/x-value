@@ -5,5 +5,5 @@ test('medium requireCodec should throw on unknown symbol', () => {
     codecs: {},
   });
 
-  expect(() => medium.requireCodec(Symbol())).toThrow('Unknown codec symbol');
+  expect(() => medium.getCodec(Symbol())).toThrow('Unknown codec symbol');
 });

@@ -1,3 +1,12 @@
+const ATOMIC_TYPE_CODECS_DEFAULT: __MediumAtomicCodec = {
+  encode(value) {
+    return value;
+  },
+  decode(value) {
+    return value;
+  },
+};
+
 export const atomicTypeSymbol = Symbol();
 
 export type GeneralMediumTypes =
@@ -29,7 +38,7 @@ export interface MediumOptions<
   TMediumTypes extends object = GeneralMediumTypes,
 > {
   packing?: MediumPacking<MediumTypesPackedType<TMediumTypes>>;
-  codecs: MediumAtomicCodecs<TMediumTypes>;
+  codecs?: MediumAtomicCodecs<TMediumTypes>;
 }
 
 export class Medium<
@@ -39,7 +48,10 @@ export class Medium<
   private packing: MediumPacking<MediumTypesPackedType<TTypes>> | undefined;
   private codecs: MediumAtomicCodecs<TTypes>;
 
-  constructor(readonly name: TName, {packing, codecs}: MediumOptions<TTypes>) {
+  constructor(
+    readonly name: TName,
+    {packing, codecs = {}}: MediumOptions<TTypes> = {},
+  ) {
     this.packing = packing;
     this.codecs = codecs;
   }
@@ -69,21 +81,17 @@ export class Medium<
     });
   }
 
-  requireCodec<TSymbol extends keyof TTypes>(
+  getCodec<TSymbol extends keyof TTypes>(
     symbol: TSymbol,
   ): MediumAtomicCodec<TTypes, TSymbol>;
-  requireCodec(symbol: symbol): __MediumAtomicCodec {
+  getCodec(symbol: symbol): __MediumAtomicCodec {
     const codecs = this.codecs;
 
-    const codec =
+    return (
       (codecs as Record<symbol, __MediumAtomicCodec>)[symbol] ??
-      codecs[atomicTypeSymbol];
-
-    if (!codec) {
-      throw new Error('Unknown codec symbol');
-    }
-
-    return codec;
+      codecs[atomicTypeSymbol] ??
+      ATOMIC_TYPE_CODECS_DEFAULT
+    );
   }
 
   unpack(packed: MediumTypesPackedType<TTypes>): unknown {
@@ -112,7 +120,7 @@ interface __MediumAtomicCodec<TMediumAtomic = unknown, TValue = unknown> {
 
 export function medium<TUsingMedium extends object>(
   name: Extract<keyof TUsingMedium, string>,
-  options: MediumOptions<Extract<TUsingMedium[keyof TUsingMedium], object>>,
+  options?: MediumOptions<Extract<TUsingMedium[keyof TUsingMedium], object>>,
 ): Medium<
   Extract<keyof TUsingMedium, string>,
   Extract<TUsingMedium[keyof TUsingMedium], object>

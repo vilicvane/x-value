@@ -35,7 +35,7 @@ export class AtomicType<TSymbol extends symbol> extends Type<
     let value: unknown;
 
     try {
-      value = medium.requireCodec(this.symbol).decode(unpacked);
+      value = medium.getCodec(this.symbol).decode(unpacked);
     } catch (error) {
       return [undefined, [buildIssueByError(error, path)]];
     }
@@ -66,7 +66,7 @@ export class AtomicType<TSymbol extends symbol> extends Type<
     }
 
     try {
-      return [medium.requireCodec(this.symbol).encode(value), issues];
+      return [medium.getCodec(this.symbol).encode(value), issues];
     } catch (error) {
       issues.push(buildIssueByError(error, path));
 
@@ -87,7 +87,7 @@ export class AtomicType<TSymbol extends symbol> extends Type<
     let value: unknown;
 
     try {
-      value = from.requireCodec(symbol).decode(unpacked);
+      value = from.getCodec(symbol).decode(unpacked);
     } catch (error) {
       return [undefined, [buildIssueByError(error, path)]];
     }
@@ -99,7 +99,7 @@ export class AtomicType<TSymbol extends symbol> extends Type<
     }
 
     try {
-      return [to.requireCodec(symbol).encode(value), issues];
+      return [to.getCodec(symbol).encode(value), issues];
     } catch (error) {
       issues.push(buildIssueByError(error, path));
 

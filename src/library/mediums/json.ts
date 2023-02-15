@@ -20,16 +20,6 @@ export const json = medium<UsingJSONMedium>('json', {
       return JSON.parse(json);
     },
   },
-  codecs: {
-    [atomicTypeSymbol]: {
-      encode(value) {
-        return value;
-      },
-      decode(value) {
-        return value;
-      },
-    },
-  },
 });
 
 export interface ExtendedJSONTypes extends JSONTypes, ExtendedTypes {}
