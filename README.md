@@ -34,6 +34,7 @@ Comparing to alternatives like [io-ts](https://github.com/gcanti/io-ts) and [Zod
   - [Type Guards](#type-guards)
   - [Type Diagnostics](#type-diagnostics)
   - [Static Type](#static-type)
+  - [JSON Schema](#json-schema)
 - [Medium](#medium)
   - [Built-in Mediums](#built-in-mediums)
   - [New Medium](#new-medium)
@@ -431,6 +432,20 @@ const Data = x.object({
 
 type Data = x.TypeOf<typeof Data>; // {foo: string; bar: number}
 type DataInJSON = x.MediumTypeOf<'json', typeof Data>; // string
+```
+
+### JSON Schema
+
+X-Value has built-in (basic) support for [JSON Schema](https://json-schema.org/).
+
+```ts
+const Data = x.object({
+  foo: x.string,
+  bar: x.number,
+});
+
+Data.toJSONSchema(); // JSON schema
+Data.exact().toJSONSchema(); // JSON schema that prohibits extra properties
 ```
 
 ## Medium
