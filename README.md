@@ -506,7 +506,7 @@ interface IdentifierInMyMedium extends Buffer {
   toString(encoding: 'hex'): x.TransformNominal<this, string>;
 }
 
-// Create the medium object with extended codec.
+// Create the medium object with extended codecs.
 export const myMedium = x.ecmascript.extend<UsingMyMedium>({
   codecs: {
     [identifierTypeSymbol]: {
