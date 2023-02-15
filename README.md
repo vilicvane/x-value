@@ -453,12 +453,12 @@ Data.exact().toJSONSchema(); // JSON schema that prohibits extra properties
 ### Built-in Mediums
 
 - `x.ecmascript` - Basically the same as the decoded value, but can be extended for different usages (e.g.: server and browser).
-- `x.json` - JSON value packed as string.
-- `x.extendedJSON` - JSON value packed as string, with extended types support (`bigint`, `Date` and `RegExp`).
+- `x.json` - JSON value **packed as string**.
+- `x.extendedJSON` - JSON value **packed as string**, with extended types support (`bigint`, `Date` and `RegExp`).
 - `x.jsonValue` - JSON value.
 - `x.extendedJSONValue` - JSON value, with extended types support (`bigint`, `Date` and `RegExp`).
-- `x.queryString` - Query string packed as string.
-- `x.extendedQueryString` - Query string packed as string, with extended types support (`bigint`, `Date` and `RegExp`).
+- `x.queryString` - Query string **packed as string**.
+- `x.extendedQueryString` - Query string **packed as string**, with extended types support (`bigint`, `Date` and `RegExp`).
 
 ### New Medium
 
