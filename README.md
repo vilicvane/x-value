@@ -432,6 +432,12 @@ const Data = x.object({
 
 type Data = x.TypeOf<typeof Data>; // {foo: string; bar: number}
 type DataInJSON = x.MediumTypeOf<'json', typeof Data>; // string
+
+/** Represents a `Type` of which the decoded value is string. */
+type TypeOfValueBeingData = x.XTypeOfValue<string>;
+
+/** Represents a `Type` of which the decoded value for "json-value" medium is string. */
+type TypeOfMediumValueBeingData = x.XTypeOfMediumValue<'json-value', string>;
 ```
 
 ### JSON Schema
