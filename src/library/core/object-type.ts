@@ -344,23 +344,17 @@ type ObjectInMedium<
   ? {[TKey in keyof T]: T[TKey]}
   : never;
 
-type KeyOfOptional<TType> = Extract<
-  {
-    [TKey in keyof TType]: TType[TKey] extends TypeKindPartial<'optional'>
-      ? TKey
-      : never;
-  }[keyof TType],
-  string
->;
+type KeyOfOptional<TType extends object> = {
+  [TKey in keyof TType]: TType[TKey] extends TypeKindPartial<'optional'>
+    ? TKey
+    : never;
+}[keyof TType];
 
-type KeyOfNonOptional<TType> = Extract<
-  {
-    [TKey in keyof TType]: TType[TKey] extends TypeKindPartial<'optional'>
-      ? never
-      : TKey;
-  }[keyof TType],
-  string
->;
+type KeyOfNonOptional<TType extends object> = {
+  [TKey in keyof TType]: TType[TKey] extends TypeKindPartial<'optional'>
+    ? never
+    : TKey;
+}[keyof TType];
 
 type DefinitionPartial<
   TDefinition extends Record<string, TypeInMediumsPartial>,
