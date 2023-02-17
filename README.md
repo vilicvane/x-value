@@ -339,7 +339,7 @@ const ExactType = x
   .exact();
 ```
 
-> `Type.exact()` is inheritable unless you explicitly use `.exact(false)`.
+> `Type.exact()` will be inherited unless explicitly `.exact(false)`.
 
 ## Type Usages
 
