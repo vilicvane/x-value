@@ -29,31 +29,37 @@ export function literal(
 ): RefinedType<TypeInMediumsPartial, never, unknown> {
   switch (typeof literal) {
     case 'string':
-      return string.refined(value =>
-        refinement(
-          value === literal,
-          value,
-          () =>
-            `Expected string ${JSON.stringify(
-              literal,
-            )}, getting ${JSON.stringify(value)}.`,
-        ),
+      return string.refined(
+        value =>
+          refinement(
+            value === literal,
+            value,
+            () =>
+              `Expected string ${JSON.stringify(
+                literal,
+              )}, getting ${JSON.stringify(value)}.`,
+          ),
+        {const: literal},
       );
     case 'number':
-      return number.refined(value =>
-        refinement(
-          value === literal,
-          value,
-          () => `Expected number ${literal}, getting ${value}.`,
-        ),
+      return number.refined(
+        value =>
+          refinement(
+            value === literal,
+            value,
+            () => `Expected number ${literal}, getting ${value}.`,
+          ),
+        {const: literal},
       );
     case 'boolean':
-      return boolean.refined(value =>
-        refinement(
-          value === literal,
-          value,
-          () => `Expected boolean ${literal}, getting ${value}.`,
-        ),
+      return boolean.refined(
+        value =>
+          refinement(
+            value === literal,
+            value,
+            () => `Expected boolean ${literal}, getting ${value}.`,
+          ),
+        {const: literal},
       );
     default:
       throw new TypeError('Unsupported literal value');

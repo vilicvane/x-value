@@ -690,6 +690,7 @@ test('refined type', () => {
   expect(x.literal(123).toJSONSchema()).toMatchInlineSnapshot(`
     {
       "$defs": {},
+      "const": 123,
       "type": "number",
     }
   `);
@@ -732,6 +733,7 @@ test('refined type', () => {
   ).toMatchInlineSnapshot(`
     {
       "$defs": {},
+      "const": "user",
       "description": "Some random keyword",
       "type": "string",
     }
