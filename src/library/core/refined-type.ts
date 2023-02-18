@@ -1,6 +1,7 @@
 import type {Exact} from './@exact-context';
 import type {TypeIssue, TypePath} from './@type-issue';
 import {buildIssueByError, hasNonDeferrableTypeIssue} from './@type-issue';
+import type {JSONSchema} from './json-schema';
 import type {Medium} from './medium';
 import {Type} from './type';
 import type {JSONSchemaContext, JSONSchemaData} from './type-like';
@@ -18,8 +19,12 @@ export class RefinedType<
 > extends Type<RefinedInMediums<TType, TNominalKey, TRefinement>> {
   readonly [__type_kind] = 'refined';
 
-  constructor(Type: TType, refinements: Refinement[]);
-  constructor(private Type: Type, private refinements: Refinement[]) {
+  constructor(Type: TType, refinements: Refinement[], jsonSchema?: JSONSchema);
+  constructor(
+    private Type: Type,
+    private refinements: Refinement[],
+    private jsonSchema?: JSONSchema,
+  ) {
     super();
   }
 
@@ -127,7 +132,27 @@ export class RefinedType<
 
   /** @internal */
   _toJSONSchema(context: JSONSchemaContext, exact: boolean): JSONSchemaData {
-    return this.Type._toJSONSchema(context, this._exact ?? exact);
+    const data = this.Type._toJSONSchema(context, this._exact ?? exact);
+
+    const schemaOverrides = this.jsonSchema;
+
+    if (!schemaOverrides) {
+      return data;
+    }
+
+    const {schema} = data;
+
+    return {
+      schema: schema.$ref
+        ? context.define(this, exact, {
+            allOf: [schema],
+            ...schemaOverrides,
+          })
+        : {
+            ...schema,
+            ...schemaOverrides,
+          },
+    };
   }
 
   private processRefinements(
@@ -152,13 +177,12 @@ declare module './type' {
   interface Type<TInMediums> {
     refined<TNominalKey extends string | symbol = never, TRefinement = unknown>(
       refinements: ElementOrArray<Refinement<TInMediums['value']>>,
+      jsonSchema?: JSONSchema,
     ): RefinedType<this, TNominalKey, TRefinement>;
 
-    nominal<TNominalKey extends string | symbol>(): RefinedType<
-      this,
-      TNominalKey,
-      unknown
-    >;
+    nominal<TNominalKey extends string | symbol>(
+      jsonSchema?: JSONSchema,
+    ): RefinedType<this, TNominalKey, unknown>;
 
     nominalize(
       value: DenominalizeDeep<TInMediums['value']>,
@@ -166,15 +190,16 @@ declare module './type' {
   }
 }
 
-Type.prototype.refined = function (refinements) {
+Type.prototype.refined = function (refinements, jsonSchema) {
   return new RefinedType(
     this,
     Array.isArray(refinements) ? refinements : [refinements],
+    jsonSchema,
   );
 };
 
-Type.prototype.nominal = function () {
-  return new RefinedType(this, []);
+Type.prototype.nominal = function (jsonSchema) {
+  return new RefinedType(this, [], jsonSchema);
 };
 
 Type.prototype.nominalize = function (value) {

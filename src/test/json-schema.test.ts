@@ -678,6 +678,66 @@ test('exact', () => {
   `);
 });
 
+test('refined type', () => {
+  expect(x.string.refined([], {maxLength: 10}).toJSONSchema())
+    .toMatchInlineSnapshot(`
+    {
+      "$defs": {},
+      "maxLength": 10,
+      "type": "string",
+    }
+  `);
+  expect(x.literal(123).toJSONSchema()).toMatchInlineSnapshot(`
+    {
+      "$defs": {},
+      "type": "number",
+    }
+  `);
+  expect(
+    x
+      .object({foo: x.string})
+      .refined([], {description: 'Some random object'})
+      .toJSONSchema(),
+  ).toMatchInlineSnapshot(`
+    {
+      "$defs": {
+        "type-1": {
+          "properties": {
+            "foo": {
+              "type": "string",
+            },
+          },
+          "required": [
+            "foo",
+          ],
+          "type": "object",
+        },
+        "type-2": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/type-1",
+            },
+          ],
+          "description": "Some random object",
+        },
+      },
+      "$ref": "#/$defs/type-2",
+    }
+  `);
+  expect(
+    x
+      .literal('user')
+      .nominal<'user keyword'>({description: 'Some random keyword'})
+      .toJSONSchema(),
+  ).toMatchInlineSnapshot(`
+    {
+      "$defs": {},
+      "description": "Some random keyword",
+      "type": "string",
+    }
+  `);
+});
+
 test('not supported', () => {
   expect(() => x.undefined.toJSONSchema()).toThrowErrorMatchingInlineSnapshot(
     `"JSON schema is not defined for this atomic type"`,

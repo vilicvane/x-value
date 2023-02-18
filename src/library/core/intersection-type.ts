@@ -175,6 +175,10 @@ export class IntersectionType<
       Type => Type._toJSONSchema(context, exact).schema,
     );
 
+    // JSON schema "allOf" is not good enough for intersection type, if any
+    // schema in "allOf" has "additionalProperties: false", then the result
+    // schema would result in a self-contradiction.
+
     let mergedSchema = mergeIntersectionJSONSchemas(context, schemas);
 
     if (exact && mergedSchema.additionalProperties === undefined) {
