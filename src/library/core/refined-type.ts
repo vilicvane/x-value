@@ -180,7 +180,7 @@ declare module './type' {
       jsonSchema?: JSONSchema,
     ): RefinedType<this, TNominalKey, TRefinement>;
 
-    nominal<TNominalKey extends string | symbol>(
+    nominal<TNominalKey extends string | symbol = never>(
       jsonSchema?: JSONSchema,
     ): RefinedType<this, TNominalKey, unknown>;
 
