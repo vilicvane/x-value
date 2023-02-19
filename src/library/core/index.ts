@@ -1,7 +1,6 @@
 export * from './medium';
-export * from './type-like';
-export * from './medium-type';
 export * from './type';
+export * from './type-like';
 export * from './type-partials';
 export * from './atomic-type';
 export * from './object-type';
@@ -15,4 +14,3 @@ export * from './refined-type';
 export * from './recursive-type';
 export * from './function-type';
 export * from './json-schema';
-export * from './errors';

@@ -24,7 +24,9 @@ export function literal<T extends number>(
 export function literal<T extends boolean>(
   literal: T,
 ): RefinedType<typeof boolean, never, T>;
-export function literal(literal: unknown): TypeInMediumsPartial {
+export function literal(
+  literal: unknown,
+): RefinedType<TypeInMediumsPartial, never, unknown> {
   switch (typeof literal) {
     case 'string':
       return string.refined(

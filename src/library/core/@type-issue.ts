@@ -12,10 +12,14 @@ export interface TypeIssue {
   message: string;
 }
 
-export function buildIssueByError(error: unknown, path: TypePath): TypeIssue {
+export function buildIssueByError(error: unknown, path: TypePath): TypeIssue;
+export function buildIssueByError(
+  error: string | Error,
+  path: TypePath,
+): TypeIssue {
   return {
     path,
-    message: error instanceof Error ? error.message : String(error),
+    message: typeof error === 'string' ? error : error.message,
   };
 }
 

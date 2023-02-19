@@ -1,9 +1,4 @@
-import type {
-  MediumType,
-  Type,
-  TypeInMediumsPartial,
-  __type_in_mediums,
-} from './core';
+import type {Type, TypeInMediumsPartial, __type_in_mediums} from './core';
 
 export type MediumTypeOf<
   TMediumName extends XValue.UsingName,
@@ -11,13 +6,14 @@ export type MediumTypeOf<
 > = TType[__type_in_mediums][TMediumName];
 
 export type XTypeOfValue<T> = Type<
-  Record<'value', T> & Record<XValue.UsingName, unknown>
+  Record<'value', T> & Record<Exclude<XValue.UsingName, 'value'>, unknown>
 >;
 
-export type XTypeOfMediumValue<
-  TMediumName extends XValue.UsingName,
-  T,
-> = MediumType<Record<TMediumName, T> & Record<XValue.UsingName, unknown>>;
+export type XTypeOfMediumValue<TMediumName extends XValue.UsingName, T> = Type<
+  Record<TMediumName, T> &
+    Record<Exclude<XValue.UsingName, TMediumName>, unknown> &
+    Record<XValue.UsingName, unknown>
+>;
 
 export function constraint(
   condition: boolean,
@@ -32,11 +28,11 @@ export function constraint(
   }
 }
 
-export function refinement<T, TRefined extends T>(
+export function refinement<T>(
   condition: boolean,
   refined: T,
   message?: string | (() => string),
-): TRefined {
+): T {
   if (!condition) {
     if (typeof message === 'function') {
       message = message();
@@ -45,5 +41,5 @@ export function refinement<T, TRefined extends T>(
     throw message ?? 'Unexpected value.';
   }
 
-  return refined as TRefined;
+  return refined;
 }
