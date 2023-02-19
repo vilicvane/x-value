@@ -3,10 +3,10 @@ import type {TypeIssue, TypePath} from './@type-issue';
 import type {JSONSchema} from './json-schema';
 import type {Medium} from './medium';
 import {__type_in_mediums, __type_kind} from './type-partials';
-import type {TypesInMediums} from './type-partials';
+import type {TypeInMediums} from './type-partials';
 
 export abstract class TypeLike<
-  TInMediums extends TypesInMediums = TypesInMediums,
+  TInMediums extends TypeInMediums = TypeInMediums,
 > {
   abstract [__type_kind]: string;
 

@@ -84,10 +84,10 @@ export class FunctionType<
 
         const [decodedArgs, argumentIssues] = ArgumentTypeTuple.reduce(
           (
-            [decodedArgs, argumentIssues],
+            [decodedArgs, argumentIssues]: [unknown[], TypeIssue[]],
             ArgumentType,
             index,
-          ): [unknown[], TypeIssue[]] => {
+          ) => {
             const [arg, issues] = ArgumentType._decode(
               medium,
               args[index],

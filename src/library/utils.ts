@@ -6,13 +6,13 @@ export type MediumTypeOf<
 > = TType[__type_in_mediums][TMediumName];
 
 export type XTypeOfValue<T> = Type<
-  Record<'value', T> & Record<Exclude<XValue.UsingName, 'value'>, unknown>
+  Record<'value', T> & Record<XValue.UsingName, unknown>,
+  true
 >;
 
 export type XTypeOfMediumValue<TMediumName extends XValue.UsingName, T> = Type<
-  Record<TMediumName, T> &
-    Record<Exclude<XValue.UsingName, TMediumName>, unknown> &
-    Record<XValue.UsingName, unknown>
+  Record<TMediumName, T> & Record<XValue.UsingName, unknown>,
+  true
 >;
 
 export function constraint(

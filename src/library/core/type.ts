@@ -5,8 +5,8 @@ import type {JSONSchema} from './json-schema';
 import type {Medium, MediumPackedType} from './medium';
 import {JSONSchemaContext, TypeLike} from './type-like';
 import type {
+  TypeInMediums,
   TypeInMediumsPartial,
-  TypesInMediums,
   __type_in_mediums,
 } from './type-partials';
 
@@ -18,13 +18,11 @@ export const DISABLED_EXACT_CONTEXT_RESULT = {
 };
 
 export abstract class Type<
-  TInMediums extends TypesInMediums = TypesInMediums,
+  TInMediums extends TypeInMediums = TypeInMediums,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  TGeneral extends boolean = false,
 > extends TypeLike<TInMediums> {
   readonly _exact: boolean | undefined;
-
-  constructor() {
-    super();
-  }
 
   exact(exact = true): this {
     return Object.create(this, {

@@ -10,10 +10,10 @@ export const __type_in_mediums = Symbol('type in mediums');
 
 export type __type_in_mediums = typeof __type_in_mediums;
 
-export type TypesInMediums = Record<XValue.UsingName, unknown>;
+export type TypeInMediums = Record<XValue.UsingName, unknown>;
 
 export interface TypeInMediumsPartial<
-  TInMediums extends TypesInMediums = TypesInMediums,
+  TInMediums extends TypeInMediums = TypeInMediums,
 > {
   [__type_in_mediums]: TInMediums;
 }

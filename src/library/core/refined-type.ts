@@ -6,8 +6,8 @@ import type {Medium} from './medium';
 import {Type} from './type';
 import type {JSONSchemaContext, JSONSchemaData} from './type-like';
 import type {
+  TypeInMediums,
   TypeInMediumsPartial,
-  TypesInMediums,
   __type_in_mediums,
 } from './type-partials';
 import {__type_kind} from './type-partials';
@@ -16,7 +16,8 @@ export class RefinedType<
   TType extends TypeInMediumsPartial,
   TNominalKey extends string | symbol,
   TRefinement,
-> extends Type<RefinedInMediums<TType, TNominalKey, TRefinement>> {
+  TGeneral extends boolean = false,
+> extends Type<RefinedInMediums<TType, TNominalKey, TRefinement>, TGeneral> {
   readonly [__type_kind] = 'refined';
 
   constructor(Type: TType, refinements: Refinement[], jsonSchema?: JSONSchema);
@@ -174,15 +175,15 @@ export class RefinedType<
 }
 
 declare module './type' {
-  interface Type<TInMediums> {
+  interface Type<TInMediums, TGeneral> {
     refined<TNominalKey extends string | symbol = never, TRefinement = unknown>(
-      refinements: ElementOrArray<Refinement<TInMediums['value']>>,
+      refinements: ElementOrArray<Refinement<TInMediums['value'], TGeneral>>,
       jsonSchema?: JSONSchema,
-    ): RefinedType<this, TNominalKey, TRefinement>;
+    ): RefinedType<this, TNominalKey, TRefinement, TGeneral>;
 
     nominal<TNominalKey extends string | symbol = never>(
       jsonSchema?: JSONSchema,
-    ): RefinedType<this, TNominalKey, unknown>;
+    ): RefinedType<this, TNominalKey, unknown, TGeneral>;
 
     nominalize(
       value: DenominalizeDeep<TInMediums['value']>,
@@ -206,7 +207,10 @@ Type.prototype.nominalize = function (value) {
   return this.satisfies(value);
 };
 
-export type Refinement<T = unknown> = (value: T) => T;
+export type Refinement<
+  T = unknown,
+  TGeneral extends boolean = false,
+> = TGeneral extends true ? (value: unknown) => never : (value: T) => T;
 
 export const __nominal = Symbol('nominal');
 
@@ -235,7 +239,7 @@ type RefinedInMediums<
 > = __RefinedInMediums<TType[__type_in_mediums], TNominalKey, TRefinement>;
 
 type __RefinedInMediums<
-  TInMediums extends TypesInMediums,
+  TInMediums extends TypeInMediums,
   TNominalKey extends string | symbol,
   TRefinement,
 > = {
