@@ -1,7 +1,8 @@
 import type {Exact} from './@exact-context';
 import type {TypeIssue, TypePath} from './@type-issue';
+import {TypeConstraintError} from './errors';
 import type {Medium, UsingMediumName} from './medium';
-import {Type, TypeConstraintError} from './type';
+import {Type} from './type';
 import {__type_kind} from './type-partials';
 import type {TypeInMediumsPartial, __type_in_mediums} from './type-partials';
 
@@ -84,10 +85,10 @@ export class FunctionType<
 
         const [decodedArgs, argumentIssues] = ArgumentTypeTuple.reduce(
           (
-            [decodedArgs, argumentIssues],
+            [decodedArgs, argumentIssues]: [unknown[], TypeIssue[]],
             ArgumentType,
             index,
-          ): [unknown[], TypeIssue[]] => {
+          ) => {
             const [arg, issues] = ArgumentType._decode(
               medium,
               args[index],

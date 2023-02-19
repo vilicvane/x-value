@@ -517,7 +517,7 @@ test('nominalize', () => {
 });
 
 test('refinement transform', () => {
-  const TrimmedNonEmptyString = x.string.refined(value => {
+  const TrimmedNonEmptyString = x.string.refined((value: string) => {
     value = value.trim();
     return x.refinement(value.length > 0, value);
   });
