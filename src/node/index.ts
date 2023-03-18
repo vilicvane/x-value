@@ -1,7 +1,8 @@
-import * as x from '../library';
-import {constraint} from '../library';
+import * as x from 'x-value';
 
 const toString = Object.prototype.toString;
+
+const BufferClass = globalThis.Buffer;
 
 declare global {
   namespace XValue {
@@ -13,8 +14,8 @@ declare global {
 
 export const bufferTypeSymbol = Symbol();
 export const Buffer = x.atomic(bufferTypeSymbol, value =>
-  constraint(
-    value instanceof globalThis.Buffer,
+  x.constraint(
+    value instanceof BufferClass,
     `Expected instance of Buffer, getting ${toString.call(value)}.`,
   ),
 );
