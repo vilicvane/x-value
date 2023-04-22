@@ -189,6 +189,22 @@ test('equal should work', () => {
   `);
 });
 
+test('string pattern should work', () => {
+  const Pattern = x.pattern(/\d/, 'Expected digit');
+
+  expect(Pattern.is('1')).toBe(true);
+  expect(Pattern.is('a')).toBe(false);
+
+  expect(Pattern.diagnose('a')).toMatchInlineSnapshot(`
+    [
+      {
+        "message": "Expected digit",
+        "path": [],
+      },
+    ]
+  `);
+});
+
 test('XTypeOfValue/XTypeOfMediumValue should work', () => {
   type _ =
     | AssertTrue<
