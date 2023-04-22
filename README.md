@@ -13,6 +13,9 @@ Comparing to alternatives like [io-ts](https://github.com/gcanti/io-ts) and [Zod
 
 - [Installation](#installation)
 - [Quick Start](#quick-start)
+  - [Runtime Type Validation](#runtime-type-validation)
+  - [JSON Schema](#json-schema)
+  - [Multi-medium Usages](#multi-medium-usages)
 - [Types](#types)
   - [Atomic Type](#atomic-type)
     - [Built-in Atomic Types](#built-in-atomic-types)
@@ -34,7 +37,7 @@ Comparing to alternatives like [io-ts](https://github.com/gcanti/io-ts) and [Zod
   - [Type Guards](#type-guards)
   - [Type Diagnostics](#type-diagnostics)
   - [Static Type](#static-type)
-  - [JSON Schema](#json-schema)
+  - [JSON Schema](#json-schema-1)
 - [Medium](#medium)
   - [Built-in Mediums](#built-in-mediums)
   - [New Medium](#new-medium)
@@ -49,6 +52,59 @@ npm install x-value
 ```
 
 ## Quick Start
+
+### Runtime Type Validation
+
+```ts
+import * as x from 'x-value';
+
+// Define X-Type.
+const Payload = x.object({
+  date: x.Date,
+  limit: x.number.optional(),
+});
+
+// Get static type of Payload.
+type Payload = x.TypeOf<typeof Payload>;
+
+// Returns true if payload is a valid value of Payload.
+const valid = Payload.is({});
+
+// Returns an array of issues if payload is not a valid value of Payload, empty
+// if valid.
+const issues = Payload.diagnose({});
+
+// Returns valid value as-is, throws if invalid.
+const value = Payload.satisfies({});
+
+// Asserts payload, throws if invalid.
+Payload.asserts({});
+```
+
+### JSON Schema
+
+```ts
+import * as x from 'x-value';
+
+const Config = x
+  .object({
+    build: x.union([x.literal('debug'), x.literal('release')]).nominal({
+      description: "Build type, 'debug' for debug and 'release' for release.",
+    }),
+    port: x
+      .integerRange({min: 1, max: 65535})
+      .nominal({
+        description: 'Port to listen.',
+      })
+      .optional(),
+  })
+  .exact();
+
+// JSON schema (object).
+const jsonSchema = Config.toJSONSchema();
+```
+
+### Multi-medium Usages
 
 ```ts
 import * as x from 'x-value';
