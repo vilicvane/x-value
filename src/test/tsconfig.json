@@ -3,6 +3,7 @@
   "compilerOptions": {
     "composite": true,
     "types": ["node", "jest"],
+    "rootDir": ".",
     "outDir": "../../bld/test"
   },
   "references": [
