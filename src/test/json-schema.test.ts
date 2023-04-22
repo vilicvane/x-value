@@ -740,6 +740,89 @@ test('refined type', () => {
   `);
 });
 
+test('utils', () => {
+  expect(x.numberRange({minInclusive: 0, maxExclusive: 10}).toJSONSchema())
+    .toMatchInlineSnapshot(`
+    {
+      "$defs": {},
+      "exclusiveMaximum": 10,
+      "minimum": 0,
+      "type": "number",
+    }
+  `);
+  expect(x.numberRange({minExclusive: -10, maxInclusive: 0}).toJSONSchema())
+    .toMatchInlineSnapshot(`
+    {
+      "$defs": {},
+      "exclusiveMinimum": -10,
+      "maximum": 0,
+      "type": "number",
+    }
+  `);
+});
+
+test('config example', () => {
+  const Config = x
+    .object({
+      build: x.union([x.literal('debug'), x.literal('release')]).nominal({
+        description: "Build type, 'debug' for debug and 'release' for release.",
+      }),
+      port: x
+        .integerRange({min: 1, max: 65535})
+        .nominal({
+          description: 'Port to listen.',
+        })
+        .optional(),
+    })
+    .exact();
+
+  expect(Config.toJSONSchema()).toMatchInlineSnapshot(`
+    {
+      "$defs": {
+        "type-1": {
+          "anyOf": [
+            {
+              "const": "debug",
+              "type": "string",
+            },
+            {
+              "const": "release",
+              "type": "string",
+            },
+          ],
+        },
+        "type-2": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/type-1",
+            },
+          ],
+          "description": "Build type, 'debug' for debug and 'release' for release.",
+        },
+        "type-3": {
+          "additionalProperties": false,
+          "properties": {
+            "build": {
+              "$ref": "#/$defs/type-2",
+            },
+            "port": {
+              "description": "Port to listen.",
+              "maximum": 65535,
+              "minimum": 1,
+              "type": "integer",
+            },
+          },
+          "required": [
+            "build",
+          ],
+          "type": "object",
+        },
+      },
+      "$ref": "#/$defs/type-3",
+    }
+  `);
+});
+
 test('not supported', () => {
   expect(() => x.undefined.toJSONSchema()).toThrowErrorMatchingInlineSnapshot(
     `"JSON schema is not defined for this atomic type"`,
