@@ -1,9 +1,0 @@
-{
-  "root": true,
-  "ignorePatterns": ["node_modules/", "/src/", "/bld/"],
-  "extends": ["eslint:recommended"],
-  "env": {
-    "node": true,
-    "es2020": true
-  }
-}
