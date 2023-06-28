@@ -23,6 +23,7 @@ export abstract class Type<
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   TGeneral extends boolean = false,
 > extends TypeLike<TInMediums> {
+  /** @internal */
   readonly _exact: boolean | undefined;
 
   exact(exact = true): this {
