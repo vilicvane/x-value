@@ -1,5 +1,9 @@
 import type {Exact} from './@exact-context';
-import type {TypeIssue, TypePath} from './@type-issue';
+import {
+  hasNonDeferrableTypeIssue,
+  type TypeIssue,
+  type TypePath,
+} from './@type-issue';
 import type {Medium, UsingMediumName} from './medium';
 import {Type, TypeConstraintError} from './type';
 import {__type_kind} from './type-partials';
@@ -137,21 +141,10 @@ export class FunctionType<
     _medium: Medium,
     unpacked: unknown,
     path: TypePath,
-    _exact: Exact,
+    exact: Exact,
   ): [unknown, TypeIssue[]] {
-    if (typeof unpacked !== 'function') {
-      return [
-        undefined,
-        [
-          {
-            path,
-            message: `Expected a function, got ${toString.call(unpacked)}.`,
-          },
-        ],
-      ];
-    }
-
-    return [unpacked, []];
+    const issues = this._diagnose(unpacked, path, exact);
+    return [hasNonDeferrableTypeIssue(issues) ? undefined : unpacked, issues];
   }
 
   /** @internal */
@@ -159,22 +152,17 @@ export class FunctionType<
     _medium: Medium,
     value: unknown,
     path: TypePath,
-    _exact: Exact,
+    exact: Exact,
     diagnose: boolean,
   ): [unknown, TypeIssue[]] {
-    if (diagnose && typeof value !== 'function') {
-      return [
-        undefined,
-        [
-          {
-            path,
-            message: `Expected a function, got ${toString.call(value)}.`,
-          },
-        ],
-      ];
-    }
+    const issues = diagnose ? this._diagnose(value, path, exact) : [];
+    return [hasNonDeferrableTypeIssue(issues) ? undefined : value, issues];
+  }
 
-    return [value, []];
+  /** @internal */
+  override _sanitize(value: unknown, path: TypePath): [unknown, TypeIssue[]] {
+    const issues = this._diagnose(value, path, 'disabled');
+    return [hasNonDeferrableTypeIssue(issues) ? undefined : value, issues];
   }
 
   /** @internal */

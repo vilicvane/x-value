@@ -1,8 +1,11 @@
 import type {Exact} from './@exact-context';
 import type {TypeIssue, TypePath} from './@type-issue';
-import type {Medium} from './medium';
 import {Type} from './type';
-import type {JSONSchemaContext, JSONSchemaData} from './type-like';
+import type {
+  JSONSchemaContext,
+  JSONSchemaData,
+  TraverseCallback,
+} from './type-like';
 import {__type_kind} from './type-partials';
 import type {TypeInMediumsPartial, __type_in_mediums} from './type-partials';
 
@@ -19,33 +22,13 @@ export class RecursiveType<T> extends Type<RecursiveInMediums<T>> {
   }
 
   /** @internal */
-  override _decode(
-    medium: Medium,
-    unpacked: unknown,
+  override _traverse(
+    input: unknown,
     path: TypePath,
     exact: Exact,
+    callback: TraverseCallback,
   ): [unknown, TypeIssue[]] {
-    return this.Type._decode(medium, unpacked, path, exact);
-  }
-
-  /** @internal */
-  override _encode(
-    medium: Medium,
-    value: unknown,
-    path: TypePath,
-    exact: Exact,
-    diagnose: boolean,
-  ): [unknown, TypeIssue[]] {
-    return this.Type._encode(medium, value, path, exact, diagnose);
-  }
-
-  /** @internal */
-  override _diagnose(
-    value: unknown,
-    path: TypePath,
-    exact: Exact,
-  ): TypeIssue[] {
-    return this.Type._diagnose(value, path, exact);
+    return callback(this.Type, input, path, exact);
   }
 
   /** @internal */

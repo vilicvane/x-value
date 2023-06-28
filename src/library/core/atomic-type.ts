@@ -75,6 +75,13 @@ export class AtomicType<TSymbol extends symbol> extends Type<
   }
 
   /** @internal */
+  override _sanitize(value: unknown, path: TypePath): [unknown, TypeIssue[]] {
+    const issues = this._diagnose(value, path, 'disabled');
+
+    return [hasNonDeferrableTypeIssue(issues) ? undefined : value, issues];
+  }
+
+  /** @internal */
   override _diagnose(
     value: unknown,
     path: TypePath,

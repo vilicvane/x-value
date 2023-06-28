@@ -44,7 +44,7 @@ export class UnionType<
 
     for (const Type of this.TypeTuple) {
       const dedicatedExact =
-        typeof wrappedExact === 'boolean' ? wrappedExact : new ExactContext();
+        typeof wrappedExact === 'object' ? new ExactContext() : wrappedExact;
 
       const [value, issues] = callback(Type, input, path, dedicatedExact);
 
@@ -69,7 +69,7 @@ export class UnionType<
       [
         {
           path,
-          message: 'The value satisfies none of the type in the union type.',
+          message: 'Value satisfies none of the type in the union type.',
         },
         ...outputIssues,
       ],
@@ -107,10 +107,7 @@ type UnionInMediums<TTypeTuple extends TypeInMediumsPartial[]> = {
 };
 
 function syncDedicatedExact(wrappedExact: Exact, dedicatedExact: Exact): void {
-  if (
-    typeof wrappedExact !== 'boolean' &&
-    typeof dedicatedExact !== 'boolean'
-  ) {
+  if (typeof wrappedExact === 'object' && typeof dedicatedExact === 'object') {
     if (dedicatedExact.touched) {
       wrappedExact.addKeys(dedicatedExact.keys);
     }

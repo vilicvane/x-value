@@ -28,9 +28,10 @@ export abstract class TypeLike<
     unpacked: unknown,
     path: TypePath,
     exact: Exact,
+    callback?: TraverseCallback,
   ): [unknown, TypeIssue[]] {
     return this._traverse(unpacked, path, exact, (Type, value, path, exact) =>
-      Type._decode(medium, value, path, exact),
+      Type._decode(medium, value, path, exact, callback),
     );
   }
 
@@ -41,9 +42,17 @@ export abstract class TypeLike<
     path: TypePath,
     exact: Exact,
     diagnose: boolean,
+    callback?: TraverseCallback,
   ): [unknown, TypeIssue[]] {
     return this._traverse(value, path, exact, (Type, value, path, exact) =>
-      Type._encode(medium, value, path, exact, diagnose),
+      Type._encode(medium, value, path, exact, diagnose, callback),
+    );
+  }
+
+  /** @internal */
+  _sanitize(value: unknown, path: TypePath): [unknown, TypeIssue[]] {
+    return this._traverse(value, path, 'disabled', (Type, value, path) =>
+      Type._sanitize(value, path),
     );
   }
 

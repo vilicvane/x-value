@@ -98,6 +98,28 @@ export class RefinedType<
   }
 
   /** @internal */
+  override _sanitize(value: unknown, path: TypePath): [unknown, TypeIssue[]] {
+    const [sanitized, issues] = this.Type._sanitize(value, path);
+
+    if (hasNonDeferrableTypeIssue(issues)) {
+      return [undefined, issues];
+    }
+
+    const [refined, refinementIssues] = this.processRefinements(
+      sanitized,
+      path,
+    );
+
+    issues.push(...refinementIssues);
+
+    if (hasNonDeferrableTypeIssue(refinementIssues)) {
+      return [undefined, issues];
+    }
+
+    return [refined, issues];
+  }
+
+  /** @internal */
   override _diagnose(
     value: unknown,
     path: TypePath,

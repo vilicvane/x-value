@@ -84,7 +84,7 @@ test('transform medium A to medium B and back', () => {
     "Failed to transform medium:
       ["data"][0] Expected a non-null object, got [object Number].
       ["data"][0] Expected a non-null object, got [object Number].
-      ["data"][1]["x"] The value satisfies none of the type in the union type.
+      ["data"][1]["x"] Value satisfies none of the type in the union type.
       ["data"][1]["x"] Expected number, got [object Boolean].
       ["data"][1]["y"] Expected number, got [object String]."
   `);

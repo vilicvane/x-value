@@ -193,7 +193,7 @@ test('record type with union string key should work', () => {
   expect(() => Type.decode(x.jsonValue, value2))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to decode from medium:
-      [key:"invalid key"] The value satisfies none of the type in the union type.
+      [key:"invalid key"] Value satisfies none of the type in the union type.
       [key:"invalid key"] Expected string "foo", got "invalid key"."
   `);
   expect(() => Type.decode(x.jsonValue, value3))
@@ -206,7 +206,7 @@ test('record type with union string key should work', () => {
   expect(() => Type.encode(x.jsonValue, value2))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to encode to medium:
-      [key:"invalid key"] The value satisfies none of the type in the union type.
+      [key:"invalid key"] Value satisfies none of the type in the union type.
       [key:"invalid key"] Expected string "foo", got "invalid key"."
   `);
   expect(() => Type.encode(x.jsonValue, value3))
@@ -221,7 +221,7 @@ test('record type with union string key should work', () => {
   expect(() => Type.transform(x.jsonValue, x.json, value2))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to transform medium:
-      [key:"invalid key"] The value satisfies none of the type in the union type.
+      [key:"invalid key"] Value satisfies none of the type in the union type.
       [key:"invalid key"] Expected string "foo", got "invalid key"."
   `);
   expect(() => Type.transform(x.jsonValue, x.json, value3))

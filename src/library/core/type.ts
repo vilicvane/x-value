@@ -3,6 +3,7 @@ import {ExactContext} from './@exact-context';
 import type {TypeIssue} from './@type-issue';
 import type {JSONSchema} from './json-schema';
 import type {Medium, MediumPackedType} from './medium';
+import type {TraverseCallback} from './type-like';
 import {JSONSchemaContext, TypeLike} from './type-like';
 import type {
   TypeInMediums,
@@ -37,11 +38,11 @@ export abstract class Type<
   decode(medium: Medium, packed: unknown): unknown {
     const unpacked = medium.unpack(packed);
 
-    const [value, issues] = this._traverse(
+    const [value, issues] = this._decode(
+      medium,
       unpacked,
       [],
       this._exact ?? false,
-      (Type, value, path, exact) => Type._decode(medium, value, path, exact),
     );
 
     if (issues.length > 0) {
@@ -56,12 +57,12 @@ export abstract class Type<
     value: TInMediums['value'],
   ): MediumPackedType<TMedium, TInMediums>;
   encode(medium: Medium, value: unknown): unknown {
-    const [unpacked, issues] = this._traverse(
+    const [unpacked, issues] = this._encode(
+      medium,
       value,
       [],
       this._exact ?? false,
-      (Type, value, path, exact) =>
-        Type._encode(medium, value, path, exact, true),
+      true,
     );
 
     if (issues.length > 0) {
@@ -82,19 +83,21 @@ export abstract class Type<
   transform(from: Medium, to: Medium, packed: unknown): unknown {
     const unpacked = from.unpack(packed);
 
+    const callback: TraverseCallback = (Type, value, path, exact) => {
+      const [decoded, issues] = Type._decode(from, value, path, exact);
+
+      if (issues.length > 0) {
+        return [undefined, issues];
+      }
+
+      return Type._encode(to, decoded, path, exact, false);
+    };
+
     const [transformedUnpacked, issues] = this._traverse(
       unpacked,
       [],
       this._exact ?? false,
-      (Type, value, path, exact) => {
-        const [decoded, issues] = Type._decode(from, value, path, exact);
-
-        if (issues.length > 0) {
-          return [undefined, issues];
-        }
-
-        return Type._encode(to, decoded, path, exact, false);
-      },
+      callback,
     );
 
     if (issues.length > 0) {
@@ -104,18 +107,18 @@ export abstract class Type<
     return to.pack(transformedUnpacked);
   }
 
-  diagnose(value: unknown): TypeIssue[] {
-    const [, issues] = this._traverse(
-      value,
-      [],
-      this._exact ?? false,
-      (Type, value, path, exact) => [
-        undefined,
-        Type._diagnose(value, path, exact),
-      ],
-    );
+  sanitize(value: unknown): TInMediums['value'] {
+    const [sanitized, issues] = this._sanitize(value, []);
 
-    return issues;
+    if (issues.length > 0) {
+      throw new TypeConstraintError('Value does not satisfy the type', issues);
+    }
+
+    return sanitized;
+  }
+
+  diagnose(value: unknown): TypeIssue[] {
+    return this._diagnose(value, [], this._exact ?? false);
   }
 
   satisfies(value: unknown): TInMediums['value'] {
@@ -184,6 +187,15 @@ export abstract class Type<
     wrappedExact: Exact;
     nestedExact: Exact;
   } {
+    if (exact === 'disabled') {
+      return {
+        context: undefined,
+        managedContext: undefined,
+        wrappedExact: 'disabled',
+        nestedExact: 'disabled',
+      };
+    }
+
     const context = typeof exact === 'boolean' ? undefined : exact;
 
     const selfExact = this._exact;

@@ -53,4 +53,4 @@ export class ExactContext {
   }
 }
 
-export type Exact = ExactContext | boolean;
+export type Exact = ExactContext | boolean | 'disabled';
