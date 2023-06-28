@@ -120,7 +120,7 @@ export class ObjectType<
       issues.push(...entryIssues);
     }
 
-    if (wrappedExact) {
+    if (typeof wrappedExact === 'object') {
       wrappedExact.addKeys(entries.map(([key]) => key));
     }
 

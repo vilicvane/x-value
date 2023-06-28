@@ -157,7 +157,7 @@ export abstract class Type<
      * Undefined if not exact or inherited (not managed by the current type).
      */
     managedContext: ExactContext | undefined;
-    wrappedExact: ExactContext | false;
+    wrappedExact: ExactContext | false | 'disabled';
     nestedExact: Exact;
   };
   protected getExactContext(
