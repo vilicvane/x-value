@@ -34,6 +34,7 @@ Comparing to alternatives like [io-ts](https://github.com/gcanti/io-ts) and [Zod
   - [Decode from Medium](#decode-from-medium)
   - [Encode to Medium](#encode-to-medium)
   - [Transform from Medium to Medium](#transform-from-medium-to-medium)
+  - [Sanitize Value](#sanitize-value)
   - [Type Guards](#type-guards)
   - [Type Diagnostics](#type-diagnostics)
   - [Static Type](#static-type)
@@ -448,6 +449,17 @@ const Data = x.object({
 });
 
 Data.transform(x.queryString, x.json, 'foo=abc&bar=123'); // '{"foo":"abc","bar":123}'
+```
+
+### Sanitize Value
+
+```ts
+const Data = x.object({
+  foo: x.string,
+  bar: x.number,
+});
+
+Data.sanitize({foo: 'abc', bar: 123, extra: true}); // {foo: 'abc', bar: 123}
 ```
 
 ### Type Guards
