@@ -23,12 +23,12 @@ test('record type with string key should work', () => {
   expect(() => Type.decode(x.jsonValue, value3))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to decode from medium:
-      ["key"] Expected number, getting [object String]."
+      ["key"] Expected number, got [object String]."
   `);
   expect(() => Type.decode(x.jsonValue, value4))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to decode from medium:
-      Expecting unpacked value to be a non-null object, getting [object Number]."
+      Expected a non-null object, got [object Number]."
   `);
 
   expect(Type.encode(x.jsonValue, value1)).toStrictEqual(value1);
@@ -36,12 +36,12 @@ test('record type with string key should work', () => {
   expect(() => Type.encode(x.jsonValue, value3))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to encode to medium:
-      ["key"] Expected number, getting [object String]."
+      ["key"] Expected number, got [object String]."
   `);
   expect(() => Type.encode(x.jsonValue, value4))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to encode to medium:
-      Expecting value to be a non-null object, getting [object Number]."
+      Expected a non-null object, got [object Number]."
   `);
 
   expect(Type.transform(x.jsonValue, x.json, value1)).toStrictEqual(
@@ -53,12 +53,12 @@ test('record type with string key should work', () => {
   expect(() => Type.transform(x.jsonValue, x.json, value3))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to transform medium:
-      ["key"] Expected number, getting [object String]."
+      ["key"] Expected number, got [object String]."
   `);
   expect(() => Type.transform(x.jsonValue, x.json, value4))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to transform medium:
-      Expecting unpacked value to be a non-null object, getting [object Number]."
+      Expected a non-null object, got [object Number]."
   `);
 
   expect(Type.is({})).toBe(true);
@@ -85,12 +85,12 @@ test('record type with number key should work', () => {
   expect(() => Type.decode(x.jsonValue, value3))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to decode from medium:
-      [key:"invalid key"] Expected number, getting [object String]."
+      [key:"invalid key"] Expected number, got [object String]."
   `);
   expect(() => Type.decode(x.jsonValue, value4))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to decode from medium:
-      Expecting unpacked value to be a non-null object, getting [object Number]."
+      Expected a non-null object, got [object Number]."
   `);
 
   expect(Type.encode(x.jsonValue, value1)).toStrictEqual(value1);
@@ -98,12 +98,12 @@ test('record type with number key should work', () => {
   expect(() => Type.encode(x.jsonValue, value3))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to encode to medium:
-      [key:"invalid key"] Expected number, getting [object String]."
+      [key:"invalid key"] Expected number, got [object String]."
   `);
   expect(() => Type.encode(x.jsonValue, value4))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to encode to medium:
-      Expecting value to be a non-null object, getting [object Number]."
+      Expected a non-null object, got [object Number]."
   `);
 
   expect(Type.transform(x.jsonValue, x.json, value1)).toStrictEqual(
@@ -115,12 +115,12 @@ test('record type with number key should work', () => {
   expect(() => Type.transform(x.jsonValue, x.json, value3))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to transform medium:
-      [key:"invalid key"] Expected number, getting [object String]."
+      [key:"invalid key"] Expected number, got [object String]."
   `);
   expect(() => Type.transform(x.jsonValue, x.json, value4))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to transform medium:
-      Expecting unpacked value to be a non-null object, getting [object Number]."
+      Expected a non-null object, got [object Number]."
   `);
 
   expect(Type.is([])).toBe(true);
@@ -194,12 +194,12 @@ test('record type with union string key should work', () => {
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to decode from medium:
       [key:"invalid key"] The value satisfies none of the type in the union type.
-      [key:"invalid key"] Expected string "foo", getting "invalid key"."
+      [key:"invalid key"] Expected string "foo", got "invalid key"."
   `);
   expect(() => Type.decode(x.jsonValue, value3))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to decode from medium:
-      ["foo"] Expected string, getting [object Number]."
+      ["foo"] Expected string, got [object Number]."
   `);
 
   expect(Type.encode(x.jsonValue, value1)).toStrictEqual(value1);
@@ -207,12 +207,12 @@ test('record type with union string key should work', () => {
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to encode to medium:
       [key:"invalid key"] The value satisfies none of the type in the union type.
-      [key:"invalid key"] Expected string "foo", getting "invalid key"."
+      [key:"invalid key"] Expected string "foo", got "invalid key"."
   `);
   expect(() => Type.encode(x.jsonValue, value3))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to encode to medium:
-      ["foo"] Expected string, getting [object Number]."
+      ["foo"] Expected string, got [object Number]."
   `);
 
   expect(Type.transform(x.jsonValue, x.json, value1)).toStrictEqual(
@@ -222,12 +222,12 @@ test('record type with union string key should work', () => {
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to transform medium:
       [key:"invalid key"] The value satisfies none of the type in the union type.
-      [key:"invalid key"] Expected string "foo", getting "invalid key"."
+      [key:"invalid key"] Expected string "foo", got "invalid key"."
   `);
   expect(() => Type.transform(x.jsonValue, x.json, value3))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to transform medium:
-      ["foo"] Expected string, getting [object Number]."
+      ["foo"] Expected string, got [object Number]."
   `);
 });
 

@@ -36,11 +36,12 @@ export abstract class Type<
   ): TInMediums['value'];
   decode(medium: Medium, packed: unknown): unknown {
     const unpacked = medium.unpack(packed);
-    const [value, issues] = this._decode(
-      medium,
+
+    const [value, issues] = this._traverse(
       unpacked,
       [],
       this._exact ?? false,
+      (Type, value, path, exact) => Type._decode(medium, value, path, exact),
     );
 
     if (issues.length > 0) {
@@ -55,12 +56,12 @@ export abstract class Type<
     value: TInMediums['value'],
   ): MediumPackedType<TMedium, TInMediums>;
   encode(medium: Medium, value: unknown): unknown {
-    const [unpacked, issues] = this._encode(
-      medium,
+    const [unpacked, issues] = this._traverse(
       value,
       [],
       this._exact ?? false,
-      true,
+      (Type, value, path, exact) =>
+        Type._encode(medium, value, path, exact, true),
     );
 
     if (issues.length > 0) {
@@ -80,12 +81,20 @@ export abstract class Type<
   ): MediumPackedType<TToMedium, TInMediums>;
   transform(from: Medium, to: Medium, packed: unknown): unknown {
     const unpacked = from.unpack(packed);
-    const [transformedUnpacked, issues] = this._transform(
-      from,
-      to,
+
+    const [transformedUnpacked, issues] = this._traverse(
       unpacked,
       [],
       this._exact ?? false,
+      (Type, value, path, exact) => {
+        const [decoded, issues] = Type._decode(from, value, path, exact);
+
+        if (issues.length > 0) {
+          return [undefined, issues];
+        }
+
+        return Type._encode(to, decoded, path, exact, false);
+      },
     );
 
     if (issues.length > 0) {
@@ -93,6 +102,20 @@ export abstract class Type<
     }
 
     return to.pack(transformedUnpacked);
+  }
+
+  diagnose(value: unknown): TypeIssue[] {
+    const [, issues] = this._traverse(
+      value,
+      [],
+      this._exact ?? false,
+      (Type, value, path, exact) => [
+        undefined,
+        Type._diagnose(value, path, exact),
+      ],
+    );
+
+    return issues;
   }
 
   satisfies(value: unknown): TInMediums['value'] {
@@ -111,10 +134,6 @@ export abstract class Type<
 
   is(value: unknown): value is TInMediums['value'] {
     return this.diagnose(value).length === 0;
-  }
-
-  diagnose(value: unknown): TypeIssue[] {
-    return this._diagnose(value, [], this._exact ?? false);
   }
 
   toJSONSchema(): JSONSchema {

@@ -3,9 +3,12 @@ import type {TypeIssue, TypePath} from './@type-issue';
 import {hasNonDeferrableTypeIssue} from './@type-issue';
 import type {TupleInMedium} from './@utils';
 import type {JSONSchema} from './json-schema';
-import type {Medium} from './medium';
-import {DISABLED_EXACT_CONTEXT_RESULT, Type} from './type';
-import type {JSONSchemaContext, JSONSchemaData} from './type-like';
+import {Type} from './type';
+import type {
+  JSONSchemaContext,
+  JSONSchemaData,
+  TraverseCallback,
+} from './type-like';
 import {__type_kind} from './type-partials';
 import type {TypeInMediumsPartial} from './type-partials';
 
@@ -23,18 +26,18 @@ export class IntersectionType<
   constructor(TypeTuple: TTypeTuple);
   constructor(private TypeTuple: Type[]) {
     if (TypeTuple.length < 2) {
-      throw new TypeError('Expecting at least 2 types for intersection type');
+      throw new TypeError('Expected at least 2 elements for intersection type');
     }
 
     super();
   }
 
   /** @internal */
-  _decode(
-    medium: Medium,
-    unpacked: unknown,
+  override _traverse(
+    input: unknown,
     path: TypePath,
     exact: Exact,
+    callback: TraverseCallback,
   ): [unknown, TypeIssue[]] {
     const {managedContext, wrappedExact} = this.getExactContext(
       exact,
@@ -45,9 +48,9 @@ export class IntersectionType<
     const issues: TypeIssue[] = [];
 
     for (const Type of this.TypeTuple) {
-      const [partial, partialIssues] = Type._decode(
-        medium,
-        unpacked,
+      const [partial, partialIssues] = callback(
+        Type,
+        input,
         path,
         wrappedExact,
       );
@@ -57,7 +60,7 @@ export class IntersectionType<
     }
 
     if (managedContext) {
-      issues.push(...managedContext.getUnknownKeyIssues(unpacked, path));
+      issues.push(...managedContext.getUnknownKeyIssues(input, path));
     }
 
     return [
@@ -66,105 +69,6 @@ export class IntersectionType<
         : internal_mergeIntersectionPartials(partials),
       issues,
     ];
-  }
-
-  /** @internal */
-  _encode(
-    medium: Medium,
-    value: unknown,
-    path: TypePath,
-    exact: Exact,
-    diagnose: boolean,
-  ): [unknown, TypeIssue[]] {
-    const {managedContext, wrappedExact} = diagnose
-      ? this.getExactContext(exact, 'managed')
-      : DISABLED_EXACT_CONTEXT_RESULT;
-
-    const partials: unknown[] = [];
-    const issues: TypeIssue[] = [];
-
-    for (const Type of this.TypeTuple) {
-      const [partial, partialIssues] = Type._encode(
-        medium,
-        value,
-        path,
-        wrappedExact,
-        diagnose,
-      );
-
-      partials.push(partial);
-      issues.push(...partialIssues);
-    }
-
-    if (managedContext) {
-      issues.push(...managedContext.getUnknownKeyIssues(value, path));
-    }
-
-    return [
-      hasNonDeferrableTypeIssue(issues)
-        ? undefined
-        : internal_mergeIntersectionPartials(partials),
-      issues,
-    ];
-  }
-
-  /** @internal */
-  _transform(
-    from: Medium,
-    to: Medium,
-    unpacked: unknown,
-    path: TypePath,
-    exact: Exact,
-  ): [unknown, TypeIssue[]] {
-    const {managedContext, wrappedExact} = this.getExactContext(
-      exact,
-      'managed',
-    );
-
-    const partials: unknown[] = [];
-    const issues: TypeIssue[] = [];
-
-    for (const Type of this.TypeTuple) {
-      const [partial, partialIssues] = Type._transform(
-        from,
-        to,
-        unpacked,
-        path,
-        wrappedExact,
-      );
-
-      partials.push(partial);
-      issues.push(...partialIssues);
-    }
-
-    if (managedContext) {
-      issues.push(...managedContext.getUnknownKeyIssues(unpacked, path));
-    }
-
-    return [
-      hasNonDeferrableTypeIssue(issues)
-        ? undefined
-        : internal_mergeIntersectionPartials(partials),
-      issues,
-    ];
-  }
-
-  /** @internal */
-  _diagnose(value: unknown, path: TypePath, exact: Exact): TypeIssue[] {
-    const {managedContext, wrappedExact} = this.getExactContext(
-      exact,
-      'managed',
-    );
-
-    const issues = this.TypeTuple.flatMap(Type =>
-      Type._diagnose(value, path, wrappedExact),
-    );
-
-    if (managedContext) {
-      issues.push(...managedContext.getUnknownKeyIssues(value, path));
-    }
-
-    return issues;
   }
 
   /** @internal */

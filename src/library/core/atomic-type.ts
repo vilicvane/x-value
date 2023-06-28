@@ -26,7 +26,7 @@ export class AtomicType<TSymbol extends symbol> extends Type<
   }
 
   /** @internal */
-  _decode(
+  override _decode(
     medium: Medium,
     unpacked: unknown,
     path: TypePath,
@@ -46,7 +46,7 @@ export class AtomicType<TSymbol extends symbol> extends Type<
   }
 
   /** @internal */
-  _encode(
+  override _encode(
     medium: Medium,
     value: unknown,
     path: TypePath,
@@ -75,40 +75,11 @@ export class AtomicType<TSymbol extends symbol> extends Type<
   }
 
   /** @internal */
-  _transform(
-    from: Medium,
-    to: Medium,
-    unpacked: unknown,
+  override _diagnose(
+    value: unknown,
     path: TypePath,
-    exact: Exact,
-  ): [unknown, TypeIssue[]] {
-    const symbol = this.symbol;
-
-    let value: unknown;
-
-    try {
-      value = from.getCodec(symbol).decode(unpacked);
-    } catch (error) {
-      return [undefined, [buildIssueByError(error, path)]];
-    }
-
-    const issues = this._diagnose(value, path, exact);
-
-    if (hasNonDeferrableTypeIssue(issues)) {
-      return [undefined, issues];
-    }
-
-    try {
-      return [to.getCodec(symbol).encode(value), issues];
-    } catch (error) {
-      issues.push(buildIssueByError(error, path));
-
-      return [undefined, issues];
-    }
-  }
-
-  /** @internal */
-  _diagnose(value: unknown, path: TypePath, _exact: Exact): TypeIssue[] {
+    _exact: Exact,
+  ): TypeIssue[] {
     const issues: TypeIssue[] = [];
 
     for (const constraint of this.constraints) {

@@ -16,6 +16,6 @@ export const bufferTypeSymbol = Symbol();
 export const Buffer = x.atomic(bufferTypeSymbol, value =>
   x.constraint(
     value instanceof BufferClass,
-    `Expected instance of Buffer, getting ${toString.call(value)}.`,
+    `Expected instance of Buffer, got ${toString.call(value)}.`,
   ),
 );

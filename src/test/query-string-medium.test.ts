@@ -49,6 +49,6 @@ test('query string medium should work', () => {
   expect(() =>
     x.string.encode(x.queryString, 'abc'),
   ).toThrowErrorMatchingInlineSnapshot(
-    `"Expected non-null object, getting [object String]"`,
+    `"Expected non-null object, got [object String]"`,
   );
 });

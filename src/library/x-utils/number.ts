@@ -7,7 +7,7 @@ export const Integer = number.refined<'integer'>(
     refinement(
       Number.isInteger(value),
       value,
-      () => `Expected integer, getting ${value}.`,
+      () => `Expected integer, got ${value}.`,
     ),
   {type: 'integer'},
 );
@@ -26,11 +26,11 @@ export function integerRange<TNominalKey extends string | symbol = never>({
   return Integer.refined(
     value => {
       if (value < min) {
-        throw `Expected integer >= ${min}, getting ${value}.`;
+        throw `Expected integer >= ${min}, got ${value}.`;
       }
 
       if (value > max) {
-        throw `Expected integer <= ${max}, getting ${value}.`;
+        throw `Expected integer <= ${max}, got ${value}.`;
       }
 
       return value;
@@ -58,19 +58,19 @@ export function numberRange<TNominalKey extends string | symbol = never>({
   return number.refined(
     value => {
       if (value < minInclusive) {
-        throw `Expected number >= ${minInclusive}, getting ${value}.`;
+        throw `Expected number >= ${minInclusive}, got ${value}.`;
       }
 
       if (value <= minExclusive) {
-        throw `Expected number > ${minExclusive}, getting ${value}.`;
+        throw `Expected number > ${minExclusive}, got ${value}.`;
       }
 
       if (value > maxInclusive) {
-        throw `Expected number <= ${maxInclusive}, getting ${value}.`;
+        throw `Expected number <= ${maxInclusive}, got ${value}.`;
       }
 
       if (value >= maxExclusive) {
-        throw `Expected number < ${maxExclusive}, getting ${value}.`;
+        throw `Expected number < ${maxExclusive}, got ${value}.`;
       }
 
       return value;

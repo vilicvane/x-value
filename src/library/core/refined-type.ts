@@ -30,7 +30,7 @@ export class RefinedType<
   }
 
   /** @internal */
-  _decode(
+  override _decode(
     medium: Medium,
     unpacked: unknown,
     path: TypePath,
@@ -55,7 +55,7 @@ export class RefinedType<
   }
 
   /** @internal */
-  _encode(
+  override _encode(
     medium: Medium,
     value: unknown,
     path: TypePath,
@@ -85,7 +85,7 @@ export class RefinedType<
       if (refinedValue !== value) {
         issues.push({
           path,
-          message: 'Expecting encoding value to be stable after refinements.',
+          message: 'Expected encoding value to be stable after refinements.',
         });
       }
 
@@ -98,26 +98,11 @@ export class RefinedType<
   }
 
   /** @internal */
-  _transform(
-    from: Medium,
-    to: Medium,
-    unpacked: unknown,
+  override _diagnose(
+    value: unknown,
     path: TypePath,
     exact: Exact,
-  ): [unknown, TypeIssue[]] {
-    const [value, issues] = this._decode(from, unpacked, path, exact);
-
-    if (hasNonDeferrableTypeIssue(issues)) {
-      return [undefined, issues];
-    }
-
-    const [transformedUnpacked] = this._encode(to, value, path, false, false);
-
-    return [transformedUnpacked, issues];
-  }
-
-  /** @internal */
-  _diagnose(value: unknown, path: TypePath, exact: Exact): TypeIssue[] {
+  ): TypeIssue[] {
     const issues = this.Type._diagnose(value, path, exact);
 
     if (hasNonDeferrableTypeIssue(issues)) {

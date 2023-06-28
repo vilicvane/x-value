@@ -13,7 +13,7 @@ test('simple array type should work with json medium', () => {
   expect(() => Type.decode(x.json, JSON.stringify(value3)))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to decode from medium:
-      [0] Expected string, getting [object Number]."
+      [0] Expected string, got [object Number]."
   `);
   expect(() => Type.decode(x.json, JSON.stringify(value4))).toThrow(
     x.TypeConstraintError,
@@ -46,7 +46,7 @@ test('simple array type should work with extended json medium', () => {
   expect(() => Type.decode(x.extendedJSON, JSON.stringify(value4)))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to decode from medium:
-      Expecting unpacked value to be an array, getting [object String]."
+      Expected an array, got [object String]."
   `);
 
   expect(Type.encode(x.extendedJSON, value1)).toEqual(JSON.stringify(value1));
@@ -134,7 +134,7 @@ test('object array type should work with json medium', () => {
   expect(() => Type.decode(x.json, JSON.stringify(value3)))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to decode from medium:
-      [0] Expecting unpacked value to be a non-null object, getting [object Number]."
+      [0] Expected a non-null object, got [object Number]."
   `);
   expect(() => Type.decode(x.json, JSON.stringify(value4))).toThrow(
     x.TypeConstraintError,
@@ -152,7 +152,7 @@ test('object array type should work with json medium', () => {
   expect(Type.diagnose(value3)).toMatchInlineSnapshot(`
     [
       {
-        "message": "Expecting a non-null object, getting [object Number].",
+        "message": "Expected a non-null object, got [object Number].",
         "path": [
           0,
         ],
@@ -162,7 +162,7 @@ test('object array type should work with json medium', () => {
   expect(Type.diagnose(value4)).toMatchInlineSnapshot(`
     [
       {
-        "message": "Expecting an array, getting [object String].",
+        "message": "Expected an array, got [object String].",
         "path": [],
       },
     ]
@@ -351,7 +351,7 @@ test('explicit non-exact array', () => {
   expect(O.diagnose(invalid2)).toMatchInlineSnapshot(`
     [
       {
-        "message": "Expecting an array, getting [object String].",
+        "message": "Expected an array, got [object String].",
         "path": [
           "foo",
         ],

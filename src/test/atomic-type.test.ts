@@ -47,80 +47,80 @@ test('pre-defined atomic types should error decode/encode ecmascript medium with
   expect(() => x.never.decode(x.ecmascript, true))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to decode from medium:
-      Expected never, getting [object Boolean]."
+      Expected never, got [object Boolean]."
   `);
   // @ts-expect-error
   expect(() => x.undefined.decode(x.ecmascript, true))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to decode from medium:
-      Expected undefined, getting [object Boolean]."
+      Expected undefined, got [object Boolean]."
   `);
   // @ts-expect-error
   expect(() => x.voidType.decode(x.ecmascript, true))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to decode from medium:
-      Expected undefined, getting [object Boolean]."
+      Expected undefined, got [object Boolean]."
   `);
   // @ts-expect-error
   expect(() => x.nullType.decode(x.ecmascript, undefined))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to decode from medium:
-      Expected null, getting [object Undefined]."
+      Expected null, got [object Undefined]."
   `);
   // @ts-expect-error
   expect(() => x.string.decode(x.ecmascript, null))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to decode from medium:
-      Expected string, getting [object Null]."
+      Expected string, got [object Null]."
   `);
   // @ts-expect-error
   expect(() => x.number.decode(x.ecmascript, 'text'))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to decode from medium:
-      Expected number, getting [object String]."
+      Expected number, got [object String]."
   `);
   // @ts-expect-error
   expect(() => x.boolean.decode(x.ecmascript, 123))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to decode from medium:
-      Expected boolean, getting [object Number]."
+      Expected boolean, got [object Number]."
   `);
 
   // @ts-expect-error
   expect(() => x.undefined.encode(x.ecmascript, true))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to encode to medium:
-      Expected undefined, getting [object Boolean]."
+      Expected undefined, got [object Boolean]."
   `);
   // @ts-expect-error
   expect(() => x.nullType.encode(x.ecmascript, undefined))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to encode to medium:
-      Expected null, getting [object Undefined]."
+      Expected null, got [object Undefined]."
   `);
   // @ts-expect-error
   expect(() => x.string.encode(x.ecmascript, null))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to encode to medium:
-      Expected string, getting [object Null]."
+      Expected string, got [object Null]."
   `);
   // @ts-expect-error
   expect(() => x.number.encode(x.ecmascript, 'text'))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to encode to medium:
-      Expected number, getting [object String]."
+      Expected number, got [object String]."
   `);
   // @ts-expect-error
   expect(() => x.boolean.encode(x.ecmascript, 123))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to encode to medium:
-      Expected boolean, getting [object Number]."
+      Expected boolean, got [object Number]."
   `);
   // @ts-expect-error
   expect(() => x.Function.encode(x.ecmascript, null))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to encode to medium:
-      Expected function, getting [object Null]."
+      Expected function, got [object Null]."
   `);
 });
 
@@ -140,7 +140,7 @@ test('pre-defined atomic types should error decode/encode json medium with wrong
   expect(() => x.nullType.decode(x.json, '"text"'))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to decode from medium:
-      Expected null, getting [object String]."
+      Expected null, got [object String]."
   `);
   expect(() => x.string.decode(x.json, '123')).toThrow(x.TypeConstraintError);
   expect(() => x.number.decode(x.json, 'true')).toThrow(x.TypeConstraintError);
@@ -162,7 +162,7 @@ test('date atomic type should error decoding json medium', () => {
   expect(() => x.Date.decode(x.json, JSON.stringify(new Date().toISOString())))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to decode from medium:
-      Expected instance of Date, getting [object String]."
+      Expected instance of Date, got [object String]."
   `);
 
   // Will not throw because json medium has defined atomicTypeSymbol codec as

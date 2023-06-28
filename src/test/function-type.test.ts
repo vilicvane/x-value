@@ -23,24 +23,24 @@ test('encode/decode/transform/diagnose', () => {
   expect(() => F.encode(x.ecmascript, undefined))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to encode to medium:
-      Expecting value to be a function, getting [object Undefined]."
+      Expected a function, got [object Undefined]."
   `);
   // @ts-expect-error
   expect(() => F.decode(x.ecmascript, undefined))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to decode from medium:
-      Expecting unpacked value to be a function, getting [object Undefined]."
+      Expected a function, got [object Undefined]."
   `);
   // @ts-expect-error
   expect(() => F.transform(x.ecmascript, x.ecmascript, undefined))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to transform medium:
-      Expecting unpacked value to be a function, getting [object Undefined]."
+      Expected a function, got [object Undefined]."
   `);
   expect(F.diagnose(undefined)).toMatchInlineSnapshot(`
     [
       {
-        "message": "Expecting a function, getting [object Undefined].",
+        "message": "Expected a function, got [object Undefined].",
         "path": [],
       },
     ]
@@ -72,7 +72,7 @@ test('guard', () => {
 
   expect(() => (f as Function)()).toThrowErrorMatchingInlineSnapshot(`
     "Failed to call guarded function:
-      Expecting at least 1 argument(s), getting 0."
+      Expected at least 1 argument(s), got 0."
   `);
   // @ts-expect-error
   expect(() => f(1234)).toThrowErrorMatchingInlineSnapshot(`
@@ -86,7 +86,7 @@ test('guard', () => {
   `);
   expect(() => (fForMediumA as Function)()).toThrowErrorMatchingInlineSnapshot(`
     "Failed to call guarded function:
-      Expecting at least 1 argument(s), getting 0."
+      Expected at least 1 argument(s), got 0."
   `);
   // @ts-expect-error
   expect(() => fForMediumA(1234)).toThrowErrorMatchingInlineSnapshot(`

@@ -39,7 +39,7 @@ export class FunctionType<
           throw new TypeConstraintError('Failed to call guarded function', [
             {
               path: [],
-              message: `Expecting at least ${ArgumentTypeTuple.length} argument(s), getting ${args.length}.`,
+              message: `Expected at least ${ArgumentTypeTuple.length} argument(s), got ${args.length}.`,
             },
           ]);
         }
@@ -77,7 +77,7 @@ export class FunctionType<
           throw new TypeConstraintError('Failed to call guarded function', [
             {
               path: [],
-              message: `Expecting at least ${ArgumentTypeTuple.length} argument(s), getting ${args.length}.`,
+              message: `Expected at least ${ArgumentTypeTuple.length} argument(s), got ${args.length}.`,
             },
           ]);
         }
@@ -133,7 +133,7 @@ export class FunctionType<
   }
 
   /** @internal */
-  _decode(
+  override _decode(
     _medium: Medium,
     unpacked: unknown,
     path: TypePath,
@@ -145,9 +145,7 @@ export class FunctionType<
         [
           {
             path,
-            message: `Expecting unpacked value to be a function, getting ${toString.call(
-              unpacked,
-            )}.`,
+            message: `Expected a function, got ${toString.call(unpacked)}.`,
           },
         ],
       ];
@@ -157,7 +155,7 @@ export class FunctionType<
   }
 
   /** @internal */
-  _encode(
+  override _encode(
     _medium: Medium,
     value: unknown,
     path: TypePath,
@@ -170,9 +168,7 @@ export class FunctionType<
         [
           {
             path,
-            message: `Expecting value to be a function, getting ${toString.call(
-              value,
-            )}.`,
+            message: `Expected a function, got ${toString.call(value)}.`,
           },
         ],
       ];
@@ -182,37 +178,16 @@ export class FunctionType<
   }
 
   /** @internal */
-  _transform(
-    _from: Medium,
-    _to: Medium,
-    unpacked: unknown,
+  override _diagnose(
+    value: unknown,
     path: TypePath,
     _exact: Exact,
-  ): [unknown, TypeIssue[]] {
-    if (typeof unpacked !== 'function') {
-      return [
-        undefined,
-        [
-          {
-            path,
-            message: `Expecting unpacked value to be a function, getting ${toString.call(
-              unpacked,
-            )}.`,
-          },
-        ],
-      ];
-    }
-
-    return [unpacked, []];
-  }
-
-  /** @internal */
-  _diagnose(value: unknown, path: TypePath, _exact: Exact): TypeIssue[] {
+  ): TypeIssue[] {
     if (typeof value !== 'function') {
       return [
         {
           path,
-          message: `Expecting a function, getting ${toString.call(value)}.`,
+          message: `Expected a function, got ${toString.call(value)}.`,
         },
       ];
     }

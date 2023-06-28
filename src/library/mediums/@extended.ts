@@ -19,7 +19,7 @@ export const EXTENDED_CODECS: MediumAtomicCodecs<ExtendedTypes> = {
     decode(value) {
       if (typeof value !== 'string') {
         throw new TypeError(
-          `Expected bigint string, getting ${toString.call(value)}`,
+          `Expected bigint string, got ${toString.call(value)}`,
         );
       }
 
@@ -33,7 +33,7 @@ export const EXTENDED_CODECS: MediumAtomicCodecs<ExtendedTypes> = {
     decode(value) {
       if (typeof value !== 'string') {
         throw new TypeError(
-          `Expected ISO date string, getting ${toString.call(value)}`,
+          `Expected ISO date string, got ${toString.call(value)}`,
         );
       }
 
@@ -53,9 +53,7 @@ export const EXTENDED_CODECS: MediumAtomicCodecs<ExtendedTypes> = {
     decode(value) {
       if (typeof value !== 'string') {
         throw new TypeError(
-          `Expected regular expression literal, getting ${toString.call(
-            value,
-          )}`,
+          `Expected regular expression literal, got ${toString.call(value)}`,
         );
       }
 

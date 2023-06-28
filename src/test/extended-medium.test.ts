@@ -42,7 +42,7 @@ test('bigint type should work', () => {
   expect(() => x.bigint.decode(x.extendedJSONValue, 123))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to decode from medium:
-      Expected bigint string, getting [object Number]"
+      Expected bigint string, got [object Number]"
   `);
 });
 
@@ -113,7 +113,7 @@ test('RegExp type should work', () => {
   expect(() => x.RegExp.decode(x.extendedJSONValue, 123))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to decode from medium:
-      Expected regular expression literal, getting [object Number]"
+      Expected regular expression literal, got [object Number]"
   `);
 
   expect(() => x.RegExp.decode(x.extendedJSONValue, ''))

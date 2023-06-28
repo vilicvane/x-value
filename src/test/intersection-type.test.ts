@@ -15,7 +15,7 @@ test('intersection type results in never should work with json medium', () => {
   expect(() => Type.decode(x.json, JSON.stringify(value1)))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to decode from medium:
-      Expected number, getting [object String]."
+      Expected number, got [object String]."
   `);
   expect(() => Type.decode(x.json, JSON.stringify(value2))).toThrow(
     x.TypeConstraintError,
@@ -24,7 +24,7 @@ test('intersection type results in never should work with json medium', () => {
   // @ts-expect-error
   expect(() => Type.encode(x.json, value1)).toThrowErrorMatchingInlineSnapshot(`
     "Failed to encode to medium:
-      Expected number, getting [object String]."
+      Expected number, got [object String]."
   `);
   // @ts-expect-error
   expect(() => Type.encode(x.json, value2)).toThrow(x.TypeConstraintError);
@@ -72,13 +72,13 @@ test('intersection type should work with json value medium', () => {
   expect(() => Type.decode(x.jsonValue, value2))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to decode from medium:
-      ["bar"] Expected number, getting [object Undefined]."
+      ["bar"] Expected number, got [object Undefined]."
   `);
   // @ts-expect-error
   expect(() => Type.decode(x.jsonValue, value3))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to decode from medium:
-      ["bar"] Expected number, getting [object String]."
+      ["bar"] Expected number, got [object String]."
   `);
 
   expect(Type.encode(x.jsonValue, value1)).toEqual(value1);
@@ -86,13 +86,13 @@ test('intersection type should work with json value medium', () => {
   expect(() => Type.encode(x.jsonValue, value2))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to encode to medium:
-      ["bar"] Expected number, getting [object Undefined]."
+      ["bar"] Expected number, got [object Undefined]."
   `);
   // @ts-expect-error
   expect(() => Type.encode(x.jsonValue, value3))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to encode to medium:
-      ["bar"] Expected number, getting [object String]."
+      ["bar"] Expected number, got [object String]."
   `);
 
   expect(Type.is(value1)).toBe(true);

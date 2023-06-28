@@ -30,7 +30,7 @@ declare global {
 
 export const neverTypeSymbol = Symbol();
 export const never = atomic(neverTypeSymbol, value => {
-  throw `Expected never, getting ${toString.call(value)}.`;
+  throw `Expected never, got ${toString.call(value)}.`;
 });
 
 export const unknownTypeSymbol = Symbol();
@@ -40,7 +40,7 @@ export const undefinedTypeSymbol = Symbol();
 export const undefined = atomic(undefinedTypeSymbol, value =>
   constraint(
     value === void 0,
-    () => `Expected undefined, getting ${toString.call(value)}.`,
+    () => `Expected undefined, got ${toString.call(value)}.`,
   ),
 );
 
@@ -48,7 +48,7 @@ export const voidTypeSymbol = Symbol();
 export const voidType = atomic(voidTypeSymbol, value =>
   constraint(
     value === void 0,
-    () => `Expected undefined, getting ${toString.call(value)}.`,
+    () => `Expected undefined, got ${toString.call(value)}.`,
   ),
 );
 
@@ -60,7 +60,7 @@ export const nullType = atomic(
   value =>
     constraint(
       value === null,
-      () => `Expected null, getting ${toString.call(value)}.`,
+      () => `Expected null, got ${toString.call(value)}.`,
     ),
   {type: 'null'},
 );
@@ -71,7 +71,7 @@ export const string = atomic(
   value =>
     constraint(
       typeof value === 'string',
-      () => `Expected string, getting ${toString.call(value)}.`,
+      () => `Expected string, got ${toString.call(value)}.`,
     ),
   {type: 'string'},
 );
@@ -82,7 +82,7 @@ export const number = atomic(
   value =>
     constraint(
       typeof value === 'number',
-      () => `Expected number, getting ${toString.call(value)}.`,
+      () => `Expected number, got ${toString.call(value)}.`,
     ),
   {type: 'number'},
 );
@@ -93,7 +93,7 @@ export const bigint = atomic(
   value =>
     constraint(
       typeof value === 'bigint',
-      () => `Expected bigint, getting ${toString.call(value)}.`,
+      () => `Expected bigint, got ${toString.call(value)}.`,
     ),
   {type: 'integer'},
 );
@@ -104,7 +104,7 @@ export const boolean = atomic(
   value =>
     constraint(
       typeof value === 'boolean',
-      () => `Expected boolean, getting ${toString.call(value)}.`,
+      () => `Expected boolean, got ${toString.call(value)}.`,
     ),
   {type: 'boolean'},
 );
@@ -113,7 +113,7 @@ export const functionTypeSymbol = Symbol();
 export const Function = atomic(functionTypeSymbol, value =>
   constraint(
     typeof value === 'function',
-    () => `Expected function, getting ${toString.call(value)}.`,
+    () => `Expected function, got ${toString.call(value)}.`,
   ),
 );
 
@@ -121,7 +121,7 @@ export const dateTypeSymbol = Symbol();
 export const Date = atomic(dateTypeSymbol, value =>
   constraint(
     value instanceof globalThis.Date,
-    () => `Expected instance of Date, getting ${toString.call(value)}.`,
+    () => `Expected instance of Date, got ${toString.call(value)}.`,
   ),
 );
 
@@ -129,6 +129,6 @@ export const regexpTypeSymbol = Symbol();
 export const RegExp = atomic(regexpTypeSymbol, value =>
   constraint(
     value instanceof globalThis.RegExp,
-    () => `Expected instance of RegExp, getting ${toString.call(value)}.`,
+    () => `Expected instance of RegExp, got ${toString.call(value)}.`,
   ),
 );

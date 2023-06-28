@@ -11,8 +11,8 @@ test('union type of atomic types should work with json medium', () => {
   expect(() => Type.decode(x.json, JSON.stringify(true)))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to decode from medium:
-      The unpacked value satisfies none of the type in the union type.
-      Expected string, getting [object Boolean]."
+      The value satisfies none of the type in the union type.
+      Expected string, got [object Boolean]."
   `);
 
   expect(JSON.parse(Type.encode(x.json, value1))).toEqual(value1);
@@ -21,7 +21,7 @@ test('union type of atomic types should work with json medium', () => {
   expect(() => Type.encode(x.json, true)).toThrowErrorMatchingInlineSnapshot(`
     "Failed to encode to medium:
       The value satisfies none of the type in the union type.
-      Expected string, getting [object Boolean]."
+      Expected string, got [object Boolean]."
   `);
 
   expect(Type.is(value1)).toBe(true);
@@ -65,8 +65,8 @@ test('union type of mixed types should work with json medium', () => {
   expect(() => Type.decode(x.json, JSON.stringify(true)))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to decode from medium:
-      The unpacked value satisfies none of the type in the union type.
-      Expecting unpacked value to be a non-null object, getting [object Boolean]."
+      The value satisfies none of the type in the union type.
+      Expected a non-null object, got [object Boolean]."
   `);
 
   expect(JSON.parse(Type.encode(x.json, value1))).toEqual(value1);
@@ -74,12 +74,12 @@ test('union type of mixed types should work with json medium', () => {
   expect(() => Type.encode(x.json, value3)).toThrowErrorMatchingInlineSnapshot(`
     "Failed to encode to medium:
       The value satisfies none of the type in the union type.
-      Expecting value to be a non-null object, getting [object Boolean]."
+      Expected a non-null object, got [object Boolean]."
   `);
   expect(() => Type.encode(x.json, value4)).toThrowErrorMatchingInlineSnapshot(`
     "Failed to encode to medium:
       The value satisfies none of the type in the union type.
-      ["value"] Expected string, getting [object Number]."
+      ["value"] Expected string, got [object Number]."
   `);
 
   expect(Type.is(value1)).toBe(true);

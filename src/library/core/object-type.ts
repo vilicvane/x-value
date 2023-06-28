@@ -2,10 +2,14 @@ import type {Exact} from './@exact-context';
 import type {TypeIssue, TypePath} from './@type-issue';
 import {hasNonDeferrableTypeIssue} from './@type-issue';
 import type {JSONSchema} from './json-schema';
-import type {Medium} from './medium';
 import {OptionalType} from './optional-type';
 import {Type} from './type';
-import type {JSONSchemaContext, JSONSchemaData, TypeLike} from './type-like';
+import type {
+  JSONSchemaContext,
+  JSONSchemaData,
+  TraverseCallback,
+  TypeLike,
+} from './type-like';
 import type {
   TypeInMediumsPartial,
   TypeKindPartial,
@@ -78,21 +82,19 @@ export class ObjectType<
   }
 
   /** @internal */
-  _decode(
-    medium: Medium,
-    unpacked: unknown,
+  override _traverse(
+    input: unknown,
     path: TypePath,
     exact: Exact,
+    callback: TraverseCallback,
   ): [unknown, TypeIssue[]] {
-    if (typeof unpacked !== 'object' || unpacked === null) {
+    if (typeof input !== 'object' || input === null) {
       return [
         undefined,
         [
           {
             path,
-            message: `Expecting unpacked value to be a non-null object, getting ${toString.call(
-              unpacked,
-            )}.`,
+            message: `Expected a non-null object, got ${toString.call(input)}.`,
           },
         ],
       ];
@@ -107,9 +109,9 @@ export class ObjectType<
     const issues: TypeIssue[] = [];
 
     for (const [key, Type] of Object.entries(this.definition)) {
-      const [value, entryIssues] = Type._decode(
-        medium,
-        (unpacked as any)[key],
+      const [value, entryIssues] = callback(
+        Type,
+        (input as any)[key],
         [...path, key],
         nestedExact,
       );
@@ -123,7 +125,7 @@ export class ObjectType<
     }
 
     if (managedContext) {
-      issues.push(...managedContext.getUnknownKeyIssues(unpacked, path));
+      issues.push(...managedContext.getUnknownKeyIssues(input, path));
     }
 
     return [
@@ -132,165 +134,6 @@ export class ObjectType<
         : Object.fromEntries(entries),
       issues,
     ];
-  }
-
-  /** @internal */
-  _encode(
-    medium: Medium,
-    value: unknown,
-    path: TypePath,
-    exact: Exact,
-    diagnose: boolean,
-  ): [unknown, TypeIssue[]] {
-    if (diagnose && (typeof value !== 'object' || value === null)) {
-      return [
-        undefined,
-        [
-          {
-            path,
-            message: `Expecting value to be a non-null object, getting ${toString.call(
-              value,
-            )}.`,
-          },
-        ],
-      ];
-    }
-
-    const {managedContext, wrappedExact, nestedExact} = diagnose
-      ? this.getExactContext(exact, 'managed')
-      : {
-          managedContext: undefined,
-          wrappedExact: false as false,
-          nestedExact: false,
-        };
-
-    const entries: [string, unknown][] = [];
-    const issues: TypeIssue[] = [];
-
-    for (const [key, Type] of Object.entries(this.definition)) {
-      const [unpacked, entryIssues] = Type._encode(
-        medium,
-        (value as any)[key],
-        [...path, key],
-        nestedExact,
-        diagnose,
-      );
-
-      entries.push([key, unpacked]);
-      issues.push(...entryIssues);
-    }
-
-    if (wrappedExact) {
-      wrappedExact.addKeys(entries.map(([key]) => key));
-    }
-
-    if (managedContext) {
-      issues.push(...managedContext.getUnknownKeyIssues(value, path));
-    }
-
-    return [
-      hasNonDeferrableTypeIssue(issues)
-        ? undefined
-        : Object.fromEntries(entries),
-      issues,
-    ];
-  }
-
-  /** @internal */
-  _transform(
-    from: Medium,
-    to: Medium,
-    unpacked: unknown,
-    path: TypePath,
-    exact: Exact,
-  ): [unknown, TypeIssue[]] {
-    if (typeof unpacked !== 'object' || unpacked === null) {
-      return [
-        undefined,
-        [
-          {
-            path,
-            message: `Expecting unpacked value to be a non-null object, getting ${toString.call(
-              unpacked,
-            )}.`,
-          },
-        ],
-      ];
-    }
-
-    const {managedContext, wrappedExact, nestedExact} = this.getExactContext(
-      exact,
-      'managed',
-    );
-
-    const entries: [string, unknown][] = [];
-    const issues: TypeIssue[] = [];
-
-    for (const [key, Type] of Object.entries(this.definition)) {
-      const [transformedUnpacked, entryIssues] = Type._transform(
-        from,
-        to,
-        (unpacked as any)[key],
-        [...path, key],
-        nestedExact,
-      );
-
-      entries.push([key, transformedUnpacked]);
-      issues.push(...entryIssues);
-    }
-
-    if (wrappedExact) {
-      wrappedExact.addKeys(entries.map(([key]) => key));
-    }
-
-    if (managedContext) {
-      issues.push(...managedContext.getUnknownKeyIssues(unpacked, path));
-    }
-
-    return [
-      hasNonDeferrableTypeIssue(issues)
-        ? undefined
-        : Object.fromEntries(entries),
-      issues,
-    ];
-  }
-
-  /** @internal */
-  _diagnose(value: unknown, path: TypePath, exact: Exact): TypeIssue[] {
-    if (typeof value !== 'object' || value === null) {
-      return [
-        {
-          path,
-          message: `Expecting a non-null object, getting ${toString.call(
-            value,
-          )}.`,
-        },
-      ];
-    }
-
-    const {managedContext, wrappedExact, nestedExact} = this.getExactContext(
-      exact,
-      'managed',
-    );
-
-    const issues: TypeIssue[] = [];
-    const entries = Object.entries(this.definition);
-
-    for (const [key, Type] of entries) {
-      issues.push(
-        ...Type._diagnose((value as any)[key], [...path, key], nestedExact),
-      );
-    }
-
-    if (wrappedExact) {
-      wrappedExact.addKeys(entries.map(([key]) => key));
-    }
-
-    if (managedContext) {
-      issues.push(...managedContext.getUnknownKeyIssues(value, path));
-    }
-
-    return issues;
   }
 
   /** @internal */

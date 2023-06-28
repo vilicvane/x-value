@@ -74,9 +74,7 @@ export const extendedQueryString =
 
 function stringify(dict: unknown): string {
   if (typeof dict !== 'object' || dict === null) {
-    throw new TypeError(
-      `Expected non-null object, getting ${toString.call(dict)}`,
-    );
+    throw new TypeError(`Expected non-null object, got ${toString.call(dict)}`);
   }
 
   return Object.entries(dict)

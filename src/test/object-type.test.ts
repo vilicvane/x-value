@@ -625,7 +625,7 @@ test('explicit non-exact object with intersection', () => {
   expect(O.diagnose(invalid1)).toMatchInlineSnapshot(`
     [
       {
-        "message": "Expected string, getting [object Undefined].",
+        "message": "Expected string, got [object Undefined].",
         "path": [
           "foo",
         ],

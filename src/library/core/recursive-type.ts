@@ -19,7 +19,7 @@ export class RecursiveType<T> extends Type<RecursiveInMediums<T>> {
   }
 
   /** @internal */
-  _decode(
+  override _decode(
     medium: Medium,
     unpacked: unknown,
     path: TypePath,
@@ -29,7 +29,7 @@ export class RecursiveType<T> extends Type<RecursiveInMediums<T>> {
   }
 
   /** @internal */
-  _encode(
+  override _encode(
     medium: Medium,
     value: unknown,
     path: TypePath,
@@ -40,18 +40,11 @@ export class RecursiveType<T> extends Type<RecursiveInMediums<T>> {
   }
 
   /** @internal */
-  _transform(
-    from: Medium,
-    to: Medium,
-    unpacked: unknown,
+  override _diagnose(
+    value: unknown,
     path: TypePath,
     exact: Exact,
-  ): [unknown, TypeIssue[]] {
-    return this.Type._transform(from, to, unpacked, path, exact);
-  }
-
-  /** @internal */
-  _diagnose(value: unknown, path: TypePath, exact: Exact): TypeIssue[] {
+  ): TypeIssue[] {
     return this.Type._diagnose(value, path, exact);
   }
 

@@ -35,9 +35,9 @@ export function literal(
             value === literal,
             value,
             () =>
-              `Expected string ${JSON.stringify(
-                literal,
-              )}, getting ${JSON.stringify(value)}.`,
+              `Expected string ${JSON.stringify(literal)}, got ${JSON.stringify(
+                value,
+              )}.`,
           ),
         {const: literal},
       );
@@ -47,7 +47,7 @@ export function literal(
           refinement(
             value === literal,
             value,
-            () => `Expected number ${literal}, getting ${value}.`,
+            () => `Expected number ${literal}, got ${value}.`,
           ),
         {const: literal},
       );
@@ -57,7 +57,7 @@ export function literal(
           refinement(
             value === literal,
             value,
-            () => `Expected boolean ${literal}, getting ${value}.`,
+            () => `Expected boolean ${literal}, got ${value}.`,
           ),
         {const: literal},
       );

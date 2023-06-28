@@ -24,7 +24,7 @@ test('Integer and integerRange should work', () => {
   expect(x.Integer.diagnose(-1.1)).toMatchInlineSnapshot(`
     [
       {
-        "message": "Expected integer, getting -1.1.",
+        "message": "Expected integer, got -1.1.",
         "path": [],
       },
     ]
@@ -44,7 +44,7 @@ test('Integer and integerRange should work', () => {
   expect(RangeA.diagnose(1.1)).toMatchInlineSnapshot(`
     [
       {
-        "message": "Expected integer, getting 1.1.",
+        "message": "Expected integer, got 1.1.",
         "path": [],
       },
     ]
@@ -52,7 +52,7 @@ test('Integer and integerRange should work', () => {
   expect(RangeA.diagnose(3)).toMatchInlineSnapshot(`
     [
       {
-        "message": "Expected integer <= 2, getting 3.",
+        "message": "Expected integer <= 2, got 3.",
         "path": [],
       },
     ]
@@ -77,7 +77,7 @@ test('numberRange should work', () => {
   expect(RangeA.diagnose(1)).toMatchInlineSnapshot(`
     [
       {
-        "message": "Expected number >= 1.1, getting 1.",
+        "message": "Expected number >= 1.1, got 1.",
         "path": [],
       },
     ]
@@ -85,7 +85,7 @@ test('numberRange should work', () => {
   expect(RangeA.diagnose(2)).toMatchInlineSnapshot(`
     [
       {
-        "message": "Expected number < 2, getting 2.",
+        "message": "Expected number < 2, got 2.",
         "path": [],
       },
     ]
@@ -96,7 +96,7 @@ test('numberRange should work', () => {
   expect(RangeB.diagnose(-1)).toMatchInlineSnapshot(`
     [
       {
-        "message": "Expected number > 0, getting -1.",
+        "message": "Expected number > 0, got -1.",
         "path": [],
       },
     ]
@@ -104,7 +104,7 @@ test('numberRange should work', () => {
   expect(RangeB.diagnose(0)).toMatchInlineSnapshot(`
     [
       {
-        "message": "Expected number > 0, getting 0.",
+        "message": "Expected number > 0, got 0.",
         "path": [],
       },
     ]
@@ -112,7 +112,7 @@ test('numberRange should work', () => {
   expect(RangeB.diagnose(4)).toMatchInlineSnapshot(`
     [
       {
-        "message": "Expected number <= 3, getting 4.",
+        "message": "Expected number <= 3, got 4.",
         "path": [],
       },
     ]
@@ -131,7 +131,7 @@ test('literal type should work', () => {
   expect(Foo.diagnose('bar')).toMatchInlineSnapshot(`
     [
       {
-        "message": "Expected string "foo", getting "bar".",
+        "message": "Expected string "foo", got "bar".",
         "path": [],
       },
     ]
@@ -139,7 +139,7 @@ test('literal type should work', () => {
   expect(One.diagnose(2)).toMatchInlineSnapshot(`
     [
       {
-        "message": "Expected number 1, getting 2.",
+        "message": "Expected number 1, got 2.",
         "path": [],
       },
     ]
@@ -147,7 +147,7 @@ test('literal type should work', () => {
   expect(True.diagnose(false)).toMatchInlineSnapshot(`
     [
       {
-        "message": "Expected boolean true, getting false.",
+        "message": "Expected boolean true, got false.",
         "path": [],
       },
     ]

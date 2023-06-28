@@ -1,9 +1,12 @@
 import type {Exact} from './@exact-context';
 import type {TypeIssue, TypePath} from './@type-issue';
 import {hasNonDeferrableTypeIssue} from './@type-issue';
-import type {Medium} from './medium';
-import {DISABLED_EXACT_CONTEXT_RESULT, Type} from './type';
-import type {JSONSchemaContext, JSONSchemaData} from './type-like';
+import {Type} from './type';
+import type {
+  JSONSchemaContext,
+  JSONSchemaData,
+  TraverseCallback,
+} from './type-like';
 import type {TypeInMediumsPartial, __type_in_mediums} from './type-partials';
 import {__type_kind} from './type-partials';
 
@@ -21,21 +24,19 @@ export class RecordType<
   }
 
   /** @internal */
-  _decode(
-    medium: Medium,
-    unpacked: unknown,
+  override _traverse(
+    input: unknown,
     path: TypePath,
     exact: Exact,
+    callback: TraverseCallback,
   ): [unknown, TypeIssue[]] {
-    if (typeof unpacked !== 'object' || unpacked === null) {
+    if (typeof input !== 'object' || input === null) {
       return [
         undefined,
         [
           {
             path,
-            message: `Expecting unpacked value to be a non-null object, getting ${toString.call(
-              unpacked,
-            )}.`,
+            message: `Expected a non-null object, got ${toString.call(input)}.`,
           },
         ],
       ];
@@ -49,169 +50,29 @@ export class RecordType<
     context?.neutralize();
 
     const entries: [string | number, unknown][] = [];
-    const issues: TypeIssue[] = [];
+    const aggregatedIssues: TypeIssue[] = [];
 
-    for (const [key, unpackedValue] of getRecordEntries(unpacked)) {
-      const [value, valueIssues] = Value._decode(
-        medium,
-        unpackedValue,
+    for (const [key, value] of getRecordEntries(input)) {
+      const keyIssues = Key._diagnose(key, [...path, {key}], nestedExact);
+
+      const [output, valueIssues] = Value._traverse(
+        value,
         [...path, key],
         nestedExact,
+        callback,
       );
 
-      entries.push([key, value]);
-      issues.push(
-        ...Key._diagnose(key, [...path, {key}], nestedExact),
-        ...valueIssues,
-      );
+      entries.push([key, output]);
+
+      aggregatedIssues.push(...keyIssues, ...valueIssues);
     }
 
     return [
-      hasNonDeferrableTypeIssue(issues)
+      hasNonDeferrableTypeIssue(aggregatedIssues)
         ? undefined
-        : buildRecord(entries, unpacked),
-      issues,
+        : buildRecord(entries, input),
+      aggregatedIssues,
     ];
-  }
-
-  /** @internal */
-  _encode(
-    medium: Medium,
-    value: unknown,
-    path: TypePath,
-    exact: Exact,
-    diagnose: boolean,
-  ): [unknown, TypeIssue[]] {
-    if (diagnose && (typeof value !== 'object' || value === null)) {
-      return [
-        undefined,
-        [
-          {
-            path,
-            message: `Expecting value to be a non-null object, getting ${toString.call(
-              value,
-            )}.`,
-          },
-        ],
-      ];
-    }
-
-    const Key = this.Key;
-    const Value = this.Value;
-
-    const {context, nestedExact} = diagnose
-      ? this.getExactContext(exact, false)
-      : DISABLED_EXACT_CONTEXT_RESULT;
-
-    context?.neutralize();
-
-    const entries: [string | number, unknown][] = [];
-    const issues: TypeIssue[] = [];
-
-    for (const [key, nestedValue] of getRecordEntries(value as object)) {
-      const [unpacked, valueIssues] = Value._encode(
-        medium,
-        nestedValue,
-        [...path, key],
-        nestedExact,
-        diagnose,
-      );
-
-      entries.push([key, unpacked]);
-      issues.push(
-        ...Key._diagnose(key, [...path, {key}], nestedExact),
-        ...valueIssues,
-      );
-    }
-
-    return [
-      hasNonDeferrableTypeIssue(issues)
-        ? undefined
-        : buildRecord(entries, value as object),
-      issues,
-    ];
-  }
-
-  /** @internal */
-  _transform(
-    from: Medium,
-    to: Medium,
-    unpacked: unknown,
-    path: TypePath,
-    exact: Exact,
-  ): [unknown, TypeIssue[]] {
-    if (typeof unpacked !== 'object' || unpacked === null) {
-      return [
-        undefined,
-        [
-          {
-            path,
-            message: `Expecting unpacked value to be a non-null object, getting ${toString.call(
-              unpacked,
-            )}.`,
-          },
-        ],
-      ];
-    }
-
-    const Key = this.Key;
-    const Value = this.Value;
-
-    const {context, nestedExact} = this.getExactContext(exact, false);
-
-    context?.neutralize();
-
-    const entries: [string | number, unknown][] = [];
-    const issues: TypeIssue[] = [];
-
-    for (const [key, unpackedValue] of getRecordEntries(unpacked)) {
-      const [transformedUnpacked, valueIssues] = Value._transform(
-        from,
-        to,
-        unpackedValue,
-        [...path, key],
-        nestedExact,
-      );
-
-      entries.push([key, transformedUnpacked]);
-      issues.push(
-        ...Key._diagnose(key, [...path, {key}], nestedExact),
-        ...valueIssues,
-      );
-    }
-
-    return [
-      hasNonDeferrableTypeIssue(issues)
-        ? undefined
-        : buildRecord(entries, unpacked),
-      issues,
-    ];
-  }
-
-  /** @internal */
-  _diagnose(value: unknown, path: TypePath, exact: Exact): TypeIssue[] {
-    if (typeof value !== 'object' || value === null) {
-      return [
-        {
-          path,
-          message: `Expecting a non-null object, getting ${toString.call(
-            value,
-          )}.`,
-        },
-      ];
-    }
-
-    const Key = this.Key;
-    const Value = this.Value;
-
-    const {context, nestedExact} = this.getExactContext(exact, false);
-
-    context?.neutralize();
-
-    return getRecordEntries(value).flatMap(([key, nestedValue]) => [
-      ...Key._diagnose(key, [...path, {key}], nestedExact),
-      ...Value._diagnose(nestedValue, [...path, key], nestedExact),
-    ]);
   }
 
   /** @internal */

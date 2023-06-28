@@ -25,13 +25,13 @@ test('atomic refinement should work', () => {
   expect(() => NonEmptyString.encode(x.jsonValue, [1, 2, 3]))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to encode to medium:
-      Expected string, getting [object Array]."
+      Expected string, got [object Array]."
   `);
   // @ts-expect-error
   expect(() => NonEmptyString.decode(x.jsonValue, 0))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to decode from medium:
-      Expected string, getting [object Number]."
+      Expected string, got [object Number]."
   `);
 
   const Email = x.string.refined<'email'>(value =>
@@ -525,7 +525,7 @@ test('refinement transform', () => {
   expect(() => TrimmedNonEmptyString.encode(x.jsonValue, ' abc '))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to encode to medium:
-      Expecting encoding value to be stable after refinements."
+      Expected encoding value to be stable after refinements."
   `);
   expect(TrimmedNonEmptyString.decode(x.jsonValue, ' def ')).toBe('def');
   expect(
