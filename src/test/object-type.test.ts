@@ -318,7 +318,7 @@ test('pick() should work', () => {
     extra: x.boolean,
   });
 
-  const PickedO = O.pick('foo', 'bar');
+  const PickedO = O.pick(['foo', 'bar']);
 
   type PickedO = x.TypeOf<typeof PickedO>;
 
@@ -352,7 +352,7 @@ test('omit() should work', () => {
     extra: x.boolean,
   });
 
-  const OmittedO = O.omit('extra');
+  const OmittedO = O.omit(['extra']);
 
   type OmittedO = x.TypeOf<typeof OmittedO>;
 

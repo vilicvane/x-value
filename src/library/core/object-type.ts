@@ -58,7 +58,7 @@ export class ObjectType<
   }
 
   pick<TKeys extends (keyof TDefinition)[]>(
-    ...keys: TKeys
+    keys: TKeys,
   ): ObjectType<Pick<TDefinition, TKeys[number]>> {
     const keySet = new Set(keys);
 
@@ -70,7 +70,7 @@ export class ObjectType<
   }
 
   omit<TKeys extends (keyof TDefinition)[]>(
-    ...keys: TKeys
+    keys: TKeys,
   ): ObjectType<Omit<TDefinition, TKeys[number]>> {
     const keySet = new Set(keys);
 
