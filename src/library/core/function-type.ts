@@ -155,7 +155,9 @@ export class FunctionType<
     exact: Exact,
     diagnose: boolean,
   ): [unknown, TypeIssue[]] {
-    const issues = diagnose ? this._diagnose(value, path, exact) : [];
+    const issues = diagnose
+      ? this._diagnose(value, path, exact)
+      : /* istanbul ignore next */ [];
     return [hasNonDeferrableTypeIssue(issues) ? undefined : value, issues];
   }
 

@@ -57,3 +57,43 @@ test('plug2proxy router rule', () => {
     }),
   ).toBe(false);
 });
+
+test('intersection union transform', () => {
+  const Document = x.intersection([
+    x.object({
+      _id: x.string,
+    }),
+    x.union([
+      x.object({
+        type: x.literal('a'),
+        a: x.string,
+      }),
+      x.object({
+        type: x.literal('b'),
+        b: x.number,
+      }),
+    ]),
+  ]);
+
+  type Document = x.MediumTypeOf<'json-value', typeof Document>;
+
+  const value_1: Document = {
+    _id: '123',
+    type: 'a',
+    a: 'abc',
+  };
+
+  const value_2: Document = {
+    _id: '123',
+    type: 'b',
+    b: 123,
+  };
+
+  expect(Document.transform(x.jsonValue, x.jsonValue, value_1)).toEqual(
+    value_1,
+  );
+
+  expect(Document.transform(x.jsonValue, x.jsonValue, value_2)).toEqual(
+    value_2,
+  );
+});

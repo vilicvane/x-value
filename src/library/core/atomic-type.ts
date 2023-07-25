@@ -55,6 +55,7 @@ export class AtomicType<TSymbol extends symbol> extends Type<
   ): [unknown, TypeIssue[]] {
     let issues: TypeIssue[];
 
+    /* istanbul ignore else */
     if (diagnose) {
       issues = this._diagnose(value, path, exact);
 

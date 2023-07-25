@@ -91,7 +91,7 @@ export abstract class Type<
         return [undefined, issues];
       }
 
-      return Type._encode(to, decoded, path, exact, false);
+      return Type._encode(to, decoded, path, exact, true);
     };
 
     const [transformedUnpacked, issues] = this._traverse(
