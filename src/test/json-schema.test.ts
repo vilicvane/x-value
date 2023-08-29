@@ -830,7 +830,7 @@ test('not supported', () => {
   expect(() =>
     x.function([], x.void).toJSONSchema(),
   ).toThrowErrorMatchingInlineSnapshot(
-    `"Cannot convert Function type to JSON Schema"`,
+    `"JSON schema is not defined for this atomic type"`,
   );
   expect(() =>
     x

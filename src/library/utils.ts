@@ -30,7 +30,7 @@ export function constraint(
 
 export function refinement<T>(
   condition: boolean,
-  refined: T,
+  refined: T extends Function ? () => T : (() => T) | T,
   message?: string | (() => string),
 ): T {
   if (!condition) {
@@ -41,5 +41,5 @@ export function refinement<T>(
     throw message ?? 'Unexpected value.';
   }
 
-  return refined;
+  return typeof refined === 'function' ? refined() : refined;
 }

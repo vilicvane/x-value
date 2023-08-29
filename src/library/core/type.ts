@@ -281,9 +281,7 @@ ${this.issues
                 segment =>
                   `[${
                     typeof segment === 'object'
-                      ? 'key' in segment
-                        ? `key:${JSON.stringify(segment.key)}`
-                        : `args[${segment.argument}]`
+                      ? `key:${JSON.stringify(segment.key)}`
                       : JSON.stringify(segment)
                   }]`,
               )

@@ -26,7 +26,6 @@ Comparing to alternatives like [io-ts](https://github.com/gcanti/io-ts) and [Zod
   - [Union Type](#union-type)
   - [Intersection Type](#intersection-type)
   - [Recursive Type](#recursive-type)
-  - [Function Type](#function-type)
   - [Refined Type](#refined-type)
   - [Nominal Type](#nominal-type)
   - [Exact Type](#exact-type)
@@ -309,24 +308,6 @@ type RecursiveType = x.TypeOf<typeof RecursiveType>;
 ```
 
 > The hand-written `RecursiveTypeDefinition` is completely different from the one built by `x.Recursive<>`, you may choose what fits your needs more.
-
-### Function Type
-
-```ts
-const FunctionType = x.function([x.string], x.number);
-
-type FunctionType = x.TypeOf<typeof FunctionType>; // (arg_0: string) => number
-```
-
-It important to understand function type validates **neither** the function parameters **nor** the return value.
-
-However, you may create guarded functions using function type:
-
-```ts
-const fn = FunctionType.guard(value => value.length);
-```
-
-> Please note that `x.Function` is not a function type, instead it's a pre-defined, non-generic atomic type that matches all functions.
 
 ### Refined Type
 

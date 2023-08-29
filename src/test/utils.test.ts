@@ -180,12 +180,12 @@ test('equal should work', () => {
   // @ts-expect-error
   expect(() => O.encode(x.json, {})).toThrowErrorMatchingInlineSnapshot(`
     "Failed to encode to medium:
-      Unexpected value."
+      Expected equal values."
   `);
   expect(() => O.decode(x.json, JSON.stringify({})))
     .toThrowErrorMatchingInlineSnapshot(`
     "Failed to decode from medium:
-      Unexpected value."
+      Expected equal values."
   `);
 });
 
@@ -247,4 +247,30 @@ test('x.Promise should work', async () => {
   `);
 
   type _ = AssertTrue<IsEqual<StringPromise, Promise<string>>>;
+});
+
+test('x.function should work', async () => {
+  const F = x.function([x.string, x.number], x.void);
+
+  type F = x.TypeOf<typeof F>;
+
+  const valid_1 = F.sanitize(() => {});
+
+  expect(valid_1('', 0)).toBe(undefined);
+
+  expect(() => (valid_1 as any)()).toThrowErrorMatchingInlineSnapshot(`
+    "Value does not satisfy the type:
+      Expected value with 2 instead of 0 element(s)."
+  `);
+
+  const invalid_1 = F.sanitize(() => 123);
+
+  expect(() => invalid_1('', 0)).toThrowErrorMatchingInlineSnapshot(`
+    "Value does not satisfy the type:
+      Expected undefined, got [object Number]."
+  `);
+
+  type _ = AssertTrue<
+    IsEqual<F, Function & ((arg_1: string, arg_2: number) => void)>
+  >;
 });
