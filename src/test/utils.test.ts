@@ -222,3 +222,29 @@ test('XTypeOfValue/XTypeOfMediumValue should work', () => {
     | AssertTrue<IsCompatible<typeof x.Date, x.XTypeOfValue<Date>>>
     | AssertFalse<IsCompatible<typeof x.Date, x.XTypeOfValue<123>>>;
 });
+
+test('x.Promise should work', async () => {
+  const StringPromise = x.Promise(x.string);
+
+  type StringPromise = x.TypeOf<typeof StringPromise>;
+
+  const valid_1 = StringPromise.sanitize(Promise.resolve('abc'));
+
+  expect(await valid_1).toBe('abc');
+
+  const invalid_1 = StringPromise.sanitize(Promise.resolve(123));
+
+  await expect(invalid_1).rejects.toMatchInlineSnapshot(`
+    [TypeError: Value does not satisfy the type:
+      Expected string, got [object Number].]{
+      "issues": [
+        {
+          "message": "Expected string, got [object Number].",
+          "path": [],
+        },
+      ],
+    }
+  `);
+
+  type _ = AssertTrue<IsEqual<StringPromise, Promise<string>>>;
+});

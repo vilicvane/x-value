@@ -2,12 +2,14 @@ import isEqual from 'lodash.isequal';
 
 import type {
   NominalPartial,
+  RefinedType,
+  Type,
   TypeInMediumsPartial,
   TypeOf,
   __nominal,
   __type,
 } from '../core';
-import {RefinedType, record} from '../core';
+import {record} from '../core';
 import {boolean, number, string, unknown} from '../types';
 import {refinement} from '../utils';
 
@@ -62,7 +64,7 @@ export function literal(
         {const: literal},
       );
     default:
-      throw new TypeError('Unsupported literal value');
+      throw new TypeError('Unsupported literal value.');
   }
 }
 
@@ -75,11 +77,29 @@ export function equal(
   comparison: unknown,
   Type = unknown,
 ): RefinedType<TypeInMediumsPartial, never, unknown> {
-  return new RefinedType(Type, [
-    value => refinement(isEqual(value, comparison), value),
-  ]);
+  return Type.refined(value =>
+    refinement(isEqual(value, comparison), value, 'Expected equal values.'),
+  );
 }
 
 export const UnknownRecord = record(string, unknown);
 
 export type UnknownRecord = TypeOf<typeof UnknownRecord>;
+
+export function Promise<TType extends TypeInMediumsPartial>(
+  Type: TType,
+): RefinedType<typeof unknown, never, Promise<TypeOf<TType>>>;
+export function Promise(
+  Type: Type,
+): RefinedType<TypeInMediumsPartial, never, Promise<unknown>> {
+  return unknown.refined(value =>
+    refinement(
+      value instanceof globalThis.Promise,
+      () =>
+        (value as Promise<unknown>).then(fulfilled =>
+          Type.satisfies(fulfilled),
+        ),
+      'Expected a Promise.',
+    ),
+  );
+}
