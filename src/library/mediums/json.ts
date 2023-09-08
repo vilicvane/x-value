@@ -1,7 +1,7 @@
 import {medium} from '../core';
 
-import type {ExtendedTypes} from './@extended';
-import {EXTENDED_CODECS} from './@extended';
+import type {JSONExtendedTypes} from './@json-extended';
+import {JSON_EXTENDED_CODECS} from './@json-extended';
 
 export interface JSONTypes {
   packed: string;
@@ -22,12 +22,12 @@ export const json = medium<UsingJSONMedium>({
   },
 });
 
-export interface ExtendedJSONTypes extends JSONTypes, ExtendedTypes {}
+export interface ExtendedJSONTypes extends JSONTypes, JSONExtendedTypes {}
 
 export interface UsingExtendedJSONMedium {
   'extended-json': ExtendedJSONTypes;
 }
 
 export const extendedJSON = json.extend<UsingExtendedJSONMedium>({
-  codecs: EXTENDED_CODECS,
+  codecs: JSON_EXTENDED_CODECS,
 });
