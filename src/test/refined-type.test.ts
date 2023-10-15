@@ -45,7 +45,7 @@ test('atomic refinement should work', () => {
   expect(Email.is('user#domain')).toBe(false);
 
   if (Email.is(unknownValue)) {
-    type _ = AssertTrue<IsEqual<typeof unknownValue, Email>>;
+    type _assert = AssertTrue<IsEqual<typeof unknownValue, Email>>;
   }
 
   const encodedEmailInJSONValue = Email.encode(
@@ -67,7 +67,7 @@ test('atomic refinement should work', () => {
   expect(LiveEmail.is('user#domain')).toBe(false);
 
   if (LiveEmail.is(unknownValue)) {
-    type _ = AssertTrue<IsEqual<typeof unknownValue, LiveEmail>>;
+    type _assert = AssertTrue<IsEqual<typeof unknownValue, LiveEmail>>;
   }
 
   const UserId = Identifier.nominal<'user'>();
@@ -83,7 +83,7 @@ test('atomic refinement should work', () => {
 
   expect(userId).toBe('ffff');
 
-  type _ =
+  type _assert =
     | AssertTrue<IsEqual<NonEmptyString, string>>
     | AssertTrue<IsEqual<Email, x.Nominal<'email', string>>>
     | AssertTrue<IsEqual<x.Denominalize<Email>, string>>
@@ -120,10 +120,10 @@ test('array refinement should work', () => {
   expect(Triple.is(false)).toBe(false);
 
   if (Triple.is(unknownValue)) {
-    type _ = AssertTrue<IsEqual<typeof unknownValue, Triple>>;
+    type _assert = AssertTrue<IsEqual<typeof unknownValue, Triple>>;
   }
 
-  type _ =
+  type _assert =
     | AssertTrue<IsEqual<Triple, string[] & {length: 3}>>
     | AssertTrue<IsEqual<TripleInJSONValue, string[] & {length: 3}>>;
 });
@@ -144,10 +144,10 @@ test('object refinement should work', () => {
   expect(O.is(false)).toBe(false);
 
   if (O.is(unknownValue)) {
-    type _ = AssertTrue<IsEqual<typeof unknownValue, O>>;
+    type _assert = AssertTrue<IsEqual<typeof unknownValue, O>>;
   }
 
-  type _ = AssertTrue<IsEqual<O, {foo: 'abc'; bar: number}>>;
+  type _assert = AssertTrue<IsEqual<O, {foo: 'abc'; bar: number}>>;
 });
 
 test('nullable refinement should work', () => {
@@ -166,10 +166,12 @@ test('nullable refinement should work', () => {
   expect(O.is(false)).toBe(false);
 
   if (O.is(unknownValue)) {
-    type _ = AssertTrue<IsEqual<typeof unknownValue, O>>;
+    type _assert = AssertTrue<IsEqual<typeof unknownValue, O>>;
   }
 
-  type _ = AssertTrue<IsEqual<O, x.Nominal<'includes #', string | undefined>>>;
+  type _assert = AssertTrue<
+    IsEqual<O, x.Nominal<'includes #', string | undefined>>
+  >;
 });
 
 test('record refinement should work', () => {
@@ -187,10 +189,10 @@ test('record refinement should work', () => {
   expect(O.is(false)).toBe(false);
 
   if (O.is(unknownValue)) {
-    type _ = AssertTrue<IsEqual<typeof unknownValue, O>>;
+    type _assert = AssertTrue<IsEqual<typeof unknownValue, O>>;
   }
 
-  type _ = AssertTrue<
+  type _assert = AssertTrue<
     IsEqual<O, x.Nominal<'not empty', Record<string, number>>>
   >;
 });
@@ -212,10 +214,10 @@ test('tuple refinement should work', () => {
   expect(O.is(false)).toBe(false);
 
   if (O.is(unknownValue)) {
-    type _ = AssertTrue<IsEqual<typeof unknownValue, O>>;
+    type _assert = AssertTrue<IsEqual<typeof unknownValue, O>>;
   }
 
-  type _ = AssertTrue<
+  type _assert = AssertTrue<
     IsEqual<O, x.Nominal<'string is abc and number is 123', [string, number]>>
   >;
 });
@@ -233,10 +235,10 @@ test('intersection refinement should work', () => {
   expect(O.is(123)).toBe(false);
 
   if (O.is(unknownValue)) {
-    type _ = AssertTrue<IsEqual<typeof unknownValue, O>>;
+    type _assert = AssertTrue<IsEqual<typeof unknownValue, O>>;
   }
 
-  type _ = AssertTrue<
+  type _assert = AssertTrue<
     IsEqual<O, x.Nominal<'foo is abc', {foo: string; bar: number}>>
   >;
 });
@@ -262,10 +264,10 @@ test('union refinement should work', () => {
   expect(O.is(123)).toBe(false);
 
   if (O.is(unknownValue)) {
-    type _ = AssertTrue<IsEqual<typeof unknownValue, O>>;
+    type _assert = AssertTrue<IsEqual<typeof unknownValue, O>>;
   }
 
-  type _ = AssertTrue<
+  type _assert = AssertTrue<
     IsEqual<
       O,
       x.Nominal<'foo is abc or bar is 123', {foo: string} | {bar: number}>
@@ -502,7 +504,7 @@ test('nominalize', () => {
   const email = Email.nominalize('user@host');
   const liveEmail = LiveEmail.nominalize('user@live');
 
-  type _ =
+  type _assert =
     | AssertTrue<IsEqual<typeof email, x.Nominal<'email', string>>>
     | AssertTrue<
         IsEqual<typeof liveEmail, x.Nominal<'email' | 'live-email', string>>

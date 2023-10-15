@@ -7,7 +7,7 @@ test('intersection type results in never should work with json medium', () => {
 
   type Type = x.TypeOf<typeof Type>;
 
-  type _ = AssertTrue<IsEqual<Type, never>>;
+  type _assert = AssertTrue<IsEqual<Type, never>>;
 
   const value1 = 'abc';
   const value2 = 123;
@@ -45,7 +45,7 @@ test('intersection type should work with json value medium', () => {
 
   type Type = x.TypeOf<typeof Type>;
 
-  type _ = AssertTrue<
+  type _assert = AssertTrue<
     IsEqual<
       Type,
       {

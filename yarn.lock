@@ -614,10 +614,10 @@
     "@jridgewell/resolve-uri" "3.1.0"
     "@jridgewell/sourcemap-codec" "1.4.14"
 
-"@mufan/eslint-plugin@^0.2.0":
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/@mufan/eslint-plugin/-/eslint-plugin-0.2.0.tgz#68cbeef5151f74d6a167a2c55b688f6084553845"
-  integrity sha512-+xtp8Iz+yz+3xthULbvQFd1cTNlUoRMb5znE5AftyM8KY7hpfcKLykEkOfD3SvtW+eGQRY3yHTXlRo9V1DH4eQ==
+"@mufan/eslint-plugin@^0.2.1":
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/@mufan/eslint-plugin/-/eslint-plugin-0.2.1.tgz#1428e7b35108603919efd5467a577857d85cdc4a"
+  integrity sha512-Ku0QdISC0vrMfnWyT2B4QMj1fPygPq3Qg8i3Z6lnCGgBMBCNu4gAeL44swLlMwFwkjG4sVHsBnS975Kozix+ng==
   dependencies:
     "@types/eslint" "^8.44.4"
     "@typescript-eslint/eslint-plugin" "^6.7.5"
@@ -625,6 +625,7 @@
     "@typescript-eslint/utils" "^6.7.5"
     eslint-import-resolver-typescript "^3.6.1"
     eslint-plugin-import "^2.28.1"
+    eslint-plugin-only-warn "^1.1.0"
     tslib "^2.6.2"
     x-value "^0.1.16"
 
@@ -1635,6 +1636,11 @@ eslint-plugin-import@^2.28.1:
     object.values "^1.1.6"
     semver "^6.3.1"
     tsconfig-paths "^3.14.2"
+
+eslint-plugin-only-warn@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-only-warn/-/eslint-plugin-only-warn-1.1.0.tgz#c6ddc37ddc4e72c121f07be565fcb7b6671fe78a"
+  integrity sha512-2tktqUAT+Q3hCAU0iSf4xAN1k9zOpjK5WO8104mB0rT/dGhOa09582HN5HlbxNbPRZ0THV7nLGvzugcNOSjzfA==
 
 eslint-scope@^7.2.2:
   version "7.2.2"

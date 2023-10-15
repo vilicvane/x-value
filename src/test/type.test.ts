@@ -17,7 +17,7 @@ test('nullable should work', () => {
   // expect(BooleanOrNullable.is(undefined)).toBe(true);
   // expect(BooleanOrNullable.is(null)).toBe(true);
   // expect(BooleanOrNullable.is(123)).toBe(false);
-  // type _ =
+  // type _assert=
   //   | AssertTrue<IsEqual<TypeOf<typeof StringOrUndefined>, string | undefined>>
   //   | AssertTrue<IsEqual<TypeOf<typeof NumberOrNull>, number | null>>
   //   | AssertTrue<

@@ -36,7 +36,7 @@ test('Integer and integerRange should work', () => {
 
   type Range = x.TypeOf<typeof RangeA>;
 
-  type _ = AssertTrue<IsEqual<Range, x.Nominal<'integer', number>>>;
+  type _assert = AssertTrue<IsEqual<Range, x.Nominal<'integer', number>>>;
 
   expect(RangeA.is(1)).toBe(true);
   expect(RangeA.is(2)).toBe(true);
@@ -71,7 +71,7 @@ test('numberRange should work', () => {
 
   type Range = x.TypeOf<typeof RangeA>;
 
-  type _ = AssertTrue<IsEqual<Range, number>>;
+  type _assert = AssertTrue<IsEqual<Range, number>>;
 
   expect(RangeA.is(1.1)).toBe(true);
   expect(RangeA.diagnose(1)).toMatchInlineSnapshot(`
@@ -153,7 +153,7 @@ test('literal type should work', () => {
     ]
   `);
 
-  type _ =
+  type _assert =
     | AssertTrue<IsEqual<x.TypeOf<typeof Foo>, 'foo'>>
     | AssertTrue<IsEqual<x.TypeOf<typeof One>, 1>>
     | AssertTrue<IsEqual<x.TypeOf<typeof True>, true>>;
@@ -206,7 +206,7 @@ test('string pattern should work', () => {
 });
 
 test('XTypeOfValue/XTypeOfMediumValue should work', () => {
-  type _ =
+  type _assert =
     | AssertTrue<
         IsCompatible<
           typeof x.Date,
@@ -246,7 +246,7 @@ test('x.Promise should work', async () => {
     }
   `);
 
-  type _ = AssertTrue<IsEqual<StringPromise, Promise<string>>>;
+  type _assert = AssertTrue<IsEqual<StringPromise, Promise<string>>>;
 });
 
 test('x.function should work', async () => {
@@ -271,7 +271,7 @@ test('x.function should work', async () => {
       Expected undefined, got [object Number]."
   `);
 
-  type _ = AssertTrue<
+  type _assert = AssertTrue<
     IsEqual<F, Function & ((arg_1: string, arg_2: number) => void)>
   >;
 });

@@ -79,7 +79,7 @@ test('recursive type should work', () => {
     children?: RefR[];
   }
 
-  type _ = AssertTrue<IsEqual<R, RefR>>;
+  type _assert = AssertTrue<IsEqual<R, RefR>>;
 });
 
 test('exact with recursive type should work', () => {
@@ -249,7 +249,7 @@ test('recursive type with non-recursive part', () => {
     next?: RecursiveTypeInExtendedJSONValueComparison;
   }
 
-  type _ =
+  type _assert =
     | AssertTrue<IsEqual<RecursiveType, RecursiveTypeComparison>>
     | AssertTrue<
         IsEqual<

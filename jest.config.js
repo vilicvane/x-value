@@ -1,19 +1,21 @@
 /** @type {import('ts-jest').JestConfigWithTsJest} */
 export default {
-  preset: 'ts-jest',
-  testEnvironment: 'node',
-  roots: ['src/test'],
+  testMatch: ['<rootDir>/src/test/*.test.ts'],
+  extensionsToTreatAsEsm: ['.ts'],
+  moduleNameMapper: {
+    '^(\\.{1,2}/.*)\\.js$': '$1',
+  },
   transform: {
     '^.+\\.ts$': [
       'ts-jest',
       {
         tsconfig: 'src/test/tsconfig.json',
+        useESM: true,
       },
     ],
   },
   clearMocks: true,
   coverageDirectory: 'coverage',
-  coveragePathIgnorePatterns: ['node_modules/', 'src/test/'],
   coverageThreshold: {
     global: {
       statements: 100,

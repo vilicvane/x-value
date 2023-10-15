@@ -45,7 +45,7 @@ test('simple object type should work with json medium', () => {
   expect(Type.is({})).toBe(false);
   expect(Type.is(123)).toBe(false);
 
-  type _ =
+  type _assert =
     | AssertTrue<IsEqual<typeof decoded_1, Type>>
     | AssertTrue<IsEqual<typeof encoded_1, string>>;
 });
@@ -227,7 +227,7 @@ test('object type with intersection type property should work with json medium',
 
   type Gender = Type['profile']['gender'];
 
-  type _ = AssertTrue<IsEqual<Gender, 'male' | 'female'>>;
+  type _assert = AssertTrue<IsEqual<Gender, 'male' | 'female'>>;
 
   const value1: x.TypeOf<typeof Type> = {
     id: 'abc',
@@ -306,7 +306,7 @@ test('partial() should work', () => {
     PartialO.decode(x.jsonValue, {foo: 'abc', extra: true}),
   ).toEqual({foo: 'abc'});
 
-  type _ =
+  type _assert =
     | AssertTrue<IsEqual<PartialO, {foo?: string; bar?: number}>>
     | AssertTrue<IsEqual<typeof encoded_1, {foo?: string; bar?: number}>>;
 });
@@ -340,7 +340,7 @@ test('pick() should work', () => {
     foo: 'abc',
   });
 
-  type _ = AssertTrue<
+  type _assert = AssertTrue<
     IsEqual<x.TypeOf<typeof PickedO>, {foo: string; bar?: number}>
   >;
 });
@@ -374,7 +374,7 @@ test('omit() should work', () => {
     OmittedO.decode(x.jsonValue, {foo: 'abc', extra: true}),
   ).toEqual({foo: 'abc'});
 
-  type _ = AssertTrue<
+  type _assert = AssertTrue<
     IsEqual<x.TypeOf<typeof OmittedO>, {foo: string; bar?: number}>
   >;
 });
@@ -396,7 +396,7 @@ test('literal property type should be correct', () => {
 
   type O = x.TypeOf<typeof O>;
 
-  type _ = AssertTrue<IsEqual<O['type'], 'foo'>>;
+  type _assert = AssertTrue<IsEqual<O['type'], 'foo'>>;
 });
 
 test('object shallow exact type should work', () => {
@@ -443,7 +443,7 @@ test('object shallow exact type should work', () => {
 
   expect(NonExactO.is(value2)).toBe(true);
 
-  type _ = AssertTrue<IsEqual<O, {foo: string; bar?: number}>>;
+  type _assert = AssertTrue<IsEqual<O, {foo: string; bar?: number}>>;
 });
 
 test('object nested exact should work', () => {
@@ -658,7 +658,7 @@ test('object extend', () => {
 
   type ExtendedO_2 = x.TypeOf<typeof ExtendedO_2>;
 
-  type _ =
+  type _assert =
     | AssertTrue<
         IsEqual<
           ExtendedO_1,

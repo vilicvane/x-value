@@ -562,7 +562,7 @@ test('exact intersection with record', () => {
 
   type O = x.TypeOf<typeof O>;
 
-  type _ = AssertTrue<
+  type _assert = AssertTrue<
     IsEqual<
       O,
       {

@@ -22,7 +22,7 @@ test('plug2proxy router rule', () => {
 
   type RouterRule = x.TypeOf<typeof RouterRule>;
 
-  type _ = AssertTrue<
+  type _assert = AssertTrue<
     IsEqual<
       RouterRule,
       (
