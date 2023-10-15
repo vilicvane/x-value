@@ -4,16 +4,14 @@
   "repository": "https://github.com/vilic/x-value.git",
   "license": "MIT",
   "author": "vilicvane",
+  "type": "module",
   "exports": {
     ".": {
-      "types": "./bld/library/cjs/index.d.ts",
-      "import": "./bld/library/esm/index.js",
-      "require": "./bld/library/cjs/index.js",
-      "default": "./bld/library/esm/index.js"
+      "types": "./bld/library/index.d.ts",
+      "default": "./bld/library/index.js"
     },
     "./node": {
       "types": "./bld/node/index.d.ts",
-      "require": "./bld/node/index.js",
       "default": "./bld/node/index.js"
     }
   },
@@ -25,16 +23,15 @@
     "test": "yarn lint-prettier && yarn build && yarn lint"
   },
   "dependencies": {
-    "tslib": "^2.6.1"
+    "tslib": "^2.6.2"
   },
   "devDependencies": {
-    "@mufan/code": "^0.2.16",
-    "@mufan/eslint-plugin": "^0.1.81",
-    "eslint": "^8.45.0",
-    "prettier": "^2.8.8",
-    "rimraf": "^5.0.1",
+    "@mufan/eslint-plugin": "^0.2.0",
+    "eslint": "^8.51.0",
+    "prettier": "^3.0.3",
+    "rimraf": "^5.0.5",
     "run-in-every": "^0.2.0",
-    "typescript": "^5.1.6",
+    "typescript": "^5.2.2",
     "yarn-deduplicate": "^6.0.2"
   }
 }
