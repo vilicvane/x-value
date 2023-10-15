@@ -1,4 +1,4 @@
-import type {TypeInMediumsPartial} from './type-partials';
+import type {TypeInMediumsPartial} from './type-partials.js';
 
 export type TupleInMedium<
   TTypeTuple extends TypeInMediumsPartial[],

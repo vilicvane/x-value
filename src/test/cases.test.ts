@@ -1,6 +1,6 @@
 import type {AssertTrue, IsEqual} from 'tslang';
 
-import * as x from '../library';
+import * as x from '../library/index.js';
 
 test('plug2proxy router rule', () => {
   const RouterRule = x.intersection([

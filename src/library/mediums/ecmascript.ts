@@ -1,4 +1,4 @@
-import {medium} from '../core';
+import {medium} from '../core/index.js';
 import type {
   bigintTypeSymbol,
   booleanTypeSymbol,
@@ -12,7 +12,7 @@ import type {
   undefinedTypeSymbol,
   unknownTypeSymbol,
   voidTypeSymbol,
-} from '../types';
+} from '../types.js';
 
 export interface ECMAScriptTypes {
   [neverTypeSymbol]: never;

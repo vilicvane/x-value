@@ -1,6 +1,6 @@
-import * as x from '../library';
+import * as x from '../library/index.js';
 
-import {Identifier, mediumA, mediumB} from './@usage';
+import {Identifier, mediumA, mediumB} from './@usage.js';
 
 test('transform medium A to medium B and back', () => {
   const Type = x.object({

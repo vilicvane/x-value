@@ -1,6 +1,6 @@
 import type {AssertTrue, IsEqual} from 'tslang';
 
-import * as x from '../library';
+import * as x from '../library/index.js';
 
 test('record type with string key should work', () => {
   const Type = x.record(x.string, x.number);

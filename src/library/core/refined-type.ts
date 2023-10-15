@@ -1,16 +1,16 @@
-import type {Exact} from './@exact-context';
-import type {TypeIssue, TypePath} from './@type-issue';
-import {buildIssueByError, hasNonDeferrableTypeIssue} from './@type-issue';
-import type {JSONSchema} from './json-schema';
-import type {Medium} from './medium';
-import {Type} from './type';
-import type {JSONSchemaContext, JSONSchemaData} from './type-like';
+import type {Exact} from './@exact-context.js';
+import type {TypeIssue, TypePath} from './@type-issue.js';
+import {buildIssueByError, hasNonDeferrableTypeIssue} from './@type-issue.js';
+import type {JSONSchema} from './json-schema.js';
+import type {Medium} from './medium.js';
+import type {JSONSchemaContext, JSONSchemaData} from './type-like.js';
 import type {
   TypeInMediums,
   TypeInMediumsPartial,
   __type_in_mediums,
-} from './type-partials';
-import {__type_kind} from './type-partials';
+} from './type-partials.js';
+import {__type_kind} from './type-partials.js';
+import {Type} from './type.js';
 
 export class RefinedType<
   TType extends TypeInMediumsPartial,
@@ -181,7 +181,7 @@ export class RefinedType<
   }
 }
 
-declare module './type' {
+declare module './type.js' {
   interface Type<TInMediums, TGeneral> {
     refined<TNominalKey extends string | symbol = never, TRefinement = unknown>(
       refinements: ElementOrArray<Refinement<TInMediums['value'], TGeneral>>,

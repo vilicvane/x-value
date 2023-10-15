@@ -1,7 +1,7 @@
 // import type {AssertTrue, IsEqual} from 'tslang';
 
-// import * as x from '../library';
-// import type {TypeOf} from '../library';
+// import * as x from '../library/index.js';
+// import type {TypeOf} from '../library/index.js';
 
 test('nullable should work', () => {
   // const StringOrUndefined = x.string.nullable(x.undefined);

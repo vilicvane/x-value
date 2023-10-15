@@ -1,6 +1,6 @@
 import type {AssertTrue, IsEqual} from 'tslang';
 
-import * as x from '../library';
+import * as x from '../library/index.js';
 
 const Sunday = x.Date.refined<'sunday'>(date =>
   x.refinement(date.getDay() === 0, date),

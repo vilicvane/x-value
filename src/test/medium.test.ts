@@ -1,4 +1,4 @@
-import * as x from '../library';
+import * as x from '../library/index.js';
 
 test('medium requireCodec should throw on unknown symbol', () => {
   const medium = new x.Medium({

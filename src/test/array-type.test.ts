@@ -1,4 +1,4 @@
-import * as x from '../library';
+import * as x from '../library/index.js';
 
 test('simple array type should work with json medium', () => {
   const Type = x.array(x.string);

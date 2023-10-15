@@ -1,6 +1,6 @@
-import type {RefinedType} from '../core';
-import {string} from '../types';
-import {refinement} from '../utils';
+import type {RefinedType} from '../core/index.js';
+import {string} from '../types.js';
+import {refinement} from '../utils.js';
 
 export function pattern<
   TNominalKey extends string | symbol = never,

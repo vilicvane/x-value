@@ -1,4 +1,4 @@
-import * as x from '../library';
+import * as x from '../library/index.js';
 
 test('basic support', () => {
   const Type = x.object({

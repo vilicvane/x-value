@@ -1,4 +1,8 @@
-import type {Type, TypeInMediumsPartial, __type_in_mediums} from './core';
+import type {
+  Type,
+  TypeInMediumsPartial,
+  __type_in_mediums,
+} from './core/index.js';
 
 export type MediumTypeOf<
   TMediumName extends XValue.UsingName,

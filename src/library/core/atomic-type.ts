@@ -1,11 +1,11 @@
-import type {Exact} from './@exact-context';
-import type {TypeIssue, TypePath} from './@type-issue';
-import {buildIssueByError, hasNonDeferrableTypeIssue} from './@type-issue';
-import type {JSONSchema} from './json-schema';
-import type {Medium} from './medium';
-import {Type} from './type';
-import type {JSONSchemaData} from './type-like';
-import {__type_kind} from './type-partials';
+import type {Exact} from './@exact-context.js';
+import type {TypeIssue, TypePath} from './@type-issue.js';
+import {buildIssueByError, hasNonDeferrableTypeIssue} from './@type-issue.js';
+import type {JSONSchema} from './json-schema.js';
+import type {Medium} from './medium.js';
+import type {JSONSchemaData} from './type-like.js';
+import {__type_kind} from './type-partials.js';
+import {Type} from './type.js';
 
 export class AtomicType<TSymbol extends symbol> extends Type<
   AtomicInMediums<TSymbol>

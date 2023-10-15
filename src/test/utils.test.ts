@@ -1,6 +1,6 @@
 import type {AssertFalse, AssertTrue, IsCompatible, IsEqual} from 'tslang';
 
-import * as x from '../library';
+import * as x from '../library/index.js';
 
 test('UnknownRecord type should work', () => {
   expect(x.UnknownRecord.is({})).toBe(true);
@@ -258,7 +258,8 @@ test('x.function should work', async () => {
 
   expect(valid_1('', 0)).toBe(undefined);
 
-  expect(() => (valid_1 as any)()).toThrowErrorMatchingInlineSnapshot(`
+  // @ts-expect-error
+  expect(() => valid_1()).toThrowErrorMatchingInlineSnapshot(`
     "Value does not satisfy the type:
       Expected value with 2 instead of 0 element(s)."
   `);

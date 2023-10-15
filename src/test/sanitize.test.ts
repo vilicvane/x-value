@@ -1,4 +1,4 @@
-import * as x from '../library';
+import * as x from '../library/index.js';
 
 test('sanitize should work', () => {
   const fn_1 = (): void => {};

@@ -1,9 +1,9 @@
 import type {AssertTrue, IsEqual} from 'tslang';
 
-import * as x from '../library';
+import * as x from '../library/index.js';
 
-import type {IdentifierInMediumA} from './@usage';
-import {Identifier, mediumA} from './@usage';
+import type {IdentifierInMediumA} from './@usage.js';
+import {Identifier, mediumA} from './@usage.js';
 
 let unknownValue: unknown;
 

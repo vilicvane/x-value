@@ -3,12 +3,14 @@
   "overrides": [
     {
       "files": ["**/*.{ts,tsx}"],
-      "extends": ["plugin:@mufan/default", "plugin:@mufan/override-dev"],
+      "extends": ["plugin:@mufan/typescript", "plugin:@mufan/dev"],
       "parserOptions": {
         "project": "tsconfig.json"
       },
       "rules": {
-        "@mufan/no-object-literal-type-assertion": "off"
+        "@typescript-eslint/ban-ts-comment": "off",
+        "@typescript-eslint/ban-types": "off",
+        "@typescript-eslint/no-explicit-any": "off"
       }
     }
   ]

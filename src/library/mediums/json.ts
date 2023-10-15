@@ -1,7 +1,7 @@
-import {medium} from '../core';
+import {medium} from '../core/index.js';
 
-import type {JSONExtendedTypes} from './@json-extended';
-import {JSON_EXTENDED_CODECS} from './@json-extended';
+import type {JSONExtendedTypes} from './@json-extended.js';
+import {JSON_EXTENDED_CODECS} from './@json-extended.js';
 
 export interface JSONTypes {
   packed: string;

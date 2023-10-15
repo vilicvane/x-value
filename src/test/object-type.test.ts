@@ -1,6 +1,6 @@
 import type {AssertTrue, IsEqual} from 'tslang';
 
-import * as x from '../library';
+import * as x from '../library/index.js';
 
 test('simple object type should work with json medium', () => {
   const Type = x.object({

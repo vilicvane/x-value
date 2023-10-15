@@ -1,8 +1,8 @@
-import {atomicTypeSymbol, medium} from '../core';
-import {booleanTypeSymbol, numberTypeSymbol} from '../types';
+import {atomicTypeSymbol, medium} from '../core/index.js';
+import {booleanTypeSymbol, numberTypeSymbol} from '../types.js';
 
-import type {ExtendedTypes} from './@extended';
-import {EXTENDED_CODECS} from './@extended';
+import type {ExtendedTypes} from './@extended.js';
+import {EXTENDED_CODECS} from './@extended.js';
 
 const toString = Object.prototype.toString;
 

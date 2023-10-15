@@ -1,4 +1,4 @@
-import type {TypeIssue, TypePath} from './@type-issue';
+import type {TypeIssue, TypePath} from './@type-issue.js';
 
 export class ExactContext {
   touched = false;

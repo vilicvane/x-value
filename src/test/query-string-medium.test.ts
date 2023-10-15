@@ -1,4 +1,4 @@
-import * as x from '../library';
+import * as x from '../library/index.js';
 
 test('query string medium should work', () => {
   const Type = x.object({

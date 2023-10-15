@@ -1,4 +1,4 @@
-import * as x from '../library';
+import * as x from '../library/index.js';
 
 test('union type of atomic types should work with json medium', () => {
   const Type = x.union([x.string, x.number]);

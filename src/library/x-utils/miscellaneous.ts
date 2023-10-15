@@ -8,10 +8,10 @@ import type {
   TypeOf,
   __nominal,
   __type,
-} from '../core';
-import {record} from '../core';
-import {boolean, number, string, unknown} from '../types';
-import {refinement} from '../utils';
+} from '../core/index.js';
+import {record} from '../core/index.js';
+import {boolean, number, string, unknown} from '../types.js';
+import {refinement} from '../utils.js';
 
 export type TransformNominal<TFrom, T> = TFrom extends NominalPartial
   ? T & Record<__type, T> & Record<__nominal, TFrom[__nominal]>

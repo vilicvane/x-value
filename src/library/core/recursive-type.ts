@@ -1,13 +1,13 @@
-import type {Exact} from './@exact-context';
-import type {TypeIssue, TypePath} from './@type-issue';
-import {Type} from './type';
+import type {Exact} from './@exact-context.js';
+import type {TypeIssue, TypePath} from './@type-issue.js';
 import type {
   JSONSchemaContext,
   JSONSchemaData,
   TraverseCallback,
-} from './type-like';
-import {__type_kind} from './type-partials';
-import type {TypeInMediumsPartial, __type_in_mediums} from './type-partials';
+} from './type-like.js';
+import type {TypeInMediumsPartial, __type_in_mediums} from './type-partials.js';
+import {__type_kind} from './type-partials.js';
+import {Type} from './type.js';
 
 export class RecursiveType<T> extends Type<RecursiveInMediums<T>> {
   readonly [__type_kind] = 'recursive';

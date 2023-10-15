@@ -1,5 +1,5 @@
-import {atomic} from './core';
-import {constraint} from './utils';
+import {atomic} from './core/index.js';
+import {constraint} from './utils.js';
 
 const toString = Object.prototype.toString;
 
@@ -37,6 +37,7 @@ export const unknownTypeSymbol = Symbol();
 export const unknown = atomic(unknownTypeSymbol, [], {});
 
 export const undefinedTypeSymbol = Symbol();
+// eslint-disable-next-line no-shadow-restricted-names
 export const undefined = atomic(undefinedTypeSymbol, value =>
   constraint(
     value === void 0,

@@ -1,14 +1,14 @@
-import type {Exact} from './@exact-context';
-import type {TypeIssue, TypePath} from './@type-issue';
-import {Type} from './type';
+import type {Exact} from './@exact-context.js';
+import type {TypeIssue, TypePath} from './@type-issue.js';
 import type {
   JSONSchemaContext,
   JSONSchemaData,
   TraverseCallback,
-} from './type-like';
-import {TypeLike} from './type-like';
-import type {TypeInMediumsPartial, __type_in_mediums} from './type-partials';
-import {__type_kind} from './type-partials';
+} from './type-like.js';
+import {TypeLike} from './type-like.js';
+import type {TypeInMediumsPartial, __type_in_mediums} from './type-partials.js';
+import {__type_kind} from './type-partials.js';
+import {Type} from './type.js';
 
 export class OptionalType<TType extends TypeInMediumsPartial> extends TypeLike<
   OptionalInMediums<TType>
@@ -49,7 +49,7 @@ type OptionalInMediums<TType extends TypeInMediumsPartial> = {
     | undefined;
 };
 
-declare module './type' {
+declare module './type.js' {
   interface Type {
     optional(): OptionalType<this>;
   }

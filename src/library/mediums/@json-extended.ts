@@ -1,8 +1,8 @@
-import type {MediumAtomicCodecs} from '../core';
-import {undefinedTypeSymbol} from '../types';
+import type {MediumAtomicCodecs} from '../core/index.js';
+import {undefinedTypeSymbol} from '../types.js';
 
-import type {ExtendedTypes} from './@extended';
-import {EXTENDED_CODECS} from './@extended';
+import type {ExtendedTypes} from './@extended.js';
+import {EXTENDED_CODECS} from './@extended.js';
 
 const toString = Object.prototype.toString;
 

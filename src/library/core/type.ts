@@ -1,15 +1,15 @@
-import type {Exact} from './@exact-context';
-import {ExactContext} from './@exact-context';
-import type {TypeIssue} from './@type-issue';
-import type {JSONSchema} from './json-schema';
-import type {Medium, MediumPackedType} from './medium';
-import type {TraverseCallback} from './type-like';
-import {JSONSchemaContext, TypeLike} from './type-like';
+import type {Exact} from './@exact-context.js';
+import {ExactContext} from './@exact-context.js';
+import type {TypeIssue} from './@type-issue.js';
+import type {JSONSchema} from './json-schema.js';
+import type {Medium, MediumPackedType} from './medium.js';
+import type {TraverseCallback} from './type-like.js';
+import {JSONSchemaContext, TypeLike} from './type-like.js';
 import type {
   TypeInMediums,
   TypeInMediumsPartial,
   __type_in_mediums,
-} from './type-partials';
+} from './type-partials.js';
 
 export const DISABLED_EXACT_CONTEXT_RESULT = {
   context: undefined,
@@ -264,7 +264,10 @@ export abstract class Type<
 }
 
 export class TypeConstraintError extends TypeError {
-  constructor(private _message: string, readonly issues: TypeIssue[]) {
+  constructor(
+    private _message: string,
+    readonly issues: TypeIssue[],
+  ) {
     super();
   }
 

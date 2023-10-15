@@ -1,6 +1,6 @@
 import type {AssertTrue, IsEqual} from 'tslang';
 
-import * as x from '../library';
+import * as x from '../library/index.js';
 
 test('intersection type results in never should work with json medium', () => {
   const Type = x.intersection([x.string, x.number]);

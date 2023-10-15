@@ -1,4 +1,4 @@
-import * as x from '../library';
+import * as x from '../library/index.js';
 
 test('undefined type should work', () => {
   expect(x.undefined.decode(x.extendedJSONValue, null)).toBe(undefined);

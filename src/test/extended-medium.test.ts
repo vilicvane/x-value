@@ -1,4 +1,4 @@
-import * as x from '../library';
+import * as x from '../library/index.js';
 
 test('bigint type should work', () => {
   const bigint = BigInt('12345678901234567890');

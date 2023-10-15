@@ -1,21 +1,21 @@
-import type {Exact} from './@exact-context';
-import type {TypeIssue, TypePath} from './@type-issue';
-import {hasNonDeferrableTypeIssue} from './@type-issue';
-import type {JSONSchema} from './json-schema';
-import {OptionalType} from './optional-type';
-import {Type} from './type';
+import type {Exact} from './@exact-context.js';
+import type {TypeIssue, TypePath} from './@type-issue.js';
+import {hasNonDeferrableTypeIssue} from './@type-issue.js';
+import type {JSONSchema} from './json-schema.js';
+import {OptionalType} from './optional-type.js';
 import type {
   JSONSchemaContext,
   JSONSchemaData,
   TraverseCallback,
   TypeLike,
-} from './type-like';
+} from './type-like.js';
 import type {
   TypeInMediumsPartial,
   TypeKindPartial,
   __type_in_mediums,
-} from './type-partials';
-import {__type_kind} from './type-partials';
+} from './type-partials.js';
+import {__type_kind} from './type-partials.js';
+import {Type} from './type.js';
 
 const toString = Object.prototype.toString;
 

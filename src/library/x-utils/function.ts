@@ -4,8 +4,8 @@ import {
   type Type,
   type TypeInMediumsPartial,
   type TypeOf,
-} from '../core';
-import {Function} from '../types';
+} from '../core/index.js';
+import {Function} from '../types.js';
 
 export function fn<
   TArgumentTypeTuple extends
@@ -35,9 +35,9 @@ export function fn<
 
   return Function.refined(
     value =>
-      function (this: unknown) {
+      function (this: unknown, ...args: unknown[]) {
         return ReturnType.satisfies(
-          value.apply(this, ArgumentsType.satisfies([...arguments])),
+          value.apply(this, ArgumentsType.satisfies(args)),
         );
       },
   );

@@ -1,6 +1,6 @@
 import type {AssertTrue, IsEqual} from 'tslang';
 
-import * as x from '../library';
+import * as x from '../library/index.js';
 
 test('recursive type should work', () => {
   interface RecursiveR {
@@ -99,20 +99,20 @@ test('exact with recursive type should work', () => {
     .exact();
 
   const valid1 = {
-    type: 'node' as 'node',
+    type: 'node' as const,
     children: [
       {
-        type: 'node' as 'node',
+        type: 'node' as const,
         children: [],
       },
     ],
   };
 
   const invalid1 = {
-    type: 'node' as 'node',
+    type: 'node' as const,
     children: [
       {
-        type: 'node' as 'node',
+        type: 'node' as const,
         children: [],
       },
     ],
@@ -120,10 +120,10 @@ test('exact with recursive type should work', () => {
   };
 
   const invalid2 = {
-    type: 'node' as 'node',
+    type: 'node' as const,
     children: [
       {
-        type: 'node' as 'node',
+        type: 'node' as const,
         children: [],
         extra: true,
       },

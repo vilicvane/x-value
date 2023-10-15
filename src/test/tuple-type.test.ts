@@ -1,4 +1,4 @@
-import * as x from '../library';
+import * as x from '../library/index.js';
 
 test('tuple type should work', () => {
   const Tuple = x.tuple([x.string, x.number]);

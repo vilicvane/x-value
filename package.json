@@ -4,16 +4,14 @@
   "repository": "https://github.com/vilic/x-value.git",
   "license": "MIT",
   "author": "vilicvane",
+  "type": "module",
   "exports": {
     ".": {
-      "types": "./bld/library/cjs/index.d.ts",
-      "import": "./bld/library/esm/index.js",
-      "require": "./bld/library/cjs/index.js",
-      "default": "./bld/library/esm/index.js"
+      "types": "./bld/library/index.d.ts",
+      "default": "./bld/library/index.js"
     },
     "./node": {
       "types": "./bld/node/index.d.ts",
-      "require": "./bld/node/index.js",
       "default": "./bld/node/index.js"
     }
   },
@@ -27,22 +25,21 @@
   },
   "dependencies": {
     "lodash.isequal": "^4.5.0",
-    "tslib": "^2.6.1"
+    "tslib": "^2.6.2"
   },
   "devDependencies": {
-    "@mufan/code": "^0.2.16",
-    "@mufan/eslint-plugin": "^0.1.81",
+    "@mufan/eslint-plugin": "^0.2.0",
     "@types/jest": "^29.5.3",
     "@types/lodash.isequal": "^4.5.6",
     "@types/node": "^20.4.4",
-    "eslint": "^8.45.0",
+    "eslint": "^8.51.0",
     "jest": "^29.6.1",
-    "prettier": "^2.8.8",
-    "rimraf": "^5.0.1",
+    "prettier": "^3.0.3",
+    "rimraf": "^5.0.5",
     "run-in-every": "^0.2.0",
     "ts-jest": "^29.1.1",
     "tslang": "^0.1.27",
-    "typescript": "^5.1.6",
+    "typescript": "^5.2.2",
     "yarn-deduplicate": "^6.0.2"
   }
 }

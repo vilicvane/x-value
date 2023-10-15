@@ -1,5 +1,5 @@
-import type {MediumAtomicCodecs} from '../core';
-import {bigintTypeSymbol, dateTypeSymbol, regexpTypeSymbol} from '../types';
+import type {MediumAtomicCodecs} from '../core/index.js';
+import {bigintTypeSymbol, dateTypeSymbol, regexpTypeSymbol} from '../types.js';
 
 const toString = Object.prototype.toString;
 

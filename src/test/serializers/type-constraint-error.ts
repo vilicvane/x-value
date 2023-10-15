@@ -1,6 +1,6 @@
 import type {NewPlugin} from 'pretty-format';
 
-import * as x from '../../library';
+import * as x from '../../library/index.js';
 
 export const test: NewPlugin['test'] = value => {
   return value instanceof x.TypeConstraintError;

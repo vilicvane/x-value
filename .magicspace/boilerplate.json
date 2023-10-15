@@ -1,14 +1,15 @@
 {
+  "$schema": "boilerplate.schema.json",
   "boilerplate": "@mufan/code-boilerplates/typescript",
   "options": {
     "name": "x-value",
     "repository": "https://github.com/vilic/x-value.git",
     "license": "MIT",
     "author": "vilicvane",
+    "type": "module",
     "projects": [
       {
-        "name": "library",
-        "module": ["cjs", "esm"]
+        "name": "library"
       },
       {
         "name": "node",
