@@ -66,6 +66,8 @@ export const nullType = atomic(
   {type: 'null'},
 );
 
+export {nullType as null};
+
 export const stringTypeSymbol = Symbol();
 export const string = atomic(
   stringTypeSymbol,
