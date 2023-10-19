@@ -8,6 +8,13 @@
     "author": "vilicvane",
     "type": "module",
     "defaultBranch": "master",
+    "badges": {
+      "npm": true,
+      "repo": true,
+      "coverage": true,
+      "license": true,
+      "discord": "https://discord.gg/vanVrDwSkS"
+    },
     "projects": [
       {
         "name": "library"

@@ -29,15 +29,15 @@ export type MediumAtomicCodecs<TMediumTypes> = {
   [atomicTypeSymbol]?: __MediumAtomicCodec;
 };
 
-export interface MediumPacking<TPacked> {
+export type MediumPacking<TPacked> = {
   pack(unpacked: unknown): TPacked;
   unpack(packed: TPacked): unknown;
-}
+};
 
-export interface MediumOptions<TUsingMedium> {
+export type MediumOptions<TUsingMedium> = {
   packing?: MediumPacking<UsingMediumPackedType<TUsingMedium>>;
   codecs?: MediumAtomicCodecs<TUsingMedium[keyof TUsingMedium]>;
-}
+};
 
 export class Medium<TUsingMedium extends object = GeneralUsingMedium> {
   private packing:
@@ -94,10 +94,10 @@ export type MediumAtomicCodec<
 >;
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
-interface __MediumAtomicCodec<TMediumAtomic = unknown, TValue = unknown> {
+type __MediumAtomicCodec<TMediumAtomic = unknown, TValue = unknown> = {
   encode(value: TValue): TMediumAtomic;
   decode(value: unknown): TValue;
-}
+};
 
 export function medium<TUsingMedium extends object>(
   options?: MediumOptions<TUsingMedium>,

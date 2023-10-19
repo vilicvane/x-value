@@ -152,7 +152,7 @@ export type TraverseCallback = (
   exact: Exact,
 ) => [unknown, TypeIssue[]];
 
-export interface JSONSchemaData {
+export type JSONSchemaData = {
   schema: JSONSchema;
   optional?: boolean;
-}
+};

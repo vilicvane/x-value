@@ -3,11 +3,11 @@ import type {AssertTrue, IsEqual} from 'tslang';
 import * as x from '../library/index.js';
 
 test('recursive type should work', () => {
-  interface RecursiveR {
+  type RecursiveR = {
     type: 'node';
     text?: typeof x.string;
     children?: RecursiveR[];
-  }
+  };
 
   const R = x.recursive<RecursiveR>(R =>
     x.object({
@@ -73,21 +73,21 @@ test('recursive type should work', () => {
       ["children"][0]["children"][0]["type"] Expected string "node", got "oops"."
   `);
 
-  interface RefR {
+  type RefR = {
     type: 'node';
     text?: string;
     children?: RefR[];
-  }
+  };
 
   type _assert = AssertTrue<IsEqual<R, RefR>>;
 });
 
 test('exact with recursive type should work', () => {
-  interface RecursiveR {
+  type RecursiveR = {
     type: 'node';
     text?: string;
     children: RecursiveR[];
-  }
+  };
 
   const R = x
     .recursive<RecursiveR>(R =>
@@ -237,17 +237,17 @@ test('recursive type with non-recursive part', () => {
     JSON.parse(JSON.stringify(value_2)),
   );
 
-  interface RecursiveTypeComparison {
+  type RecursiveTypeComparison = {
     type: string;
     date: Date;
     next?: RecursiveTypeComparison;
-  }
+  };
 
-  interface RecursiveTypeInExtendedJSONValueComparison {
+  type RecursiveTypeInExtendedJSONValueComparison = {
     type: string;
     date: string;
     next?: RecursiveTypeInExtendedJSONValueComparison;
-  }
+  };
 
   type _assert =
     | AssertTrue<IsEqual<RecursiveType, RecursiveTypeComparison>>

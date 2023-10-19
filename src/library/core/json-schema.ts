@@ -35,7 +35,7 @@ export type JSONSchemaType =
   | 'array'
   | 'object';
 
-export interface JSONSchema {
+export type JSONSchema = {
   id?: string;
   $id?: string;
   $schema?: string;
@@ -117,15 +117,15 @@ export interface JSONSchema {
   suggestSortText?: string;
   allowComments?: boolean;
   allowTrailingCommas?: boolean;
-}
+};
 
-export interface JSONSchemaMap {
+export type JSONSchemaMap = {
   [name: string]: JSONSchema;
-}
+};
 
-export interface JSONSchemaSnippet {
+export type JSONSchemaSnippet = {
   label?: string;
   description?: string;
   body?: any; // a object that will be JSON stringified
   bodyText?: string; // an already stringified JSON object that can contain new lines (\n) and tabs (\t)
-}
+};

@@ -14,7 +14,7 @@ import type {
   voidTypeSymbol,
 } from '../types.js';
 
-export interface ECMAScriptTypes {
+export type ECMAScriptTypes = {
   [neverTypeSymbol]: never;
   [unknownTypeSymbol]: unknown;
   [undefinedTypeSymbol]: undefined;
@@ -27,10 +27,10 @@ export interface ECMAScriptTypes {
   [functionTypeSymbol]: Function;
   [dateTypeSymbol]: Date;
   [regexpTypeSymbol]: RegExp;
-}
+};
 
-export interface UsingECMAScriptMedium {
+export type UsingECMAScriptMedium = {
   ecmascript: ECMAScriptTypes;
-}
+};
 
 export const ecmascript = medium<UsingECMAScriptMedium>();

@@ -5,11 +5,11 @@ export type TypePath = (
   | {key: string | number | symbol}
 )[];
 
-export interface TypeIssue {
+export type TypeIssue = {
   path: TypePath;
   deferrable?: true;
   message: string;
-}
+};
 
 export function buildIssueByError(error: unknown, path: TypePath): TypeIssue {
   return {

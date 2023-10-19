@@ -14,10 +14,10 @@ export const Integer = number.refined<'integer'>(
 
 export type Integer = TypeOf<typeof Integer>;
 
-export interface IntegerRangeOptions {
+export type IntegerRangeOptions = {
   min?: number;
   max?: number;
-}
+};
 
 export function integerRange<TNominalKey extends string | symbol = never>({
   min = -Infinity,
@@ -42,12 +42,12 @@ export function integerRange<TNominalKey extends string | symbol = never>({
   );
 }
 
-export interface NumberRangeOptions {
+export type NumberRangeOptions = {
   minInclusive?: number;
   minExclusive?: number;
   maxInclusive?: number;
   maxExclusive?: number;
-}
+};
 
 export function numberRange<TNominalKey extends string | symbol = never>({
   minInclusive = -Infinity,

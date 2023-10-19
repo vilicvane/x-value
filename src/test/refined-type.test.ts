@@ -383,9 +383,9 @@ test('transform exact refined type', () => {
     .refined(value => value)
     .exact();
 
-  interface T6 {
+  type T6 = {
     next?: T6;
-  }
+  };
 
   const T6 = x
     .recursive<T6>(T6 => x.object({next: T6.optional()}))

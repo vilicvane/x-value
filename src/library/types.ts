@@ -5,6 +5,7 @@ const toString = Object.prototype.toString;
 
 declare global {
   namespace XValue {
+    // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
     interface Types {
       [neverTypeSymbol]: never;
       [unknownTypeSymbol]: unknown;
@@ -20,6 +21,7 @@ declare global {
       [regexpTypeSymbol]: RegExp;
     }
 
+    // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
     interface Using {
       value: Types;
     }

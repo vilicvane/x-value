@@ -6,13 +6,13 @@ import {EXTENDED_CODECS} from './@extended.js';
 
 const toString = Object.prototype.toString;
 
-export interface QueryStringTypes {
+export type QueryStringTypes = {
   packed: string;
-}
+};
 
-export interface UsingQueryStringMedium {
+export type UsingQueryStringMedium = {
   'query-string': QueryStringTypes;
-}
+};
 
 export const queryString = medium<UsingQueryStringMedium>({
   packing: {
@@ -59,13 +59,11 @@ export const queryString = medium<UsingQueryStringMedium>({
   },
 });
 
-export interface ExtendedQueryStringTypes
-  extends QueryStringTypes,
-    ExtendedTypes {}
+export type ExtendedQueryStringTypes = QueryStringTypes & ExtendedTypes;
 
-export interface UsingExtendedQueryStringMedium {
+export type UsingExtendedQueryStringMedium = {
   'extended-query-string': ExtendedQueryStringTypes;
-}
+};
 
 export const extendedQueryString =
   queryString.extend<UsingExtendedQueryStringMedium>({

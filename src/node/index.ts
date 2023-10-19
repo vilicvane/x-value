@@ -6,6 +6,7 @@ const BufferClass = globalThis.Buffer;
 
 declare global {
   namespace XValue {
+    // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
     interface Types {
       [bufferTypeSymbol]: Buffer;
     }

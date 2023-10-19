@@ -182,6 +182,7 @@ export class RefinedType<
 }
 
 declare module './type.js' {
+  // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
   interface Type<TInMediums, TGeneral> {
     refined<TNominalKey extends string | symbol = never, TRefinement = unknown>(
       refinements: ElementOrArray<Refinement<TInMediums['value'], TGeneral>>,

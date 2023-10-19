@@ -5,11 +5,11 @@ const toString = Object.prototype.toString;
 
 const REGEXP_LITERAL_REGEX = /^\/(.*)\/([^/]*)$/;
 
-export interface ExtendedTypes {
+export type ExtendedTypes = {
   [bigintTypeSymbol]: string;
   [dateTypeSymbol]: string;
   [regexpTypeSymbol]: string;
-}
+};
 
 export const EXTENDED_CODECS: MediumAtomicCodecs<ExtendedTypes> = {
   [bigintTypeSymbol]: {

@@ -3,13 +3,13 @@ import {medium} from '../core/index.js';
 import type {JSONExtendedTypes} from './@json-extended.js';
 import {JSON_EXTENDED_CODECS} from './@json-extended.js';
 
-export interface JSONTypes {
+export type JSONTypes = {
   packed: string;
-}
+};
 
-export interface UsingJSONMedium {
+export type UsingJSONMedium = {
   json: JSONTypes;
-}
+};
 
 export const json = medium<UsingJSONMedium>({
   packing: {
@@ -22,11 +22,11 @@ export const json = medium<UsingJSONMedium>({
   },
 });
 
-export interface ExtendedJSONTypes extends JSONTypes, JSONExtendedTypes {}
+export type ExtendedJSONTypes = {} & JSONTypes & JSONExtendedTypes;
 
-export interface UsingExtendedJSONMedium {
+export type UsingExtendedJSONMedium = {
   'extended-json': ExtendedJSONTypes;
-}
+};
 
 export const extendedJSON = json.extend<UsingExtendedJSONMedium>({
   codecs: JSON_EXTENDED_CODECS,

@@ -64,6 +64,9 @@
         },
         "license": {
           "type": "boolean"
+        },
+        "discord": {
+          "type": "string"
         }
       },
       "additionalProperties": false

@@ -12,28 +12,26 @@ import type {
 import type {JSONExtendedTypes} from './@json-extended.js';
 import {JSON_EXTENDED_CODECS} from './@json-extended.js';
 
-export interface JSONValueTypes {
+export type JSONValueTypes = {
   [neverTypeSymbol]: never;
   [unknownTypeSymbol]: unknown;
   [nullTypeSymbol]: null;
   [stringTypeSymbol]: string;
   [numberTypeSymbol]: number;
   [booleanTypeSymbol]: boolean;
-}
+};
 
-export interface UsingJSONValueMedium {
+export type UsingJSONValueMedium = {
   'json-value': JSONValueTypes;
-}
+};
 
 export const jsonValue = medium<UsingJSONValueMedium>();
 
-export interface ExtendedJSONValueTypes
-  extends JSONValueTypes,
-    JSONExtendedTypes {}
+export type ExtendedJSONValueTypes = {} & JSONValueTypes & JSONExtendedTypes;
 
-export interface UsingExtendedJSONValueMedium {
+export type UsingExtendedJSONValueMedium = {
   'extended-json-value': ExtendedJSONValueTypes;
-}
+};
 
 export const extendedJSONValue = jsonValue.extend<UsingExtendedJSONValueMedium>(
   {

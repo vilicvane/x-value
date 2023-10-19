@@ -50,6 +50,7 @@ type OptionalInMediums<TType extends TypeInMediumsPartial> = {
 };
 
 declare module './type.js' {
+  // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
   interface Type {
     optional(): OptionalType<this>;
   }

@@ -6,9 +6,9 @@ import {EXTENDED_CODECS} from './@extended.js';
 
 const toString = Object.prototype.toString;
 
-export interface JSONExtendedTypes extends ExtendedTypes {
+export type JSONExtendedTypes = {
   [undefinedTypeSymbol]: null;
-}
+} & ExtendedTypes;
 
 export const JSON_EXTENDED_CODECS: MediumAtomicCodecs<JSONExtendedTypes> = {
   ...EXTENDED_CODECS,

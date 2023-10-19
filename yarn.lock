@@ -614,10 +614,10 @@
     "@jridgewell/resolve-uri" "3.1.0"
     "@jridgewell/sourcemap-codec" "1.4.14"
 
-"@mufan/eslint-plugin@^0.2.1":
-  version "0.2.1"
-  resolved "https://registry.yarnpkg.com/@mufan/eslint-plugin/-/eslint-plugin-0.2.1.tgz#1428e7b35108603919efd5467a577857d85cdc4a"
-  integrity sha512-Ku0QdISC0vrMfnWyT2B4QMj1fPygPq3Qg8i3Z6lnCGgBMBCNu4gAeL44swLlMwFwkjG4sVHsBnS975Kozix+ng==
+"@mufan/eslint-plugin@^0.2.6":
+  version "0.2.6"
+  resolved "https://registry.yarnpkg.com/@mufan/eslint-plugin/-/eslint-plugin-0.2.6.tgz#5976ef6efae57ca741b2fa666abda14e0cc5b9fd"
+  integrity sha512-EDFmAEe8UR6E1GT58U1mKx+gorLpQS4obDNXG0Ik5Qdw+Up6vV0p15Yj9OlIX4r7MTIviuoHMZH6ZmAchox2LQ==
   dependencies:
     "@types/eslint" "^8.44.4"
     "@typescript-eslint/eslint-plugin" "^6.7.5"
@@ -626,6 +626,7 @@
     eslint-import-resolver-typescript "^3.6.1"
     eslint-plugin-import "^2.28.1"
     eslint-plugin-only-warn "^1.1.0"
+    module-lens "^0.1.6"
     tslib "^2.6.2"
     x-value "^0.1.16"
 
@@ -2955,6 +2956,11 @@ minimist@^1.2.0, minimist@^1.2.6:
   version "7.0.4"
   resolved "https://registry.yarnpkg.com/minipass/-/minipass-7.0.4.tgz#dbce03740f50a4786ba994c1fb908844d27b038c"
   integrity sha512-jYofLM5Dam9279rdkWzqHozUo4ybjdZmCsDHePy5V/PbBcVMiSZR97gmAy45aqi8CK1lG2ECd356FU86avfwUQ==
+
+module-lens@^0.1.6:
+  version "0.1.6"
+  resolved "https://registry.yarnpkg.com/module-lens/-/module-lens-0.1.6.tgz#b06c2ef7ff85311fde41daa6480b23653c813639"
+  integrity sha512-mVnydRRE7uaVZbfeS5ajDqcncoBL67qNyZvQ3MX5+dxnK7KjT96JSqpKjc2a1v3Hz1ElMHn+JO8k2QCUsUfrgA==
 
 ms@2.1.2:
   version "2.1.2"
