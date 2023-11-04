@@ -1,19 +1,7 @@
-/** @type {import('ts-jest').JestConfigWithTsJest} */
+/** @type {import('jest').Config} */
 export default {
-  testMatch: ['<rootDir>/src/test/*.test.ts'],
-  extensionsToTreatAsEsm: ['.ts'],
-  moduleNameMapper: {
-    '^(\\.{1,2}/.*)\\.js$': '$1',
-  },
-  transform: {
-    '^.+\\.ts$': [
-      'ts-jest',
-      {
-        tsconfig: 'src/test/tsconfig.json',
-        useESM: true,
-      },
-    ],
-  },
+  transform: {},
+  testMatch: ['<rootDir>/bld/test/*.test.js'],
   clearMocks: true,
   coverageDirectory: 'coverage',
   coverageThreshold: {
@@ -24,7 +12,5 @@ export default {
       lines: 100,
     },
   },
-  snapshotSerializers: [
-    '<rootDir>/src/test/serializers/type-constraint-error.ts',
-  ],
+  prettierPath: null,
 };

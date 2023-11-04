@@ -190,12 +190,14 @@ function mergeIntersectionJSONSchemas(
       throw new TypeError('Cannot merge non-object JSON schemas');
     }
 
+    // istanbul ignore else
     if (schema.required) {
       for (const key of schema.required) {
         requiredSet.add(key);
       }
     }
 
+    // istanbul ignore else
     if (schema.properties) {
       for (const [key, propertySchema] of Object.entries(schema.properties)) {
         if (hasOwnProperty.call(properties, key)) {

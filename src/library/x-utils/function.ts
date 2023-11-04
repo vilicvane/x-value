@@ -1,9 +1,9 @@
 import {
-  tuple,
   type RefinedType,
   type Type,
   type TypeInMediumsPartial,
   type TypeOf,
+  tuple,
 } from '../core/index.js';
 import {Function} from '../types.js';
 

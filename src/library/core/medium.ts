@@ -93,7 +93,6 @@ export type MediumAtomicCodec<
   TSymbol extends keyof XValue.Types ? XValue.Types[TSymbol] : unknown
 >;
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 type __MediumAtomicCodec<TMediumAtomic = unknown, TValue = unknown> = {
   encode(value: TValue): TMediumAtomic;
   decode(value: unknown): TValue;

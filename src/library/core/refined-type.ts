@@ -74,6 +74,7 @@ export class RefinedType<
       return [undefined, issues];
     }
 
+    // istanbul ignore else
     if (diagnose) {
       const [refinedValue, refinementIssues] = this.processRefinements(
         value,

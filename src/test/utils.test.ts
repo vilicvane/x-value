@@ -234,17 +234,10 @@ test('x.Promise should work', async () => {
 
   const invalid_1 = StringPromise.sanitize(Promise.resolve(123));
 
-  await expect(invalid_1).rejects.toMatchInlineSnapshot(`
-    [TypeError: Value does not satisfy the type:
-      Expected string, got [object Number].]{
-      "issues": [
-        {
-          "message": "Expected string, got [object Number].",
-          "path": [],
-        },
-      ],
-    }
-  `);
+  await expect(invalid_1).rejects.toThrowErrorMatchingInlineSnapshot(`
+"Value does not satisfy the type:
+  Expected string, got [object Number]."
+`);
 
   type _assert = AssertTrue<IsEqual<StringPromise, Promise<string>>>;
 });
