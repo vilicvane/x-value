@@ -80,13 +80,13 @@ type RecursivePartialInMedium<
     ? undefined
     : RecursivePartialInMedium<TInMediums[TMediumName], TMediumName>
   : TRecursivePartial extends Function
-  ? TRecursivePartial
-  : {
-      [TKey in keyof TRecursivePartial]: RecursivePartialInMedium<
-        TRecursivePartial[TKey],
-        TMediumName
-      >;
-    };
+    ? TRecursivePartial
+    : {
+        [TKey in keyof TRecursivePartial]: RecursivePartialInMedium<
+          TRecursivePartial[TKey],
+          TMediumName
+        >;
+      };
 
 type RecursiveInMediums<T> = T extends TypeInMediumsPartial
   ? T[__type_in_mediums]
@@ -94,16 +94,14 @@ type RecursiveInMediums<T> = T extends TypeInMediumsPartial
       [TMediumName in XValue.UsingName]: RecursiveInMedium<T, TMediumName>;
     };
 
-type RecursiveInMedium<
-  TRecursive,
-  TMediumName extends XValue.UsingName,
-> = TRecursive extends TypeInMediumsPartial<infer TInMediums>
-  ? TInMediums[TMediumName]
-  : TRecursive extends Function
-  ? TRecursive
-  : {
-      [TKey in keyof TRecursive]: RecursiveInMedium<
-        TRecursive[TKey],
-        TMediumName
-      >;
-    };
+type RecursiveInMedium<TRecursive, TMediumName extends XValue.UsingName> =
+  TRecursive extends TypeInMediumsPartial<infer TInMediums>
+    ? TInMediums[TMediumName]
+    : TRecursive extends Function
+      ? TRecursive
+      : {
+          [TKey in keyof TRecursive]: RecursiveInMedium<
+            TRecursive[TKey],
+            TMediumName
+          >;
+        };

@@ -825,12 +825,12 @@ test('config example', () => {
 
 test('not supported', () => {
   expect(() => x.undefined.toJSONSchema()).toThrowErrorMatchingInlineSnapshot(
-    `"JSON schema is not defined for this atomic type"`,
+    '"JSON schema is not defined for this atomic type"',
   );
   expect(() =>
     x.function([], x.void).toJSONSchema(),
   ).toThrowErrorMatchingInlineSnapshot(
-    `"JSON schema is not defined for this atomic type"`,
+    '"JSON schema is not defined for this atomic type"',
   );
   expect(() =>
     x
@@ -842,6 +842,6 @@ test('not supported', () => {
       ])
       .toJSONSchema(),
   ).toThrowErrorMatchingInlineSnapshot(
-    `"Cannot merge non-object JSON schemas"`,
+    '"Cannot merge non-object JSON schemas"',
   );
 });

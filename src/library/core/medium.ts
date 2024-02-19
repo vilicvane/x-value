@@ -109,15 +109,13 @@ export type UsingMediumPackedType<TUsingMedium> = MediumTypesPackedType_<
   unknown
 >;
 
-export type MediumPackedType<
-  TMedium extends Medium<object>,
-  TInMediums,
-> = TMedium extends Medium<infer TUsingMedium>
-  ? MediumTypesPackedType_<
-      TUsingMedium[keyof TUsingMedium],
-      TInMediums[Extract<keyof TUsingMedium, keyof TInMediums>]
-    >
-  : never;
+export type MediumPackedType<TMedium extends Medium<object>, TInMediums> =
+  TMedium extends Medium<infer TUsingMedium>
+    ? MediumTypesPackedType_<
+        TUsingMedium[keyof TUsingMedium],
+        TInMediums[Extract<keyof TUsingMedium, keyof TInMediums>]
+      >
+    : never;
 
 type MediumTypesPackedType_<TMediumTypes, TFallback> = TMediumTypes extends {
   packed: infer TPacked;
@@ -125,8 +123,7 @@ type MediumTypesPackedType_<TMediumTypes, TFallback> = TMediumTypes extends {
   ? TPacked
   : TFallback;
 
-export type UsingMediumName<TMedium extends Medium> = TMedium extends Medium<
-  Record<infer TName, GeneralMediumTypes>
->
-  ? Extract<TName, XValue.UsingName>
-  : never;
+export type UsingMediumName<TMedium extends Medium> =
+  TMedium extends Medium<Record<infer TName, GeneralMediumTypes>>
+    ? Extract<TName, XValue.UsingName>
+    : never;

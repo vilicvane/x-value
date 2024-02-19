@@ -102,7 +102,7 @@ export abstract class Type<
     );
 
     if (issues.length > 0) {
-      throw new TypeConstraintError(`Failed to transform medium`, issues);
+      throw new TypeConstraintError('Failed to transform medium', issues);
     }
 
     return to.pack(transformedUnpacked);

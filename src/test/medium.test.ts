@@ -5,5 +5,5 @@ test('medium requireCodec should throw on unknown symbol', () => {
     codecs: {},
   });
 
-  expect(() => medium.getCodec(Symbol())).toMatchInlineSnapshot(`[Function]`);
+  expect(() => medium.getCodec(Symbol())).toMatchInlineSnapshot('[Function]');
 });

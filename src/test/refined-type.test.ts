@@ -108,9 +108,10 @@ test('atomic refinement should work', () => {
 test('array refinement should work', () => {
   const Triple = x
     .array(x.string)
-    .refined<never, {length: 3}>(value =>
-      x.refinement(value.length === 3, value),
-    );
+    .refined<
+      never,
+      {length: 3}
+    >(value => x.refinement(value.length === 3, value));
 
   type Triple = x.TypeOf<typeof Triple>;
   type TripleInJSONValue = x.MediumTypeOf<'json-value', typeof Triple>;
@@ -131,9 +132,10 @@ test('array refinement should work', () => {
 test('object refinement should work', () => {
   const O = x
     .object({foo: x.string, bar: x.number})
-    .refined<never, {foo: 'abc'}>(value =>
-      x.refinement(value.foo === 'abc', value),
-    );
+    .refined<
+      never,
+      {foo: 'abc'}
+    >(value => x.refinement(value.foo === 'abc', value));
 
   type O = x.TypeOf<typeof O>;
 
