@@ -27,7 +27,7 @@ export type UsingJSONValueMedium = {
 
 export const jsonValue = medium<UsingJSONValueMedium>();
 
-export type ExtendedJSONValueTypes = {} & JSONValueTypes & JSONExtendedTypes;
+export type ExtendedJSONValueTypes = JSONValueTypes & JSONExtendedTypes;
 
 export type UsingExtendedJSONValueMedium = {
   'extended-json-value': ExtendedJSONValueTypes;

@@ -1,17 +1,17 @@
 import type {MediumAtomicCodecs} from '../core/index.js';
 import {undefinedTypeSymbol} from '../types.js';
 
-import type {ExtendedTypes} from './@extended.js';
-import {EXTENDED_CODECS} from './@extended.js';
+import type {ExtendedStringTypes} from './@string.js';
+import {EXTENDED_STRING_CODECS} from './@string.js';
 
 const toString = Object.prototype.toString;
 
 export type JSONExtendedTypes = {
   [undefinedTypeSymbol]: null;
-} & ExtendedTypes;
+} & ExtendedStringTypes;
 
 export const JSON_EXTENDED_CODECS: MediumAtomicCodecs<JSONExtendedTypes> = {
-  ...EXTENDED_CODECS,
+  ...EXTENDED_STRING_CODECS,
   [undefinedTypeSymbol]: {
     encode() {
       return null;

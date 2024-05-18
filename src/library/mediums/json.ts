@@ -1,6 +1,5 @@
 import {medium} from '../core/index.js';
 
-import type {JSONExtendedTypes} from './@json-extended.js';
 import {JSON_EXTENDED_CODECS} from './@json-extended.js';
 
 export type JSONTypes = {
@@ -22,7 +21,7 @@ export const json = medium<UsingJSONMedium>({
   },
 });
 
-export type ExtendedJSONTypes = {} & JSONTypes & JSONExtendedTypes;
+export type ExtendedJSONTypes = JSONTypes;
 
 export type UsingExtendedJSONMedium = {
   'extended-json': ExtendedJSONTypes;

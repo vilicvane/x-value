@@ -1,17 +1,57 @@
 import type {MediumAtomicCodecs} from '../core/index.js';
-import {bigintTypeSymbol, dateTypeSymbol, regexpTypeSymbol} from '../types.js';
+import {
+  bigintTypeSymbol,
+  booleanTypeSymbol,
+  dateTypeSymbol,
+  numberTypeSymbol,
+  regexpTypeSymbol,
+} from '../types.js';
 
 const toString = Object.prototype.toString;
 
-const REGEXP_LITERAL_REGEX = /^\/(.*)\/([^/]*)$/;
+const REGEXP_LITERAL_PATTERN = /^\/(.*)\/([^/]*)$/;
 
-export type ExtendedTypes = {
-  [bigintTypeSymbol]: string;
-  [dateTypeSymbol]: string;
-  [regexpTypeSymbol]: string;
+export type BasicStringTypes = Record<
+  typeof numberTypeSymbol | typeof booleanTypeSymbol,
+  string
+>;
+
+export const BASIC_STRING_CODECS: MediumAtomicCodecs<BasicStringTypes> = {
+  [numberTypeSymbol]: {
+    encode(value) {
+      return String(value);
+    },
+    decode(value) {
+      return Number(value);
+    },
+  },
+  [booleanTypeSymbol]: {
+    encode(value) {
+      return String(value);
+    },
+    decode(value) {
+      switch (String(value)) {
+        case 'true':
+        case '1':
+          return true;
+        case 'false':
+        case '0':
+          return false;
+        default:
+          throw new TypeError(
+            `Expected true/1/false/0, got ${toString.call(value)}`,
+          );
+      }
+    },
+  },
 };
 
-export const EXTENDED_CODECS: MediumAtomicCodecs<ExtendedTypes> = {
+export type ExtendedStringTypes = Record<
+  typeof bigintTypeSymbol | typeof dateTypeSymbol | typeof regexpTypeSymbol,
+  string
+>;
+
+export const EXTENDED_STRING_CODECS: MediumAtomicCodecs<ExtendedStringTypes> = {
   [bigintTypeSymbol]: {
     encode(bigint) {
       return bigint.toString();
@@ -57,7 +97,7 @@ export const EXTENDED_CODECS: MediumAtomicCodecs<ExtendedTypes> = {
         );
       }
 
-      const groups = REGEXP_LITERAL_REGEX.exec(value);
+      const groups = REGEXP_LITERAL_PATTERN.exec(value);
 
       if (!groups) {
         throw new TypeError('Invalid regular expression literal');

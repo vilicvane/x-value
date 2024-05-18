@@ -164,10 +164,6 @@ test('date atomic type should error decoding json medium', () => {
     "Failed to decode from medium:
       Expected instance of Date, got [object String]."
   `);
-
-  // Will not throw because json medium has defined atomicTypeSymbol codec as
-  // fallback:
-  // expect(() => x.Date.encode(x.json, new Date())).toThrow(x.TypeConstraintError);
 });
 
 test('date atomic type should work with extended json medium', () => {

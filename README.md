@@ -41,6 +41,7 @@ Comparing to alternatives like [io-ts](https://github.com/gcanti/io-ts) and [Zod
   - [JSON Schema](#json-schema-1)
 - [Medium](#medium)
   - [Built-in Mediums](#built-in-mediums)
+    - [Command-Line Medium Example](#command-line-medium-example)
   - [New Medium](#new-medium)
 - [Medium Packing](#medium-packing)
 - [Mediums and Values](#mediums-and-values)
@@ -515,6 +516,48 @@ Data.exact().toJSONSchema(); // JSON schema that prohibits extra properties
 - `x.extendedJSONValue` - JSON value, with extended types support (`bigint`, `Date` and `RegExp`).
 - `x.queryString` - Query string **packed as string**.
 - `x.extendedQueryString` - Query string **packed as string**, with extended types support (`bigint`, `Date` and `RegExp`).
+- `x.commandLine` - Command line arguments **packed as string**.
+
+#### Command-Line Medium Example
+
+> Please note that command-line parsing is not directly relevant to X-Value. I build it into X-Value because it's super lightweight and the usage intersects one of X-Value's major scenarios, i.e., config validation.
+
+```ts
+// Positional arguments
+
+const [name, date] = x
+  .tuple([x.string, x.Date])
+  .decode(x.commandLine, process.argv.slice(2));
+```
+
+```ts
+// Named arguments
+
+const {name, date} = x
+  .object({
+    name: x.string,
+    date: x.Date,
+  })
+  .decode(x.commandLine, process.argv.slice(2));
+```
+
+```ts
+// Or both
+
+const args = x
+  .intersection([
+    // In this case, tuple must come first.
+    x.tuple([x.string]),
+    x.object({
+      from: x.Date,
+      to: x.Date.optional(),
+    }),
+  ])
+  .decode(x.commandLine, process.argv.slice(2));
+
+const [name] = args;
+const {from, to = new Date()} = args;
+```
 
 ### New Medium
 

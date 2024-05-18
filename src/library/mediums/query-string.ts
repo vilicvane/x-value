@@ -1,8 +1,6 @@
-import {atomicTypeSymbol, medium} from '../core/index.js';
-import {booleanTypeSymbol, numberTypeSymbol} from '../types.js';
+import {medium} from '../core/index.js';
 
-import type {ExtendedTypes} from './@extended.js';
-import {EXTENDED_CODECS} from './@extended.js';
+import {BASIC_STRING_CODECS, EXTENDED_STRING_CODECS} from './@string.js';
 
 const toString = Object.prototype.toString;
 
@@ -23,43 +21,10 @@ export const queryString = medium<UsingQueryStringMedium>({
       return parse(queryString);
     },
   },
-  codecs: {
-    [numberTypeSymbol]: {
-      encode(value) {
-        return String(value);
-      },
-      decode(value) {
-        return Number(value);
-      },
-    },
-    [booleanTypeSymbol]: {
-      encode(value) {
-        return String(value);
-      },
-      decode(value) {
-        value = String(value);
-
-        const numberValue = Number(value);
-
-        if (!isNaN(numberValue)) {
-          return numberValue !== 0;
-        }
-
-        return value === 'true';
-      },
-    },
-    [atomicTypeSymbol]: {
-      encode(value) {
-        return String(value);
-      },
-      decode(value) {
-        return value;
-      },
-    },
-  },
+  codecs: BASIC_STRING_CODECS,
 });
 
-export type ExtendedQueryStringTypes = QueryStringTypes & ExtendedTypes;
+export type ExtendedQueryStringTypes = QueryStringTypes;
 
 export type UsingExtendedQueryStringMedium = {
   'extended-query-string': ExtendedQueryStringTypes;
@@ -67,7 +32,7 @@ export type UsingExtendedQueryStringMedium = {
 
 export const extendedQueryString =
   queryString.extend<UsingExtendedQueryStringMedium>({
-    codecs: EXTENDED_CODECS,
+    codecs: EXTENDED_STRING_CODECS,
   });
 
 function stringify(dict: unknown): string {
