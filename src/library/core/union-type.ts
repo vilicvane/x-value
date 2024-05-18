@@ -103,7 +103,10 @@ export function union<
 }
 
 type UnionInMediums<TTypeTuple extends TypeInMediumsPartial[]> = {
-  [TKey in XValue.UsingName]: TupleInMedium<TTypeTuple, TKey>[number];
+  [TMediumName in XValue.UsingName]: TupleInMedium<
+    TTypeTuple,
+    TMediumName
+  >[number];
 };
 
 function syncDedicatedExact(wrappedExact: Exact, dedicatedExact: Exact): void {

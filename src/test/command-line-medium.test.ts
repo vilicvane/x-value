@@ -19,6 +19,23 @@ test('command line medium should work', () => {
     x.tuple([x.string, x.boolean]).decode(x.commandLine, ['abc', 'false']),
   ).toEqual(['abc', false]);
 
+  {
+    const Type = x.tuple([x.string, x.boolean.optional()]);
+
+    expect(Type.decode(x.commandLine, ['abc', 'false'])).toEqual([
+      'abc',
+      false,
+    ]);
+
+    expect(Type.decode(x.commandLine, ['abc'])).toEqual(['abc']);
+
+    expect(() => Type.decode(x.commandLine, ['abc', 'false', 'true']))
+      .toThrowErrorMatchingInlineSnapshot(`
+"Failed to decode from medium:
+  Expected value with 1 to 2 instead of 3 element(s)."
+`);
+  }
+
   expect(
     x
       .intersection([

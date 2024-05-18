@@ -75,6 +75,39 @@ test('tuple type should work', () => {
   expect(Tuple.is(invalid2)).toBe(false);
 });
 
+test('tuple with optional elements should work', () => {
+  const Tuple = x.tuple([x.string, x.number.optional()]);
+
+  type Tuple = x.TypeOf<typeof Tuple>;
+
+  const valid1: Tuple = ['abc'];
+  const valid2: Tuple = ['abc', 123];
+  const invalid1: any = ['abc', 'def'];
+  const invalid2: any = [123];
+  const invalid3: any = ['abc', 123, true];
+
+  expect(Tuple.is(valid1)).toBe(true);
+  expect(Tuple.is(valid2)).toBe(true);
+  expect(Tuple.is(invalid1)).toBe(false);
+  expect(Tuple.is(invalid2)).toBe(false);
+  expect(Tuple.is(invalid3)).toBe(false);
+
+  expect(Tuple.encode(x.jsonValue, valid1)).toEqual(valid1);
+  expect(Tuple.decode(x.jsonValue, valid1)).toEqual(valid1);
+
+  expect(() => Tuple.encode(x.jsonValue, invalid1))
+    .toThrowErrorMatchingInlineSnapshot(`
+"Failed to encode to medium:
+  [1] Expected number, got [object String]."
+`);
+
+  expect(() => Tuple.decode(x.jsonValue, invalid3))
+    .toThrowErrorMatchingInlineSnapshot(`
+"Failed to decode from medium:
+  Expected value with 1 to 2 instead of 3 element(s)."
+`);
+});
+
 test('exact with tuple type should work', () => {
   const Tuple = x
     .tuple([

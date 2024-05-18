@@ -229,9 +229,9 @@ type ArrayType = x.TypeOf<typeof ArrayType>; // string[]
 ### Tuple Type
 
 ```ts
-const TupleType = x.tuple([x.string, x.number]);
+const TupleType = x.tuple([x.string, x.number, x.boolean.optional()]);
 
-type TupleType = x.TypeOf<typeof TupleType>; // [string, number]
+type TupleType = x.TypeOf<typeof TupleType>; // [string, number, boolean?]
 ```
 
 ### Union Type

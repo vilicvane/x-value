@@ -23,5 +23,11 @@
     "typescript",
     "typescriptreact"
   ],
-  "cSpell.words": ["Denominalize", "Denominalized", "nominalize", "typeof"]
+  "cSpell.words": [
+    "Denominalize",
+    "Denominalized",
+    "nominalize",
+    "optionalize",
+    "typeof"
+  ]
 }

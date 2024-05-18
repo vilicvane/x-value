@@ -2,6 +2,7 @@ import type {Exact} from './@exact-context.js';
 import type {TypeIssue, TypePath} from './@type-issue.js';
 import {hasNonDeferrableTypeIssue} from './@type-issue.js';
 import type {TupleInMedium} from './@utils.js';
+import {OptionalType} from './optional-type.js';
 import type {
   JSONSchemaContext,
   JSONSchemaData,
@@ -18,9 +19,19 @@ export class TupleType<
 > extends Type<TupleInMediums<TElementTypeTuple>> {
   readonly [__type_kind] = 'tuple';
 
+  private minLength: number;
+  private maxLength: number;
+
   constructor(ElementTypeTuple: TElementTypeTuple);
   constructor(private ElementTypeTuple: Type[]) {
     super();
+
+    const lastNonOptionalIndex = ElementTypeTuple.findLastIndex(
+      Type => !(Type instanceof OptionalType),
+    );
+
+    this.minLength = lastNonOptionalIndex < 0 ? 0 : lastNonOptionalIndex + 1;
+    this.maxLength = ElementTypeTuple.length;
   }
 
   /** @internal */
@@ -44,13 +55,17 @@ export class TupleType<
 
     const ElementTypeTuple = this.ElementTypeTuple;
 
-    if (input.length !== ElementTypeTuple.length) {
+    if (input.length < this.minLength || input.length > this.maxLength) {
       return [
         undefined,
         [
           {
             path,
-            message: `Expected value with ${ElementTypeTuple.length} instead of ${input.length} element(s).`,
+            message: `Expected value with ${
+              this.minLength === this.maxLength
+                ? this.minLength
+                : `${this.minLength} to ${this.maxLength}`
+            } instead of ${input.length} element(s).`,
           },
         ],
       ];
@@ -104,8 +119,25 @@ export function tuple<
 }
 
 type TupleInMediums<TElementTypeTuple extends TypeInMediumsPartial[]> = {
-  [TMediumName in XValue.UsingName]: TupleInMedium<
-    TElementTypeTuple,
-    TMediumName
+  [TMediumName in XValue.UsingName]: OptionalizeTupleTail<
+    TupleInMedium<TElementTypeTuple, TMediumName>
   >;
 };
+
+type OptionalizeTupleTail<T> = T extends [infer TElement, ...infer TRest]
+  ? Optionalize<[TElement, ...OptionalizeTupleTail<TRest>]>
+  : [];
+
+type Optionalize<TupleSubsection> =
+  EveryTupleElementInclude<TupleSubsection, undefined> extends true
+    ? Partial<TupleSubsection>
+    : TupleSubsection;
+
+type EveryTupleElementInclude<T, TConstraint> = T extends [
+  infer TElement,
+  ...infer TRest,
+]
+  ? TConstraint extends TElement
+    ? EveryTupleElementInclude<TRest, TConstraint>
+    : false
+  : true;
