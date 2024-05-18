@@ -15,6 +15,7 @@ Comparing to alternatives like [io-ts](https://github.com/gcanti/io-ts) and [Zod
 - [Installation](#installation)
 - [Quick Start](#quick-start)
   - [Runtime Type Validation](#runtime-type-validation)
+  - [Basic Command-Line Parsing](#basic-command-line-parsing)
   - [JSON Schema](#json-schema)
   - [Multi-medium Usages](#multi-medium-usages)
 - [Types](#types)
@@ -81,6 +82,22 @@ const value = Payload.satisfies({});
 
 // Asserts payload, throws if invalid.
 Payload.asserts({});
+```
+
+### Basic Command-Line Parsing
+
+```ts
+import * as x from 'x-value';
+
+const {file, force = false} = x
+  .object({
+    file: x.string,
+    force: x.boolean.optional(),
+  })
+  .decode(x.commandLine, process.argv.slice(2));
+
+// Command line:
+// command --file=example.txt --force
 ```
 
 ### JSON Schema
