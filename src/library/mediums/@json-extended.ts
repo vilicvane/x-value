@@ -1,5 +1,5 @@
+import {undefinedTypeSymbol} from '../atomics.js';
 import type {MediumAtomicCodecs} from '../core/index.js';
-import {undefinedTypeSymbol} from '../types.js';
 
 import type {ExtendedStringTypes} from './@string.js';
 import {EXTENDED_STRING_CODECS} from './@string.js';

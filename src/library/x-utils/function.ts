@@ -1,3 +1,4 @@
+import {Function} from '../atomics.js';
 import {
   type RefinedType,
   type Type,
@@ -5,7 +6,6 @@ import {
   type TypeOf,
   tuple,
 } from '../core/index.js';
-import {Function} from '../types.js';
 
 export function fn<
   TArgumentTypeTuple extends

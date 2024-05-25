@@ -1,5 +1,3 @@
-import type {MediumAtomicCodecs} from '../core/index.js';
-import {medium} from '../core/index.js';
 import type {
   booleanTypeSymbol,
   neverTypeSymbol,
@@ -7,7 +5,9 @@ import type {
   numberTypeSymbol,
   stringTypeSymbol,
   unknownTypeSymbol,
-} from '../types.js';
+} from '../atomics.js';
+import type {MediumAtomicCodecs} from '../core/index.js';
+import {medium} from '../core/index.js';
 
 import type {JSONExtendedTypes} from './@json-extended.js';
 import {JSON_EXTENDED_CODECS} from './@json-extended.js';

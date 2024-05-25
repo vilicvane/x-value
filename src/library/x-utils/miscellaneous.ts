@@ -1,5 +1,6 @@
 import isEqual from 'lodash.isequal';
 
+import {boolean, number, string, unknown} from '../atomics.js';
 import type {
   NominalPartial,
   RefinedType,
@@ -10,7 +11,6 @@ import type {
   __type,
 } from '../core/index.js';
 import {record} from '../core/index.js';
-import {boolean, number, string, unknown} from '../types.js';
 import {refinement} from '../utils.js';
 
 export type TransformNominal<TFrom, T> = TFrom extends NominalPartial

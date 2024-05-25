@@ -1,5 +1,5 @@
+import {number} from '../atomics.js';
 import type {RefinedType, TypeOf} from '../core/index.js';
-import {number} from '../types.js';
 import {refinement} from '../utils.js';
 
 export const Integer = number.refined<'integer'>(

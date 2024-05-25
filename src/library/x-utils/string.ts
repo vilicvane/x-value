@@ -1,5 +1,5 @@
+import {string} from '../atomics.js';
 import type {RefinedType} from '../core/index.js';
-import {string} from '../types.js';
 import {refinement} from '../utils.js';
 
 export function pattern<

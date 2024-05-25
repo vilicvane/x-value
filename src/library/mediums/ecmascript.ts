@@ -1,4 +1,3 @@
-import {medium} from '../core/index.js';
 import type {
   bigintTypeSymbol,
   booleanTypeSymbol,
@@ -12,7 +11,8 @@ import type {
   undefinedTypeSymbol,
   unknownTypeSymbol,
   voidTypeSymbol,
-} from '../types.js';
+} from '../atomics.js';
+import {medium} from '../core/index.js';
 
 export type ECMAScriptTypes = {
   [neverTypeSymbol]: never;

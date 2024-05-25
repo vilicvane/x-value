@@ -1,5 +1,4 @@
-import type {MediumAtomicCodecs} from '../core/index.js';
-import type {stringTypeSymbol} from '../types.js';
+import type {stringTypeSymbol} from '../atomics.js';
 import {
   bigintTypeSymbol,
   booleanTypeSymbol,
@@ -7,7 +6,8 @@ import {
   nullTypeSymbol,
   numberTypeSymbol,
   regexpTypeSymbol,
-} from '../types.js';
+} from '../atomics.js';
+import type {MediumAtomicCodecs} from '../core/index.js';
 
 const toString = Object.prototype.toString;
 
