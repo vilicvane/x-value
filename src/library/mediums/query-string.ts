@@ -21,19 +21,22 @@ export const queryString = medium<UsingQueryStringMedium>({
       return parse(queryString);
     },
   },
-  codecs: BASIC_STRING_CODECS,
+  codecs: {
+    ...BASIC_STRING_CODECS,
+    ...EXTENDED_STRING_CODECS,
+  },
 });
 
+/** @deprecated */
 export type ExtendedQueryStringTypes = QueryStringTypes;
 
+/** @deprecated */
 export type UsingExtendedQueryStringMedium = {
   'extended-query-string': ExtendedQueryStringTypes;
 };
 
-export const extendedQueryString =
-  queryString.extend<UsingExtendedQueryStringMedium>({
-    codecs: EXTENDED_STRING_CODECS,
-  });
+/** @deprecated */
+export const extendedQueryString = queryString;
 
 function stringify(dict: unknown): string {
   if (typeof dict !== 'object' || dict === null) {

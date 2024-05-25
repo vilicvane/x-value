@@ -21,7 +21,7 @@
     "lint": "eslint --no-error-on-unmatched-pattern --report-unused-disable-directives . && run-in-every eslint-project --parallel --echo -- eslint --no-error-on-unmatched-pattern --report-unused-disable-directives .",
     "lint-prettier": "prettier --check .",
     "bare-test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest",
-    "test": "npm run lint-prettier && npm run build && npm run lint && npm run bare-test --coverage",
+    "test": "npm run lint-prettier && npm run build && npm run lint && npm run bare-test -- --coverage",
     "prepublishOnly": "yarn test"
   },
   "dependencies": {

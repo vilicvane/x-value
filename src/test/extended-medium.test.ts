@@ -13,7 +13,7 @@ test('bigint type should work', () => {
   expect(
     x.object({value: x.bigint}).transform(
       x.extendedJSON,
-      x.extendedQueryString,
+      x.queryString,
       JSON.stringify({
         value: bigintString,
       }),
@@ -26,7 +26,7 @@ test('bigint type should work', () => {
 
   expect(
     x.object({value: x.bigint}).transform(
-      x.extendedQueryString,
+      x.queryString,
       x.extendedJSON,
       new URLSearchParams({
         value: bigintString,
@@ -59,7 +59,7 @@ test('Date type should work', () => {
   expect(
     x.object({date: x.Date}).transform(
       x.extendedJSON,
-      x.extendedQueryString,
+      x.queryString,
       JSON.stringify({
         date,
       }),
@@ -72,7 +72,7 @@ test('Date type should work', () => {
 
   expect(
     x.object({date: x.Date}).transform(
-      x.extendedQueryString,
+      x.queryString,
       x.extendedJSON,
       new URLSearchParams({
         date: dateString,
@@ -98,7 +98,7 @@ test('RegExp type should work', () => {
   expect(
     x.object({test: x.RegExp}).transform(
       x.extendedJSON,
-      x.extendedQueryString,
+      x.queryString,
       JSON.stringify({
         test: regexpLiteral,
       }),
