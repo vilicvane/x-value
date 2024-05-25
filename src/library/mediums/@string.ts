@@ -1,8 +1,10 @@
 import type {MediumAtomicCodecs} from '../core/index.js';
+import type {stringTypeSymbol} from '../types.js';
 import {
   bigintTypeSymbol,
   booleanTypeSymbol,
   dateTypeSymbol,
+  nullTypeSymbol,
   numberTypeSymbol,
   regexpTypeSymbol,
 } from '../types.js';
@@ -11,12 +13,14 @@ const toString = Object.prototype.toString;
 
 const REGEXP_LITERAL_PATTERN = /^\/(.*)\/([^/]*)$/;
 
-export type BasicStringTypes = Record<
-  typeof numberTypeSymbol | typeof booleanTypeSymbol,
-  string
->;
+export type StringTypes = {
+  [stringTypeSymbol]: string;
+  [numberTypeSymbol]: string;
+  [booleanTypeSymbol]: 'true' | 'false' | '1' | '0';
+  [nullTypeSymbol]: 'null';
+};
 
-export const BASIC_STRING_CODECS: MediumAtomicCodecs<BasicStringTypes> = {
+export const STRING_CODECS: MediumAtomicCodecs<StringTypes> = {
   [numberTypeSymbol]: {
     encode(value) {
       return String(value);
@@ -27,7 +31,7 @@ export const BASIC_STRING_CODECS: MediumAtomicCodecs<BasicStringTypes> = {
   },
   [booleanTypeSymbol]: {
     encode(value) {
-      return String(value);
+      return String(value) as 'true' | 'false';
     },
     decode(value) {
       switch (String(value)) {
@@ -42,6 +46,18 @@ export const BASIC_STRING_CODECS: MediumAtomicCodecs<BasicStringTypes> = {
             `Expected true/1/false/0, got ${toString.call(value)}`,
           );
       }
+    },
+  },
+  [nullTypeSymbol]: {
+    encode() {
+      return 'null';
+    },
+    decode(value) {
+      if (value != 'null') {
+        throw new TypeError(`Expected "null", got ${toString.call(value)}`);
+      }
+
+      return null;
     },
   },
 };

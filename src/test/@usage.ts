@@ -15,6 +15,8 @@ declare global {
         x.UsingExtendedJSONValueMedium,
         x.UsingQueryStringMedium,
         x.UsingECMAScriptMedium,
+        x.UsingCommandLineMedium,
+        x.UsingStringRecordsMedium,
         UsingMediumA,
         UsingMediumB {}
   }

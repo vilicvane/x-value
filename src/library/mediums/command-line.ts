@@ -1,6 +1,6 @@
 import {medium} from '../core/index.js';
 
-import {BASIC_STRING_CODECS, EXTENDED_STRING_CODECS} from './@string.js';
+import {EXTENDED_STRING_CODECS, STRING_CODECS} from './@string.js';
 
 const NAMED_ARGUMENT_PATTERN = /^--([^=]+)(?:=(.*))?$/;
 
@@ -22,7 +22,7 @@ export const commandLine = medium<UsingCommandLineMedium>({
     },
   },
   codecs: {
-    ...BASIC_STRING_CODECS,
+    ...STRING_CODECS,
     ...EXTENDED_STRING_CODECS,
   },
 });

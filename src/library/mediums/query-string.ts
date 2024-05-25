@@ -1,6 +1,6 @@
 import {medium} from '../core/index.js';
 
-import {BASIC_STRING_CODECS, EXTENDED_STRING_CODECS} from './@string.js';
+import {EXTENDED_STRING_CODECS, STRING_CODECS} from './@string.js';
 
 const toString = Object.prototype.toString;
 
@@ -22,7 +22,7 @@ export const queryString = medium<UsingQueryStringMedium>({
     },
   },
   codecs: {
-    ...BASIC_STRING_CODECS,
+    ...STRING_CODECS,
     ...EXTENDED_STRING_CODECS,
   },
 });
