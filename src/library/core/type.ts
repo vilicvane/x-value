@@ -1,6 +1,5 @@
 import type {Exact} from './@exact-context.js';
 import {ExactContext} from './@exact-context.js';
-import type {TypeIssue} from './@type-issue.js';
 import type {JSONSchema} from './json-schema.js';
 import type {Medium, MediumPackedType} from './medium.js';
 import type {TraverseCallback} from './type-like.js';
@@ -262,6 +261,19 @@ export abstract class Type<
     }
   }
 }
+
+export type TypePath = (
+  | string
+  | number
+  | symbol
+  | {key: string | number | symbol}
+)[];
+
+export type TypeIssue = {
+  path: TypePath;
+  deferrable?: true;
+  message: string;
+};
 
 export class TypeConstraintError extends TypeError {
   constructor(

@@ -1,5 +1,4 @@
 import type {Exact} from './@exact-context.js';
-import type {TypeIssue, TypePath} from './@type-issue.js';
 import {hasNonDeferrableTypeIssue} from './@type-issue.js';
 import type {JSONSchema} from './json-schema.js';
 import {OptionalType} from './optional-type.js';
@@ -15,6 +14,7 @@ import type {
   __type_in_mediums,
 } from './type-partials.js';
 import {__type_kind} from './type-partials.js';
+import type {TypeIssue, TypePath} from './type.js';
 import {Type} from './type.js';
 
 const toString = Object.prototype.toString;

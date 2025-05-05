@@ -1,15 +1,4 @@
-export type TypePath = (
-  | string
-  | number
-  | symbol
-  | {key: string | number | symbol}
-)[];
-
-export type TypeIssue = {
-  path: TypePath;
-  deferrable?: true;
-  message: string;
-};
+import type {TypeIssue, TypePath} from './type.js';
 
 export function buildIssueByError(error: unknown, path: TypePath): TypeIssue {
   return {

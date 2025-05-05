@@ -1,5 +1,4 @@
 import type {Exact} from './@exact-context.js';
-import type {TypeIssue, TypePath} from './@type-issue.js';
 import {buildIssueByError, hasNonDeferrableTypeIssue} from './@type-issue.js';
 import type {JSONSchema} from './json-schema.js';
 import type {Medium} from './medium.js';
@@ -10,6 +9,7 @@ import type {
   __type_in_mediums,
 } from './type-partials.js';
 import {__type_kind} from './type-partials.js';
+import type {TypeIssue, TypePath} from './type.js';
 import {Type} from './type.js';
 
 export class RefinedType<
